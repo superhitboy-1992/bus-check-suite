@@ -20,16 +20,6 @@ export function weekStartStr(d = new Date()) {
   return toDateStr(s);
 }
 
-export function periodStartDate(period, d = new Date()) {
-  if (period === 'week') return weekStartStr(d);
-  if (period === 'month') return monthStartStr(d);
-  return toDateStr(d);
-}
-
-export function periodLabel(period) {
-  return period === 'day' ? '日' : period === 'week' ? '周' : '月';
-}
-
 export function formatM_D(dateStr) {
   const [, t, r] = String(dateStr).split('-');
   return `${parseInt(t, 10)}.${parseInt(r, 10)}`;

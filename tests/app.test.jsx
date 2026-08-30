@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { beforeEach, describe, expect, it } from 'vitest';
+import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import App from '../src/App';
 import { replaceAllData } from '../src/lib/storage';
@@ -10,6 +10,11 @@ const emptyData = {
   basicData: { routes: [], stations: [], plates: [], inspectors: [], drivers: [], conductors: [], fleets: [] },
 };
 
+beforeAll(() => {
+  globalThis.URL.createObjectURL = globalThis.URL.createObjectURL || (() => 'blob:mock');
+  globalThis.URL.revokeObjectURL = globalThis.URL.revokeObjectURL || (() => {});
+});
+
 beforeEach(() => {
   cleanup();
   localStorage.clear();
@@ -19,13 +24,13 @@ beforeEach(() => {
 });
 
 describe('应用冒烟测试', () => {
-  it('渲染外壳与五个导航入口', () => {
+  it('渲染外壳与四个导航入口', () => {
     render(<App />);
     expect(screen.getByText('公交检查助手')).toBeTruthy();
     expect(screen.getByText('首页')).toBeTruthy();
     expect(screen.getAllByText('驻站检查').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('跳车检查').length).toBeGreaterThanOrEqual(1);
-    expect(screen.getByText('统计')).toBeTruthy();
+    expect(screen.queryByText('统计')).toBeNull();
     expect(screen.getByText('基础数据')).toBeTruthy();
   });
 
@@ -54,38 +59,44 @@ describe('应用冒烟测试', () => {
     expect(screen.getByText('其他信息')).toBeTruthy();
   });
 
-  it('统计页渲染三张卡片与图表标题', () => {
-    const now = new Date().toISOString();
+  it('跳车台账页可进入数据导出页', () => {
+    window.location.hash = '#/jump';
+    render(<App />);
+    fireEvent.click(screen.getByText('导出'));
+    expect(screen.getByText('数据导出')).toBeTruthy();
+  });
+
+  it('驻站导出页导出后出现成功面板与已导出列表', () => {
     replaceAllData({
-      records: [
+      records: [],
+      stationRecords: [
         {
-          id: 'r1',
-          route: '1路',
-          plateNumber: '粤B12345',
-          driver: '张三',
-          conductor: '',
-          boardTime: '08:00',
-          boardLocation: '总站',
-          alightTime: '08:30',
-          alightLocation: '终点站',
-          item01: 'pass',
-          item02: 'fail',
-          remark: '',
-          inspector: '王五',
-          inspectionDate: '2026-08-30',
-          createdAt: now,
-          updatedAt: now,
+          id: 'z1',
+          station: '汽车站',
+          checker: '张三',
+          date: '2026-08-16',
+          time: '08:30',
+          route: '莲朱专线',
+          plate: '沪A36401D',
+          boarding: '12',
+          stationNorms: '√',
+          conductorCall: '×',
+          checkResult: '正常',
+          rectification: '已当场整改',
+          remark: '备注',
         },
       ],
-      basicData: { routes: [], drivers: [], conductors: [], stations: [] },
+      basicData: emptyData.basicData,
     });
-    window.location.hash = '#/statistics';
+    window.location.hash = '#/station/export';
     render(<App />);
-    expect(screen.getByText('检查车次总数')).toBeTruthy();
-    expect(screen.getByText('整体合格率')).toBeTruthy();
-    expect(screen.getByText('整体不合格率')).toBeTruthy();
-    expect(screen.getByText('项目合格率')).toBeTruthy();
-    expect(screen.getByText('不合格项 Top 排行')).toBeTruthy();
+    const exportButtons = screen.getAllByText('导出表格');
+    expect(exportButtons.length).toBeGreaterThanOrEqual(2);
+    fireEvent.click(exportButtons[exportButtons.length - 1]);
+    expect(screen.getByText('导出成功')).toBeTruthy();
+    expect(screen.getAllByText('驻站记录表【8.16】.xlsx').length).toBeGreaterThanOrEqual(1);
+    fireEvent.click(screen.getByText('完成'));
+    expect(screen.getByText('已导出文件（本次）')).toBeTruthy();
   });
 
   it('导出页渲染配置卡片', () => {

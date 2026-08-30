@@ -56,6 +56,14 @@ export function safeName(s) {
   return normalize(s).replace(/[\\/:*?"<>|]/g, '_');
 }
 
+// 文件大小人性化显示（B / KB / MB）
+export function humanSize(bytes) {
+  const n = Number(bytes) || 0;
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(1)} KB`;
+  return `${(n / 1024 / 1024).toFixed(1)} MB`;
+}
+
 // 按 日期+站点 分组，组内按时间排序
 export function groupRecords(records) {
   const map = new Map();

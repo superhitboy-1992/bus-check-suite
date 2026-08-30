@@ -329,7 +329,7 @@ export default function BasicDataPage() {
 
   return (
     <div className="space-y-4">
-      <div className="sticky top-14 z-30 -mx-4 -mt-4 border-b border-border bg-background px-4 py-3">
+      <div className="sticky top-14 z-30 -mx-4 -mt-4 border-b border-border bg-background/95 px-4 py-3 shadow-sm backdrop-blur">
         <div className="flex gap-1 overflow-x-auto rounded-full bg-accent p-1">
           {TABS.map((t) => (
             <button

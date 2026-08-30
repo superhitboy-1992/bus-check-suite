@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import * as XLSX from 'xlsx';
 import { generate, zip } from '../src/lib/stationXlsx';
-import { groupRecords, toRecordRows } from '../src/lib/stationCore';
+import { groupRecords, humanSize, toRecordRows } from '../src/lib/stationCore';
 
 function stationRec(overrides = {}) {
   return {
@@ -75,5 +75,15 @@ describe('驻站模板导出', () => {
     expect(bin[2]).toBe(0x03);
     expect(bin[3]).toBe(0x04);
     expect(bin.length).toBeGreaterThan(data.length);
+  });
+});
+
+describe('humanSize', () => {
+  it('按 B / KB / MB 格式化文件大小', () => {
+    expect(humanSize(0)).toBe('0 B');
+    expect(humanSize(512)).toBe('512 B');
+    expect(humanSize(2048)).toBe('2.0 KB');
+    expect(humanSize(3 * 1024 * 1024)).toBe('3.0 MB');
+    expect(humanSize('abc')).toBe('0 B');
   });
 });

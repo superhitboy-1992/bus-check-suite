@@ -376,6 +376,10 @@ export default function HomePage() {
               { value: 'daily', label: '当日表格', icon: 'table' },
             ]}
           />
+          <Button variant="outline" onClick={() => navigate('/export')}>
+            <Icon name="download" className="size-4" />
+            导出
+          </Button>
           <Button onClick={() => navigate('/new')} className="hidden sm:inline-flex">
             <Icon name="plus" className="size-4" />
             新建检查

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { addDays, formatM_D, monthStartStr, periodStartDate, toDateStr, weekStartStr } from '../src/lib/dates';
+import { addDays, formatM_D, monthStartStr, toDateStr, weekStartStr } from '../src/lib/dates';
 
 describe('dates', () => {
   it('toDateStr 输出本地 yyyy-MM-dd', () => {
@@ -13,13 +13,6 @@ describe('dates', () => {
   it('weekStartStr 返回本周一（2026-08-30 是周日，本周一为 08-24）', () => {
     expect(weekStartStr(new Date(2026, 7, 30))).toBe('2026-08-24');
     expect(weekStartStr(new Date(2026, 7, 24))).toBe('2026-08-24');
-  });
-
-  it('periodStartDate 按日/周/月返回起点', () => {
-    const d = new Date(2026, 7, 30);
-    expect(periodStartDate('day', d)).toBe('2026-08-30');
-    expect(periodStartDate('week', d)).toBe('2026-08-24');
-    expect(periodStartDate('month', d)).toBe('2026-08-01');
   });
 
   it('formatM_D 输出 M.D 格式', () => {

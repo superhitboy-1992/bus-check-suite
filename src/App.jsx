@@ -6,7 +6,6 @@ import HomePage from './pages/HomePage';
 import JumpHomePage from './pages/JumpHomePage';
 import FormPage from './pages/FormPage';
 import DetailPage from './pages/DetailPage';
-import StatsPage from './pages/StatsPage';
 import ExportPage from './pages/ExportPage';
 import BasicDataPage from './pages/BasicDataPage';
 import PickPage from './pages/PickPage';
@@ -18,7 +17,6 @@ const NAV = [
   { path: '/', label: '首页', icon: 'home', end: true },
   { path: '/station/reg', label: '驻站检查', icon: 'station', end: false },
   { path: '/jump', label: '跳车检查', icon: 'bus', end: false },
-  { path: '/statistics', label: '统计', icon: 'chart', end: false },
   { path: '/basic-data', label: '基础数据', icon: 'database', end: false },
 ];
 
@@ -48,7 +46,6 @@ function Shell() {
             <Route path="/new" element={<FormPage />} />
             <Route path="/edit/:id" element={<FormPage />} />
             <Route path="/detail/:id" element={<DetailPage />} />
-            <Route path="/statistics" element={<StatsPage />} />
             <Route path="/export" element={<ExportPage />} />
             <Route path="/basic-data" element={<BasicDataPage />} />
             <Route path="/pick/:field" element={<PickPage />} />

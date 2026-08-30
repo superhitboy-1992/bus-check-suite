@@ -16,7 +16,7 @@ const MODULES = [
   {
     key: 'jump',
     title: '跳车检查',
-    desc: '乘车随检 14 项检查记录、台账与当日表格打印，日/周/月统计，一键导出 Excel/CSV。',
+    desc: '乘车随检 14 项检查记录、台账与当日表格打印，一键导出 Excel/CSV。',
     to: '/jump',
     icon: 'bus',
     accent: 'from-sky-500 to-blue-600',

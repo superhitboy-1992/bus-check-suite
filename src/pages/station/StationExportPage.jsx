@@ -1,9 +1,9 @@
 import { useMemo, useState } from 'react';
-import { Button, Card, EmptyState, Field, Input, toast } from '../../components/ui';
+import { Button, Card, EmptyState, Field, Input, Modal, toast } from '../../components/ui';
 import { Icon } from '../../components/icons';
 import StationTabs from './StationTabs';
 import { useStationRecords } from '../../lib/storage';
-import { dateDot, groupRecords, normalize, safeName, toRecordRows } from '../../lib/stationCore';
+import { dateDot, groupRecords, humanSize, normalize, safeName, toRecordRows } from '../../lib/stationCore';
 import { generate, zip } from '../../lib/stationXlsx';
 
 function downloadBlob(blob, filename) {
@@ -19,10 +19,13 @@ function downloadBlob(blob, filename) {
   }, 1200);
 }
 
+function isMobileView() {
+  return typeof window.matchMedia === 'function' && window.matchMedia('(max-width: 767px)').matches;
+}
+
 // 移动端优先走系统分享（微信/邮件等），不可用时降级为下载
 function shareOrDownload(blob, filename, mime) {
-  const isMobile = window.matchMedia('(max-width: 767px)').matches;
-  if (isMobile && navigator.share && navigator.canShare) {
+  if (isMobileView() && navigator.share && navigator.canShare) {
     try {
       const file = new File([blob], filename, { type: mime });
       if (navigator.canShare({ files: [file] })) {
@@ -45,12 +48,19 @@ function buildGroupFile(group) {
   );
 }
 
+function formatTime(d) {
+  return new Date(d).toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' });
+}
+
 export default function StationExportPage() {
   const records = useStationRecords();
   const [from, setFrom] = useState('');
   const [to, setTo] = useState('');
   const [station, setStation] = useState('');
   const [queried, setQueried] = useState(false);
+  const [exportedFiles, setExportedFiles] = useState([]);
+  const [result, setResult] = useState(null);
+  const isMobile = isMobileView();
 
   const groups = useMemo(() => {
     const list = records.filter((r) => {
@@ -62,17 +72,29 @@ export default function StationExportPage() {
     return groupRecords(list);
   }, [records, from, to, station, queried]);
 
+  function pushExport(entry) {
+    setExportedFiles((prev) => [entry, ...prev]);
+    setResult(entry);
+  }
+
   function exportGroup(g) {
     if (g.count > 30) {
       toast(`该分组有 ${g.count} 条记录，模板最多 30 行，已按时间取前 30 条`, 'error');
     }
     const bin = buildGroupFile(g);
     const filename = `驻站记录表【${dateDot(g.date)}】.xlsx`;
-    shareOrDownload(
-      new Blob([bin], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+    const mime = 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet';
+    pushExport({
+      id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
       filename,
-      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    );
+      size: bin.length,
+      kind: 'xlsx',
+      groupLabel: `${g.date} · ${g.station}`,
+      recordCount: g.count,
+      blob: new Blob([bin], { type: mime }),
+      mime,
+      time: new Date(),
+    });
     toast(`已导出：${filename}`);
   }
 
@@ -94,9 +116,28 @@ export default function StationExportPage() {
       return { name, data: buildGroupFile(g) };
     });
     const bin = zip(entries);
-    downloadBlob(new Blob([bin], { type: 'application/zip' }), `驻站记录表_${from || '起始'}_${to || '结束'}.zip`);
+    const filename = `驻站记录表_${from || '起始'}_${to || '结束'}.zip`;
+    const mime = 'application/zip';
+    pushExport({
+      id: `${Date.now()}-${Math.random().toString(36).slice(2)}`,
+      filename,
+      size: bin.length,
+      kind: 'zip',
+      groupLabel: `${entries.length} 个分组`,
+      recordCount: entries.length,
+      blob: new Blob([bin], { type: mime }),
+      mime,
+      time: new Date(),
+    });
     toast(`已导出 ${entries.length} 张表格（ZIP）`);
   }
+
+  const downloadResult = () => {
+    if (result) downloadBlob(result.blob, result.filename);
+  };
+  const shareResult = () => {
+    if (result) shareOrDownload(result.blob, result.filename, result.mime);
+  };
 
   return (
     <div className="space-y-4">
@@ -124,6 +165,44 @@ export default function StationExportPage() {
           <span className="ml-auto text-sm text-muted-foreground">共 {groups.length} 个分组</span>
         </div>
       </Card>
+
+      {exportedFiles.length > 0 && (
+        <Card className="p-4">
+          <div className="flex items-center justify-between gap-2">
+            <h2 className="text-base font-semibold text-foreground">已导出文件（本次）</h2>
+            <Button size="sm" variant="ghost" onClick={() => setExportedFiles([])}>
+              清空列表
+            </Button>
+          </div>
+          <div className="mt-2 divide-y divide-border">
+            {exportedFiles.map((f) => (
+              <div key={f.id} className="flex flex-wrap items-center gap-3 py-2.5">
+                <div className="flex size-9 shrink-0 items-center justify-center rounded-lg bg-accent text-muted-foreground">
+                  <Icon name={f.kind === 'zip' ? 'file' : 'table'} className="size-4" />
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-foreground">{f.filename}</p>
+                  <p className="mt-0.5 text-xs text-muted-foreground">
+                    {humanSize(f.size)} · {f.groupLabel} · {f.kind === 'zip' ? `${f.recordCount} 张` : `${f.recordCount} 条`} ·{' '}
+                    {formatTime(f.time)}
+                  </p>
+                </div>
+                {isMobile && (
+                  <Button size="sm" variant="outline" onClick={() => shareOrDownload(f.blob, f.filename, f.mime)}>
+                    分享
+                  </Button>
+                )}
+                <Button size="sm" variant="outline" onClick={() => downloadBlob(f.blob, f.filename)}>
+                  下载
+                </Button>
+              </div>
+            ))}
+          </div>
+          <p className="mt-3 border-t border-border pt-3 text-xs text-muted-foreground">
+            文件仅保存在当前页面（本次会话），刷新或离开页面后需重新导出。
+          </p>
+        </Card>
+      )}
 
       {groups.length === 0 ? (
         <Card>
@@ -154,8 +233,64 @@ export default function StationExportPage() {
 
       <div className="rounded-lg border border-border bg-accent/40 p-4 text-xs leading-relaxed text-muted-foreground">
         说明：按「日期 + 站点」分组，每组自动生成一张《驻站记录表》（固定 30 行、A4 打印格式），与现成模板一致。
+        点击「导出表格」会先弹出导出结果，可在弹窗中下载或分享；已导出的文件会保留在本页列表中，可再次下载。
         手机上可直接分享表格到微信/邮件；批量导出会把多张表打包成一个 ZIP 文件。
       </div>
+
+      <Modal
+        open={!!result}
+        onClose={() => setResult(null)}
+        title="导出成功"
+        footer={
+          <>
+            <Button variant="outline" onClick={() => setResult(null)}>
+              完成
+            </Button>
+            {isMobile && (
+              <Button variant="outline" onClick={shareResult}>
+                <Icon name="upload" className="size-4" />
+                分享
+              </Button>
+            )}
+            <Button onClick={downloadResult}>
+              <Icon name="download" className="size-4" />
+              下载文件
+            </Button>
+          </>
+        }
+      >
+        {result && (
+          <div className="space-y-3 py-1">
+            <div className="flex items-center gap-2 rounded-lg border border-success/30 bg-success/5 px-3 py-2.5 text-sm text-success">
+              <Icon name="circleCheck" className="size-5 shrink-0" />
+              <span className="font-medium break-all">{result.filename}</span>
+            </div>
+            <div className="grid grid-cols-2 gap-x-4 gap-y-3 text-sm">
+              <div className="min-w-0">
+                <p className="text-xs text-muted-foreground">{result.kind === 'zip' ? '内容' : '日期 · 站点'}</p>
+                <p className="mt-0.5 break-words font-medium text-foreground">{result.groupLabel}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">文件大小</p>
+                <p className="mt-0.5 font-medium text-foreground">{humanSize(result.size)}</p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">{result.kind === 'zip' ? '表格数' : '记录数'}</p>
+                <p className="mt-0.5 font-medium text-foreground">
+                  {result.recordCount} {result.kind === 'zip' ? '张' : '条'}
+                </p>
+              </div>
+              <div>
+                <p className="text-xs text-muted-foreground">生成时间</p>
+                <p className="mt-0.5 font-medium text-foreground">{formatTime(result.time)}</p>
+              </div>
+            </div>
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              点击「下载文件」保存到手机或电脑；手机上也可以直接分享到微信/邮件。
+            </p>
+          </div>
+        )}
+      </Modal>
     </div>
   );
 }
