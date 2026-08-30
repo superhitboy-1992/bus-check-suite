@@ -380,10 +380,6 @@ export default function HomePage() {
             <Icon name="download" className="size-4" />
             导出
           </Button>
-          <Button onClick={() => navigate('/new')} className="hidden sm:inline-flex">
-            <Icon name="plus" className="size-4" />
-            新建检查
-          </Button>
         </div>
       </div>
 
