@@ -96,7 +96,7 @@ describe('应用冒烟测试', () => {
     expect(screen.getByText('导出成功')).toBeTruthy();
     expect(screen.getAllByText('驻站记录表【8.16】.xlsx').length).toBeGreaterThanOrEqual(1);
     fireEvent.click(screen.getByText('下载文件'));
-    expect(screen.getByText('已开始下载：驻站记录表【8.16】.xlsx')).toBeTruthy();
+    expect(screen.getByText(/已开始下载：驻站记录表【8.16】\.xlsx/)).toBeTruthy();
     fireEvent.click(screen.getByText('完成'));
     expect(screen.getByText('已导出文件（本次）')).toBeTruthy();
   });

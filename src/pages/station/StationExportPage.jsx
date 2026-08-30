@@ -6,7 +6,28 @@ import { useStationRecords } from '../../lib/storage';
 import { dateDot, groupRecords, humanSize, normalize, safeName, toRecordRows } from '../../lib/stationCore';
 import { generate, zip } from '../../lib/stationXlsx';
 
-const IS_WECHAT = typeof navigator !== 'undefined' && /MicroMessenger/i.test(navigator.userAgent || '');
+const EMBEDDED_HINTS = {
+  wechat: '当前是微信内置浏览器，会拦截文件保存。请点右上角「···」→「在浏览器打开」，再重新导出；也可以先试「打开文件」。',
+  wecom: '当前是企业微信内置浏览器，会拦截文件保存。请点右上角「···」→「在浏览器打开」，再重新导出。',
+  qq: '当前是 QQ 内置浏览器，可能无法保存文件。请点右上角「···」→「在浏览器打开」，再重新导出。',
+  uc: '当前是 UC 浏览器，可能限制文件保存。请改用手机自带浏览器或 Chrome/Safari 打开后重新导出。',
+  quark: '当前是夸克浏览器，可能限制文件保存。请改用手机自带浏览器或 Chrome/Safari 打开后重新导出。',
+  baidu: '当前是百度浏览器，可能限制文件保存。请改用手机自带浏览器或 Chrome/Safari 打开后重新导出。',
+};
+
+function detectEmbeddedBrowser() {
+  const ua = typeof navigator !== 'undefined' ? navigator.userAgent || '' : '';
+  if (/MicroMessenger/i.test(ua)) return 'wechat';
+  if (/wxwork/i.test(ua)) return 'wecom';
+  if (/QQ\/|QBCore|MQQBrowser/i.test(ua)) return 'qq';
+  if (/UCBrowser|UBrowser/i.test(ua)) return 'uc';
+  if (/Quark/i.test(ua)) return 'quark';
+  if (/baiduboxapp/i.test(ua)) return 'baidu';
+  return null;
+}
+
+const embeddedBrowser = detectEmbeddedBrowser();
+const embeddedHint = embeddedBrowser ? EMBEDDED_HINTS[embeddedBrowser] : '';
 
 function anchorDownload(blob, filename) {
   const url = URL.createObjectURL(blob);
@@ -19,7 +40,11 @@ function anchorDownload(blob, filename) {
     URL.revokeObjectURL(url);
     a.remove();
   }, 1200);
-  toast(`已开始下载：${filename}`);
+  if (embeddedHint) {
+    toast(`已尝试下载：${filename}（当前浏览器可能无法保存，请看弹窗内提示）`, 'error');
+  } else {
+    toast(`已开始下载：${filename}，请到手机「下载」或「文件」中查看`);
+  }
 }
 
 function downloadBlob(blob, filename, mime = '') {
@@ -59,7 +84,7 @@ function openInNewTab(blob, filename) {
     return;
   }
   setTimeout(() => URL.revokeObjectURL(url), 60000);
-  toast(`已在新的标签页打开：${filename}`);
+  toast(`已尝试打开：${filename}；若新页面空白，请改用「下载文件」`);
 }
 
 function isMobileView() {
@@ -189,6 +214,13 @@ export default function StationExportPage() {
     <div className="space-y-4">
       <StationTabs />
 
+      {embeddedHint && (
+        <div className="flex items-start gap-2 rounded-lg border border-warning/50 bg-warning/10 px-4 py-3 text-sm text-warning">
+          <Icon name="alert" className="mt-0.5 size-4 shrink-0" />
+          <p className="leading-relaxed">{embeddedHint}</p>
+        </div>
+      )}
+
       <Card className="p-4">
         <div className="grid gap-3 sm:grid-cols-3">
           <Field label="日期从">
@@ -284,8 +316,7 @@ export default function StationExportPage() {
         说明：按「日期 + 站点」分组，每组自动生成一张《驻站记录表》（固定 30 行、A4 打印格式），与现成模板一致。
         点击「导出表格」会先弹出导出结果，可在弹窗中下载、打开或分享；已导出的文件会保留在本页列表中，可再次下载。
         手机上可直接分享表格到微信/邮件；批量导出会把多张表打包成一个 ZIP 文件。
-        {IS_WECHAT &&
-          '微信内置浏览器可能无法直接下载文件，建议点右上角「···」→「在浏览器打开」后重新导出。'}
+        {embeddedHint && ` ${embeddedHint}`}
       </div>
 
       <Modal
@@ -342,9 +373,9 @@ export default function StationExportPage() {
             <p className="text-xs leading-relaxed text-muted-foreground">
               点击「下载文件」保存到手机或电脑；手机上也可以直接分享到微信/邮件。
             </p>
-            {IS_WECHAT && (
+            {embeddedHint && (
               <p className="rounded-lg border border-warning/40 bg-warning/10 px-3 py-2 text-xs leading-relaxed text-warning">
-                微信内置浏览器可能无法直接下载文件：可先点「打开文件」试试；若仍不行，请点右上角「···」→「在浏览器打开」后重新导出。
+                {embeddedHint}
               </p>
             )}
           </div>
