@@ -38,7 +38,7 @@ function Shell() {
         </header>
       )}
 
-      <main className={`flex-1 overflow-x-hidden ${hideChrome ? '' : 'pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-8'}`}>
+      <main className={`flex-1 overflow-x-clip ${hideChrome ? '' : 'pb-[calc(5rem+env(safe-area-inset-bottom))] md:pb-8'}`}>
         <div className="mx-auto max-w-5xl px-4 py-4">
           <Routes>
             <Route path="/" element={<HomePage />} />
