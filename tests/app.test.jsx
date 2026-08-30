@@ -138,10 +138,31 @@ describe('应用冒烟测试', () => {
     expect(screen.getByText('记录不存在')).toBeTruthy();
   });
 
-  it('选择页渲染线路选择标题', () => {
-    window.location.hash = '#/pick/route';
+  it('新建表单线路弹层支持车队两级浏览', () => {
+    replaceAllData({
+      records: [],
+      stationRecords: [],
+      basicData: {
+        routes: [
+          { id: 'rt1', name: '莲朱专线', fleet: '一车队' },
+          { id: 'rt2', name: '金山115路', fleet: '五车队' },
+        ],
+        stations: [],
+        plates: [],
+        inspectors: [],
+        drivers: [],
+        conductors: [],
+        fleets: ['一车队', '五车队'],
+      },
+    });
+    window.location.hash = '#/new';
     render(<App />);
+    fireEvent.click(screen.getByLabelText('选择线路'));
     expect(screen.getByText('选择线路')).toBeTruthy();
+    expect(screen.getByText('全部线路')).toBeTruthy();
+    fireEvent.click(screen.getByText('一车队'));
+    expect(screen.getByText('莲朱专线')).toBeTruthy();
+    expect(screen.queryByText('金山115路')).toBeNull();
   });
 
   it('台账列表渲染已有记录', () => {
@@ -188,10 +209,11 @@ describe('应用冒烟测试', () => {
         ],
       },
     });
-    // 模拟从选择页返回：表单通过 sessionStorage 恢复已选的线路（jsdom 不支持 history.go(-1)）
-    sessionStorage.setItem('pickResult', JSON.stringify({ field: 'route', value: '1路' }));
     window.location.hash = '#/new';
     render(<App />);
+    fireEvent.click(screen.getByLabelText('选择线路'));
+    fireEvent.click(screen.getByText('全部线路'));
+    fireEvent.click(screen.getByText('1路'));
     expect(screen.getByPlaceholderText('如：1路、20路').value).toBe('1路');
 
     fireEvent.change(screen.getByPlaceholderText('车牌号或自编号'), { target: { value: '粤B12345' } });

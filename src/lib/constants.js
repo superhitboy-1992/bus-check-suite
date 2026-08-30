@@ -58,14 +58,6 @@ export const BASIC_DATA_TYPES = [
   { key: 'station', label: '站点管理', itemLabel: '站点' },
 ];
 
-export const PICK_FIELDS = {
-  route: { title: '选择线路', type: 'route' },
-  driver: { title: '选择驾驶员', type: 'driver' },
-  conductor: { title: '选择售票员', type: 'conductor' },
-  boardLocation: { title: '选择上车站点', type: 'station' },
-  alightLocation: { title: '选择下车站点', type: 'station' },
-};
-
 export const STATUS_META = {
   pass: { label: '合格' },
   fail: { label: '不合格' },

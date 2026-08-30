@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { CHECK_ITEMS, emptyItems } from '../lib/constants';
 import {
@@ -10,10 +10,12 @@ import {
   getRecords,
   saveDraft,
   updateRecord,
+  useBasicData,
 } from '../lib/storage';
 import { todayStr } from '../lib/dates';
 import { Icon } from '../components/icons';
 import { Button, Card, Field, Input, Modal, Textarea, toast } from '../components/ui';
+import StationPicker from './station/StationPicker';
 
 function isDraftEmpty(p) {
   return (
@@ -78,25 +80,11 @@ function ItemToggle({ item, value, onChange }) {
   );
 }
 
-function PickInput({ value, placeholder, onClick, readOnly = true }) {
-  return (
-    <div className="relative cursor-pointer" onClick={onClick}>
-      <Input
-        value={value}
-        readOnly={readOnly}
-        placeholder={placeholder}
-        className="h-11 pr-9"
-        onChange={() => {}}
-      />
-      <Icon name="chevronDown" className="pointer-events-none absolute right-3 top-1/2 size-4 -translate-y-1/2 text-muted-foreground" />
-    </div>
-  );
-}
-
 export default function FormPage() {
   const { id } = useParams();
   const navigate = useNavigate();
   const mode = id ? 'edit' : 'create';
+  const basicData = useBasicData();
 
   const [route, setRoute] = useState('');
   const [plateNumber, setPlateNumber] = useState('');
@@ -114,9 +102,29 @@ export default function FormPage() {
   const [notFound, setNotFound] = useState(false);
   const [draftRestored, setDraftRestored] = useState(false);
   const [inspectorPickerOpen, setInspectorPickerOpen] = useState(false);
-  const snapshotRestored = useRef(false);
+  const [picker, setPicker] = useState(null); // 'route'|'driver'|'conductor'|'boardLocation'|'alightLocation'|null
   const draftTimer = useRef(null);
   const inspectorHistory = getInspectorHistory();
+
+  const fleets = basicData.fleets.map((name) => ({
+    name,
+    routes: basicData.routes.filter((r) => r.fleet === name).map((r) => r.name),
+  }));
+  const routeNames = basicData.routes.map((r) => r.name);
+  const pickerField = picker === 'boardLocation' || picker === 'alightLocation' ? 'station' : picker;
+  const stationNames = useMemo(() => {
+    const seen = new Set();
+    const out = [];
+    const r = route.trim();
+    basicData.stations.forEach((s) => {
+      if (r && s.routeName !== r) return;
+      if (!seen.has(s.name)) {
+        seen.add(s.name);
+        out.push(s.name);
+      }
+    });
+    return out;
+  }, [basicData.stations, route]);
 
   useEffect(() => {
     if (!id) return;
@@ -130,10 +138,6 @@ export default function FormPage() {
   }, [id]);
 
   function applyInitial(rec) {
-    if (snapshotRestored.current) {
-      snapshotRestored.current = false;
-      return;
-    }
     setRoute(rec.route || '');
     setPlateNumber(rec.plateNumber || '');
     setDriver(rec.driver || '');
@@ -149,19 +153,7 @@ export default function FormPage() {
   }
 
   useEffect(() => {
-    const snap = sessionStorage.getItem('inspectionFormSnapshot');
-    const pick = sessionStorage.getItem('pickResult');
-    if (snap) {
-      snapshotRestored.current = true;
-      try {
-        const K = JSON.parse(snap);
-        applyPayload(K);
-      } catch (e) {
-        console.error('恢复表单快照失败', e);
-      } finally {
-        sessionStorage.removeItem('inspectionFormSnapshot');
-      }
-    } else if (!id) {
+    if (!id) {
       const draft = getDraft();
       if (draft && !isDraftEmpty(draft)) {
         applyPayload(draft);
@@ -169,35 +161,8 @@ export default function FormPage() {
         toast('已恢复上次未提交的草稿');
       }
     }
-    if (pick) {
-      try {
-        const { field, value } = JSON.parse(pick);
-        switch (field) {
-          case 'route':
-            setRoute(value);
-            break;
-          case 'driver':
-            setDriver(value);
-            break;
-          case 'conductor':
-            setConductor(value);
-            break;
-          case 'boardLocation':
-            setBoardLocation(value);
-            break;
-          case 'alightLocation':
-            setAlightLocation(value);
-            break;
-          default:
-            break;
-        }
-      } catch (e) {
-        console.error('解析选择结果失败', e);
-      } finally {
-        sessionStorage.removeItem('pickResult');
-      }
-    }
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [id]);
 
   function applyPayload(K) {
     if (K.route !== undefined) setRoute(K.route);
@@ -251,32 +216,6 @@ export default function FormPage() {
     items,
   ]);
 
-  const openPick = (field) => {
-    if (field !== 'route' && !route.trim()) {
-      toast('请先选择线路', 'error');
-      return;
-    }
-    sessionStorage.setItem(
-      'inspectionFormSnapshot',
-      JSON.stringify({
-        route,
-        plateNumber,
-        driver,
-        conductor,
-        boardTime,
-        boardLocation,
-        alightTime,
-        alightLocation,
-        remark,
-        inspector,
-        inspectionDate,
-        items,
-      })
-    );
-    sessionStorage.setItem('pickRouteName', route.trim());
-    navigate(`/pick/${field}`);
-  };
-
   const toggleItem = (key, status) => {
     setItems((prev) => ({ ...prev, [key]: status }));
   };
@@ -297,6 +236,15 @@ export default function FormPage() {
     setItems(emptyItems());
     setDraftRestored(false);
     toast('草稿已清空');
+  };
+
+  const applyPick = (value) => {
+    if (picker === 'route') setRoute(value);
+    else if (picker === 'driver') setDriver(value);
+    else if (picker === 'conductor') setConductor(value);
+    else if (picker === 'boardLocation') setBoardLocation(value);
+    else if (picker === 'alightLocation') setAlightLocation(value);
+    setPicker(null);
   };
 
   const handleSubmit = async (e) => {
@@ -361,28 +309,108 @@ export default function FormPage() {
         <h2 className="pb-4 text-base font-semibold">基本信息</h2>
         <div className="space-y-4 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
           <Field label="线路">
-            <PickInput value={route} placeholder="如：1路、20路" onClick={() => openPick('route')} />
+            <div className="flex gap-1.5">
+              <Input
+                value={route}
+                onChange={(e) => setRoute(e.target.value)}
+                placeholder="如：1路、20路"
+                className="h-11"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                aria-label="选择线路"
+                onClick={() => setPicker('route')}
+                className="h-11 w-11 shrink-0"
+              >
+                ▾
+              </Button>
+            </div>
           </Field>
           <Field label="车牌/自编号">
             <Input value={plateNumber} onChange={(e) => setPlateNumber(e.target.value)} placeholder="车牌号或自编号" className="h-11" />
           </Field>
           <Field label="驾驶员">
-            <PickInput value={driver} placeholder="驾驶员姓名" onClick={() => openPick('driver')} />
+            <div className="flex gap-1.5">
+              <Input
+                value={driver}
+                onChange={(e) => setDriver(e.target.value)}
+                placeholder="驾驶员姓名"
+                className="h-11"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                aria-label="选择驾驶员"
+                onClick={() => setPicker('driver')}
+                className="h-11 w-11 shrink-0"
+              >
+                ▾
+              </Button>
+            </div>
           </Field>
           <Field label="售票员">
-            <PickInput value={conductor} placeholder="售票员姓名（可选）" onClick={() => openPick('conductor')} />
+            <div className="flex gap-1.5">
+              <Input
+                value={conductor}
+                onChange={(e) => setConductor(e.target.value)}
+                placeholder="售票员姓名（可选）"
+                className="h-11"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                aria-label="选择售票员"
+                onClick={() => setPicker('conductor')}
+                className="h-11 w-11 shrink-0"
+              >
+                ▾
+              </Button>
+            </div>
           </Field>
           <Field label="上车时间">
             <Input type="time" value={boardTime} onChange={(e) => setBoardTime(e.target.value)} className="h-11" />
           </Field>
           <Field label="上车地点">
-            <PickInput value={boardLocation} placeholder="站点名称" onClick={() => openPick('boardLocation')} />
+            <div className="flex gap-1.5">
+              <Input
+                value={boardLocation}
+                onChange={(e) => setBoardLocation(e.target.value)}
+                placeholder="站点名称"
+                className="h-11"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                aria-label="选择上车站点"
+                onClick={() => setPicker('boardLocation')}
+                className="h-11 w-11 shrink-0"
+              >
+                ▾
+              </Button>
+            </div>
           </Field>
           <Field label="下车时间">
             <Input type="time" value={alightTime} onChange={(e) => setAlightTime(e.target.value)} className="h-11" />
           </Field>
           <Field label="下车地点">
-            <PickInput value={alightLocation} placeholder="站点名称" onClick={() => openPick('alightLocation')} />
+            <div className="flex gap-1.5">
+              <Input
+                value={alightLocation}
+                onChange={(e) => setAlightLocation(e.target.value)}
+                placeholder="站点名称"
+                className="h-11"
+              />
+              <Button
+                type="button"
+                variant="outline"
+                aria-label="选择下车站点"
+                onClick={() => setPicker('alightLocation')}
+                className="h-11 w-11 shrink-0"
+              >
+                ▾
+              </Button>
+            </div>
           </Field>
         </div>
       </Card>
@@ -480,6 +508,19 @@ export default function FormPage() {
           </ul>
         )}
       </Modal>
+
+      <StationPicker
+        open={Boolean(picker)}
+        field={pickerField}
+        onClose={() => setPicker(null)}
+        onPick={applyPick}
+        stationNames={stationNames}
+        routeNames={routeNames}
+        fleets={fleets}
+        drivers={basicData.drivers}
+        conductors={basicData.conductors}
+        routeFilter={route}
+      />
     </form>
   );
 }

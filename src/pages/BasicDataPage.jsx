@@ -250,8 +250,14 @@ export default function BasicDataPage() {
     try {
       const buf = await file.arrayBuffer();
       const parsed = readFile(buf);
-      if (!parsed.stations.length && !parsed.routes.length && !parsed.checkers.length) {
-        toast('未从文件中识别到站点/线路/驻站人，请确认文件格式', 'error');
+      if (
+        !parsed.stations.length &&
+        !parsed.routes.length &&
+        !parsed.checkers.length &&
+        !parsed.drivers.length &&
+        !parsed.conductors.length
+      ) {
+        toast('未从文件中识别到站点/线路/驻站人/司售名单，请确认文件格式', 'error');
         return;
       }
       setImportPreview(parsed);
@@ -266,7 +272,18 @@ export default function BasicDataPage() {
     setImporting(true);
     try {
       const r = mergeCatalogItems(importPreview);
-      toast(`已导入：站点新增 ${r.addedStations} 条、线路新增 ${r.addedRoutes} 条、驻站人新增 ${r.addedCheckers} 条`);
+      const parts = [
+        `站点新增 ${r.addedStations} 条`,
+        `线路新增 ${r.addedRoutes} 条`,
+        `驻站人新增 ${r.addedCheckers} 条`,
+      ];
+      if (r.addedDrivers || r.filledDrivers) {
+        parts.push(`驾驶员新增 ${r.addedDrivers} 条、补充线路 ${r.filledDrivers} 条`);
+      }
+      if (r.addedConductors || r.filledConductors) {
+        parts.push(`售票员新增 ${r.addedConductors} 条、补充线路 ${r.filledConductors} 条`);
+      }
+      toast(`已导入：${parts.join('、')}`);
       setImportPreview(null);
     } catch (err) {
       console.error('导入失败', err);
@@ -390,8 +407,9 @@ export default function BasicDataPage() {
             <div>
               <h2 className="text-base font-semibold text-foreground">Excel 导入资料库</h2>
               <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
-                从现成 Excel（.xlsx/.xls/.csv）一键导入站点、线路、驻站人名单。系统按表头自动识别列
-                （如「站名」「线路」「驻站人」），重复项自动跳过，只补充缺失项，不影响已保存的记录。
+                从现成 Excel（.xlsx/.xls/.csv）一键导入站点、线路、驻站人名单，也支持导入《司售人员名单》
+                （按「姓名/岗位/科室/线路」识别驾驶员、售票员及其线路归属）。重复项自动跳过，
+                只补充缺失项，不影响已保存的记录。
               </p>
               <Button className="mt-4" onClick={() => fileRef.current?.click()}>
                 <Icon name="upload" className="size-4" />
@@ -406,6 +424,8 @@ export default function BasicDataPage() {
                   <li>站点：{importPreview.stations.length} 条</li>
                   <li>线路：{importPreview.routes.length} 条</li>
                   <li>驻站人：{importPreview.checkers.length} 条</li>
+                  {importPreview.drivers.length > 0 && <li>驾驶员：{importPreview.drivers.length} 条</li>}
+                  {importPreview.conductors.length > 0 && <li>售票员：{importPreview.conductors.length} 条</li>}
                 </ul>
                 <div className="mt-3 flex gap-2">
                   <Button size="sm" onClick={confirmImport} disabled={importing}>

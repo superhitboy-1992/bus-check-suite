@@ -20,6 +20,72 @@ const CHECKER_HEAD = /驻站人|检查人|人员|姓名/;
 const ROUTE_HEAD = /线路|路线|线名|公交线路/;
 const ANY_HEAD = /站名|站点|车站|驻站站名|线路站点|全部|驻站人|检查人|人员|姓名|线路|路线|线名|公交线路/;
 
+// ---------- 司售人员名单解析（姓名 + 岗位 + 科室/线路） ----------
+export const STAFF_DRIVER_POSITIONS = new Set(['驾驶员', '旅游车驾驶员', '常务司机']);
+export const STAFF_CONDUCTOR_POSITIONS = new Set(['乘务员']);
+
+// 线路名规范化：别名映射 + 去掉全角括号后缀（如 1652路（工业区三路）→ 1652路）
+const ROUTE_ALIAS = { 枫一: '枫泾1路', 枫二: '枫泾2路', 枫六: '枫泾6路', 朱枫专线: '朱枫线' };
+
+export function normalizeStaffRoute(raw, position) {
+  const v = String(raw === null || raw === undefined ? '' : raw).trim();
+  if (!v || v === position) return '';
+  if (ROUTE_ALIAS[v]) return ROUTE_ALIAS[v];
+  const m = v.match(/^(.+?)（/);
+  return m ? m[1].trim() : v;
+}
+
+// rows: 二维数组（字符串），来自 sheet_to_json(ws, {header:1, raw:false, defval:''})
+export function parseStaff(rows) {
+  const grid = [];
+  (rows || []).forEach((r) => {
+    const row = [];
+    (r || []).forEach((v) => {
+      row.push(String(v === null || v === undefined ? '' : v).trim());
+    });
+    grid.push(row);
+  });
+
+  let headerIdx = -1;
+  let nameCol = -1;
+  let posCol = -1;
+  let routeCol = -1;
+  for (let i = 0; i < Math.min(grid.length, 5); i++) {
+    const cells = grid[i] || [];
+    const nc = cells.findIndex((c) => c === '姓名');
+    const pc = cells.findIndex((c) => c === '岗位');
+    if (nc >= 0 && pc >= 0) {
+      headerIdx = i;
+      nameCol = nc;
+      posCol = pc;
+      routeCol = cells.findIndex((c) => c === '科室/线路');
+      break;
+    }
+  }
+  if (headerIdx < 0) return { drivers: [], conductors: [] };
+
+  const drivers = [];
+  const conductors = [];
+  const seenD = new Set();
+  const seenC = new Set();
+  for (let ri = headerIdx + 1; ri < grid.length; ri++) {
+    const name = String(grid[ri][nameCol] || '').trim();
+    if (!name) continue;
+    const pos = String(grid[ri][posCol] || '').trim();
+    const rawRoute = routeCol >= 0 ? String(grid[ri][routeCol] || '').trim() : '';
+    if (STAFF_DRIVER_POSITIONS.has(pos)) {
+      if (seenD.has(name)) continue;
+      seenD.add(name);
+      drivers.push({ name, routeName: normalizeStaffRoute(rawRoute, pos) });
+    } else if (STAFF_CONDUCTOR_POSITIONS.has(pos)) {
+      if (seenC.has(name)) continue;
+      seenC.add(name);
+      conductors.push({ name, routeName: normalizeStaffRoute(rawRoute, pos) });
+    }
+  }
+  return { drivers, conductors };
+}
+
 // rows: 二维数组（字符串），来自 sheet_to_json(ws, {header:1, raw:false, defval:''})
 export function parseFile(rows) {
   const grid = [];
@@ -30,6 +96,12 @@ export function parseFile(rows) {
     });
     grid.push(row);
   });
+
+  // 司售名单格式（姓名 + 岗位）：按岗位解析驾驶员/售票员，不再把姓名当驻站人
+  const staff = parseStaff(grid);
+  if (staff.drivers.length || staff.conductors.length) {
+    return { stations: [], routes: [], checkers: [], ...staff };
+  }
 
   let headerIdx = -1;
   for (let i = 0; i < Math.min(grid.length, 5); i++) {
@@ -133,7 +205,7 @@ export function parseFile(rows) {
     }
   }
 
-  return { stations, routes, checkers };
+  return { stations, routes, checkers, drivers: [], conductors: [] };
 }
 
 // 合并统计：existing 为数组，incoming 为数组

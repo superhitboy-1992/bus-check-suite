@@ -42,6 +42,9 @@ export default function StationPicker({
   routeNames = [],
   plateNames = [],
   fleets = [],
+  drivers = [],
+  conductors = [],
+  routeFilter = '',
 }) {
   const [query, setQuery] = useState('');
   const [view, setView] = useState(null); // null | '__all__' | '__unassigned__' | 车队名
@@ -57,7 +60,12 @@ export default function StationPicker({
     if (view === '__all__') return '全部线路';
     if (view === '__unassigned__') return '未分类';
     if (view) return view;
-    return field === 'station' ? '选择站点' : field === 'checker' ? '选择驻站人' : field === 'route' ? '选择线路' : '选择车号';
+    if (field === 'station') return '选择站点';
+    if (field === 'checker') return '选择驻站人';
+    if (field === 'route') return '选择线路';
+    if (field === 'driver') return '选择驾驶员';
+    if (field === 'conductor') return '选择售票员';
+    return '选择车号';
   }, [field, view]);
 
   if (!open) return null;
@@ -74,10 +82,19 @@ export default function StationPicker({
   let items = [];
   if (field === 'route') {
     items = search(showFleetNav ? [] : view ? routesInFleet(view) : routeNames, q, 50).map((m) => m.value);
+  } else if (field === 'driver' || field === 'conductor') {
+    const route = routeFilter.trim();
+    const staff = (field === 'driver' ? drivers : conductors).filter(
+      (s) => !route || (s && s.routeName && s.routeName.trim() === route)
+    );
+    items = search(staff.map((s) => (s && s.name) || ''), q, 50).map((m) => m.value);
   } else {
     const list = field === 'station' ? stationNames : field === 'checker' ? inspectorNames : plateNames;
     items = search(list, q, 50).map((m) => m.value);
   }
+
+  const staffLabel = field === 'driver' ? '驾驶员' : field === 'conductor' ? '售票员' : '';
+  const emptyHint = routeFilter.trim() && staffLabel ? `该线路暂无已分配${staffLabel}，可直接在上方输入后点「使用输入内容」` : '没有匹配项，可直接在上方输入后点「使用输入内容」';
 
   const apply = (v) => {
     if (v) onPick(v);
@@ -123,7 +140,7 @@ export default function StationPicker({
             items.map((v) => <ItemButton key={v} value={v} onClick={apply} />)
           ) : (
             <p className="px-3 py-4 text-center text-sm text-muted-foreground">
-              没有匹配项，可直接在上方输入后点「使用输入内容」
+              {emptyHint}
             </p>
           )}
         </div>

@@ -8,7 +8,6 @@ import FormPage from './pages/FormPage';
 import DetailPage from './pages/DetailPage';
 import ExportPage from './pages/ExportPage';
 import BasicDataPage from './pages/BasicDataPage';
-import PickPage from './pages/PickPage';
 import StationRegPage from './pages/station/StationRegPage';
 import StationListPage from './pages/station/StationListPage';
 import StationExportPage from './pages/station/StationExportPage';
@@ -25,7 +24,6 @@ function Shell() {
   const hideChrome =
     pathname.startsWith('/detail/') ||
     pathname.startsWith('/edit/') ||
-    pathname.startsWith('/pick/') ||
     pathname === '/new';
 
   return (
@@ -48,7 +46,6 @@ function Shell() {
             <Route path="/detail/:id" element={<DetailPage />} />
             <Route path="/export" element={<ExportPage />} />
             <Route path="/basic-data" element={<BasicDataPage />} />
-            <Route path="/pick/:field" element={<PickPage />} />
             <Route path="/station" element={<Navigate to="/station/reg" replace />} />
             <Route path="/station/reg" element={<StationRegPage />} />
             <Route path="/station/list" element={<StationListPage />} />

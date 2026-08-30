@@ -115,7 +115,7 @@ describe('撤销删除', () => {
 });
 
 describe('选择列表搜索', () => {
-  it('按关键字过滤线路，无匹配时显示空态', () => {
+  it('跳车表单线路弹层按关键字过滤线路，无匹配时显示空态', () => {
     replaceAllData({
       records: [],
       basicData: {
@@ -129,16 +129,17 @@ describe('选择列表搜索', () => {
         stations: [],
       },
     });
-    window.location.hash = '#/pick/route';
+    window.location.hash = '#/new';
     render(<App />);
-    const search = screen.getByPlaceholderText('搜索名称');
+    fireEvent.click(screen.getByLabelText('选择线路'));
+    const search = screen.getByPlaceholderText('搜索线路（支持拼音）…');
     fireEvent.change(search, { target: { value: '2' } });
     expect(screen.getByText('12路')).toBeTruthy();
     expect(screen.getByText('20路')).toBeTruthy();
     expect(screen.queryByText('1路')).toBeNull();
 
     fireEvent.change(search, { target: { value: 'zz' } });
-    expect(screen.getByText('无匹配结果')).toBeTruthy();
+    expect(screen.getByText(/没有匹配项/)).toBeTruthy();
   });
 });
 

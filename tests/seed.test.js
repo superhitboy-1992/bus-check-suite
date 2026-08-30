@@ -8,7 +8,7 @@ async function importStorage() {
 }
 
 describe('首启内置驾驶员/售票员名单', () => {
-  it('全新存储时按种子填充驾驶员/售票员（仅姓名）', async () => {
+  it('全新存储时按种子填充驾驶员/售票员（含线路归属）', async () => {
     localStorage.clear();
     const storage = await importStorage();
     const basicData = storage.getBasicData();
@@ -19,8 +19,10 @@ describe('首启内置驾驶员/售票员名单', () => {
     expect(basicData.conductors).toHaveLength(CatalogSeed.conductors.length);
     expect(basicData.drivers.map((d) => d.name)).toContain(CatalogSeed.drivers[0].name);
     expect(basicData.conductors.map((c) => c.name)).toContain(CatalogSeed.conductors[0].name);
-    expect(basicData.drivers.every((d) => d.name && d.routeName === '')).toBe(true);
-    expect(basicData.conductors.every((c) => c.name && c.routeName === '')).toBe(true);
+    expect(basicData.drivers.every((d) => d.name)).toBe(true);
+    expect(basicData.drivers.some((d) => d.routeName)).toBe(true);
+    expect(basicData.conductors.every((c) => c.name)).toBe(true);
+    expect(basicData.conductors.some((c) => c.routeName)).toBe(true);
   });
 
   it('重复初始化不产生重复', async () => {

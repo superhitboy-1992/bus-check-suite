@@ -491,8 +491,9 @@ export function deleteFleet(name) {
   emit();
 }
 
-// 资料库合并（Excel 导入等场景）：只填充缺失项，返回新增数量
-export function mergeCatalogItems({ stations = [], routes = [], checkers = [] }) {
+// 资料库合并（Excel 导入等场景）：只填充缺失项，返回新增数量。
+// 司机/售票员按姓名补缺，并只为 routeName 为空的已有人员补充线路，不覆盖手工维护的归属。
+export function mergeCatalogItems({ stations = [], routes = [], checkers = [], drivers = [], conductors = [] }) {
   const b = state.basicData;
   const stationKeys = new Set(b.stations.map((s) => s.name + '|' + s.routeName));
   let addedStations = 0;
@@ -522,9 +523,43 @@ export function mergeCatalogItems({ stations = [], routes = [], checkers = [] })
       addedCheckers++;
     }
   });
+  const driverMap = new Map(b.drivers.map((d) => [d.name, d]));
+  let addedDrivers = 0;
+  let filledDrivers = 0;
+  (drivers || []).forEach((s) => {
+    const name = String((s && s.name !== undefined ? s.name : s) || '').trim();
+    if (!name) return;
+    const routeName = String((s && s.routeName) || '').trim();
+    const existing = driverMap.get(name);
+    if (!existing) {
+      driverMap.set(name, { id: uid(), name, routeName });
+      b.drivers.push({ id: uid(), name, routeName });
+      addedDrivers++;
+    } else if (!existing.routeName && routeName) {
+      existing.routeName = routeName;
+      filledDrivers++;
+    }
+  });
+  const conductorMap = new Map(b.conductors.map((c) => [c.name, c]));
+  let addedConductors = 0;
+  let filledConductors = 0;
+  (conductors || []).forEach((s) => {
+    const name = String((s && s.name !== undefined ? s.name : s) || '').trim();
+    if (!name) return;
+    const routeName = String((s && s.routeName) || '').trim();
+    const existing = conductorMap.get(name);
+    if (!existing) {
+      conductorMap.set(name, { id: uid(), name, routeName });
+      b.conductors.push({ id: uid(), name, routeName });
+      addedConductors++;
+    } else if (!existing.routeName && routeName) {
+      existing.routeName = routeName;
+      filledConductors++;
+    }
+  });
   state = { ...state, basicData: { ...b } };
   emit();
-  return { addedStations, addedRoutes, addedCheckers };
+  return { addedStations, addedRoutes, addedCheckers, addedDrivers, addedConductors, filledDrivers, filledConductors };
 }
 
 // ---------- 驻站登记时的联想学习 ----------

@@ -1,12 +1,12 @@
 /* 从 database/*.xlsx 与《车队线路信息.xlsx》重新生成 src/data/catalogSeed.js（内置初始资料库）
-   database/司售人员名单.xlsx 提供驾驶员/售票员内置名单
+   database/司售人员名单.xlsx 提供驾驶员/售票员内置名单（含「科室/线路」列生成的线路归属）
    用法：node tools/build-catalog.js
    依赖：项目内 npm 包 xlsx 与 src/lib/stationImport.js（同一套解析逻辑） */
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import * as XLSX from 'xlsx';
-import { parseFile } from '../src/lib/stationImport.js';
+import { parseFile, parseStaff } from '../src/lib/stationImport.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
@@ -37,42 +37,6 @@ function readFleets(file) {
   return fleets;
 }
 
-// 《司售人员名单.xlsx》：按表头定位「姓名」「岗位」列，岗位决定归属驾驶员/售票员；
-// 按姓名去重、保持出现顺序，只取姓名（不带线路归属）
-const DRIVER_POSITIONS = new Set(['驾驶员', '旅游车驾驶员', '常务司机']);
-const CONDUCTOR_POSITIONS = new Set(['乘务员']);
-
-function readStaff(file) {
-  const rows = readRows(file);
-  const header = (rows[0] || []).map((c) => String(c || '').trim());
-  const nameCol = header.indexOf('姓名');
-  const posCol = header.indexOf('岗位');
-  if (nameCol < 0 || posCol < 0) {
-    throw new Error(`《司售人员名单》表头缺少「姓名/岗位」列：${header.join(',')}`);
-  }
-  const seenDrivers = new Set();
-  const seenConductors = new Set();
-  const drivers = [];
-  const conductors = [];
-  for (let ri = 1; ri < rows.length; ri++) {
-    const name = String(rows[ri][nameCol] || '').trim();
-    if (!name) continue;
-    const pos = String(rows[ri][posCol] || '').trim();
-    if (DRIVER_POSITIONS.has(pos)) {
-      if (!seenDrivers.has(name)) {
-        seenDrivers.add(name);
-        drivers.push({ name });
-      }
-    } else if (CONDUCTOR_POSITIONS.has(pos)) {
-      if (!seenConductors.has(name)) {
-        seenConductors.add(name);
-        conductors.push({ name });
-      }
-    }
-  }
-  return { drivers, conductors };
-}
-
 // 合并线路名单：应用改名映射、去重，保持出现顺序
 function mergeRoutes(...lists) {
   const seen = {};
@@ -97,7 +61,9 @@ const staffFile = path.join(ROOT, 'database', '司售人员名单.xlsx');
 const fromStations = parseFile(readRows(stationFile));
 const fromCheckers = parseFile(readRows(checkerFile));
 const fleetSeed = fs.existsSync(fleetFile) ? readFleets(fleetFile) : [];
-const staff = fs.existsSync(staffFile) ? readStaff(staffFile) : { drivers: [], conductors: [] };
+const staff = fs.existsSync(staffFile)
+  ? parseStaff(readRows(staffFile))
+  : { drivers: [], conductors: [] };
 if (!fs.existsSync(staffFile)) {
   console.warn('警告：缺少 database/司售人员名单.xlsx，驾驶员/售票员内置名单为空');
 }
