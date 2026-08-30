@@ -65,3 +65,63 @@ describe('首启内置驾驶员/售票员名单', () => {
     expect(basicData.conductors.find((c) => c.name === seedConductor).routeName).toBe('自定义线路');
   });
 });
+
+describe('旧数据一次性补线路归属', () => {
+  it('已有安装缺 routeName 的司机/售票员按内置名单补齐，不覆盖已维护归属', async () => {
+    const seedDriver = CatalogSeed.drivers.find((d) => d.routeName);
+    const seedConductor = CatalogSeed.conductors.find((c) => c.routeName);
+    localStorage.clear();
+    localStorage.setItem('busCheck.seeded.v2', '1');
+    localStorage.setItem(
+      'busCheck.basicData',
+      JSON.stringify({
+        routes: [],
+        stations: [],
+        plates: [],
+        inspectors: [],
+        drivers: [
+          { id: 'd1', name: seedDriver.name, routeName: '' },
+          { id: 'd2', name: '仅本机添加', routeName: '' },
+        ],
+        conductors: [
+          { id: 'c1', name: seedConductor.name, routeName: '自定义线路' },
+          { id: 'c2', name: '仅本机售票', routeName: '' },
+        ],
+        fleets: [],
+      })
+    );
+
+    const storage = await importStorage();
+    const basicData = storage.getBasicData();
+    expect(basicData.drivers.find((d) => d.name === seedDriver.name).routeName).toBe(seedDriver.routeName);
+    expect(basicData.drivers.find((d) => d.name === '仅本机添加').routeName).toBe('');
+    expect(basicData.conductors.find((c) => c.name === seedConductor.name).routeName).toBe('自定义线路');
+    expect(basicData.conductors.find((c) => c.name === '仅本机售票').routeName).toBe('');
+  });
+
+  it('迁移只执行一次，后续手动清空线路不会被覆盖', async () => {
+    const seedDriver = CatalogSeed.drivers.find((d) => d.routeName);
+    localStorage.clear();
+    localStorage.setItem('busCheck.seeded.v2', '1');
+    localStorage.setItem(
+      'busCheck.basicData',
+      JSON.stringify({
+        routes: [],
+        stations: [],
+        plates: [],
+        inspectors: [],
+        drivers: [{ id: 'd1', name: seedDriver.name, routeName: '' }],
+        conductors: [],
+        fleets: [],
+      })
+    );
+
+    const first = await importStorage();
+    expect(first.getBasicData().drivers[0].routeName).toBe(seedDriver.routeName);
+    expect(localStorage.getItem('busCheck.staffRoutes.v1')).toBe('1');
+
+    first.updateBasicItem('driver', first.getBasicData().drivers[0].id, { routeName: '' });
+    const second = await importStorage();
+    expect(second.getBasicData().drivers[0].routeName).toBe('');
+  });
+});

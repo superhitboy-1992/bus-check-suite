@@ -298,6 +298,56 @@ function seedCatalogIfNeeded() {
 
 seedCatalogIfNeeded();
 
+// ---------- 旧数据一次性补线路归属 ----------
+// 新版内置名单带线路归属，但旧安装的 localStorage 里司机/售票员 routeName 为空；
+// 迁移按姓名从内置名单补一次空归属（不覆盖手工维护），且只执行一次，避免后续手动清空被覆盖。
+const STAFF_ROUTES_MIGRATION_KEY = 'busCheck.staffRoutes.v1';
+
+function migrateStaffRoutes() {
+  try {
+    if (localStorage.getItem(STAFF_ROUTES_MIGRATION_KEY) === '1') return;
+  } catch {
+    return;
+  }
+  if (!CatalogSeed) return;
+  const driverMap = new Map(
+    (CatalogSeed.drivers || []).map((s) => [
+      String((s && s.name) || '').trim(),
+      String((s && s.routeName) || '').trim(),
+    ])
+  );
+  const conductorMap = new Map(
+    (CatalogSeed.conductors || []).map((s) => [
+      String((s && s.name) || '').trim(),
+      String((s && s.routeName) || '').trim(),
+    ])
+  );
+  const b = state.basicData;
+  let changed = false;
+  b.drivers.forEach((d) => {
+    const route = driverMap.get(d.name);
+    if (!d.routeName && route) {
+      d.routeName = route;
+      changed = true;
+    }
+  });
+  b.conductors.forEach((c) => {
+    const route = conductorMap.get(c.name);
+    if (!c.routeName && route) {
+      c.routeName = route;
+      changed = true;
+    }
+  });
+  try {
+    localStorage.setItem(STAFF_ROUTES_MIGRATION_KEY, '1');
+  } catch {
+    /* 存储不可用时忽略 */
+  }
+  if (changed) emit();
+}
+
+migrateStaffRoutes();
+
 // ---------- 跳车记录 ----------
 export function useRecords() {
   return useSyncExternalStore(subscribe, () => state.records);
