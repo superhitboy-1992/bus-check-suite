@@ -27,7 +27,7 @@ describe('驻站登记', () => {
     const dateInput = container.querySelector('input[type="date"]');
     fireEvent.change(dateInput, { target: { value: '2026-08-30' } });
     fireEvent.change(screen.getByPlaceholderText('如：莲朱专线'), { target: { value: '莲朱专线' } });
-    const plateInput = screen.getByPlaceholderText('如：沪A36401D');
+    const plateInput = screen.getByPlaceholderText('如：沪A36401D，可留空');
     fireEvent.change(plateInput, { target: { value: '沪A 36401 D' } });
     fireEvent.blur(plateInput);
     fireEvent.click(screen.getByText('保存记录'));
@@ -44,7 +44,7 @@ describe('驻站登记', () => {
     // 固定信息保留，车辆信息清空
     expect(screen.getByPlaceholderText('如：汽车站').value).toBe('汽车站');
     expect(screen.getByPlaceholderText('如：莲朱专线').value).toBe('');
-    expect(screen.getByPlaceholderText('如：沪A36401D').value).toBe('');
+    expect(screen.getByPlaceholderText('如：沪A36401D，可留空').value).toBe('');
 
     // 自动学习：车号与驻站人进入基础资料
     expect(getBasicData().plates).toContain('沪A36401D');
@@ -63,13 +63,30 @@ describe('驻站登记', () => {
     expect(screen.getAllByText('留空').length).toBeGreaterThanOrEqual(1);
   });
 
-  it('必填校验：缺线路/车号时提示', () => {
+  it('必填校验：缺日期/过站时间/线路时提示', () => {
     render(<App />);
     fireEvent.change(screen.getByPlaceholderText('如：汽车站'), { target: { value: '汽车站' } });
     fireEvent.change(screen.getByPlaceholderText('检查人姓名'), { target: { value: '王五' } });
     fireEvent.click(screen.getByText('保存记录'));
-    expect(screen.getByText('请填写：站点、驻站人、日期、线路、车号')).toBeTruthy();
+    expect(screen.getByText('请填写：站点、驻站人、日期、过站时间、线路')).toBeTruthy();
     expect(localStorage.getItem('busCheck.stationRecords')).toBe('[]');
+  });
+
+  it('必填字段齐全但车号留空时可正常保存', () => {
+    const { container } = render(<App />);
+
+    fireEvent.change(screen.getByPlaceholderText('如：汽车站'), { target: { value: '汽车站' } });
+    fireEvent.change(screen.getByPlaceholderText('检查人姓名'), { target: { value: '王五' } });
+    const dateInput = container.querySelector('input[type="date"]');
+    fireEvent.change(dateInput, { target: { value: '2026-08-30' } });
+    fireEvent.change(screen.getByPlaceholderText('如：莲朱专线'), { target: { value: '莲朱专线' } });
+    fireEvent.click(screen.getByText('现在'));
+    fireEvent.click(screen.getByText('保存记录'));
+
+    const stored = JSON.parse(localStorage.getItem('busCheck.stationRecords'));
+    expect(stored).toHaveLength(1);
+    expect(stored[0].plate).toBe('');
+    expect(stored[0].route).toBe('莲朱专线');
   });
 
   it('线路选择弹层支持车队两级浏览', () => {

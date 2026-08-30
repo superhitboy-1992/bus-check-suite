@@ -115,7 +115,7 @@ export function validRecord(r) {
     normalize(r.station) &&
     normalize(r.checker) &&
     normalize(r.date) &&
-    normalize(r.route) &&
-    normalize(r.plate)
+    normalize(r.time) &&
+    normalize(r.route)
   );
 }

@@ -56,12 +56,14 @@ describe('驻站 core 函数', () => {
     expect(safeName('a/b:c*d?')).toBe('a_b_c_d_');
   });
 
-  it('有效记录校验：站点/驻站人/日期/线路/车号必填', () => {
+  it('有效记录校验：站点/驻站人/日期/过站时间/线路必填，车号可留空', () => {
     expect(validRecord(rec())).toBe(true);
     expect(validRecord(rec({ station: '' }))).toBe(false);
     expect(validRecord(rec({ checker: '' }))).toBe(false);
+    expect(validRecord(rec({ date: '' }))).toBe(false);
+    expect(validRecord(rec({ time: '  ' }))).toBe(false);
     expect(validRecord(rec({ route: '' }))).toBe(false);
-    expect(validRecord(rec({ plate: '  ' }))).toBe(false);
+    expect(validRecord(rec({ plate: '' }))).toBe(true);
     expect(validRecord(null)).toBe(false);
   });
 

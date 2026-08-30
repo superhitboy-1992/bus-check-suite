@@ -189,7 +189,7 @@ export default function StationRegPage() {
       remark: remark.trim(),
     };
     if (!validRecord(rec)) {
-      toast('请填写：站点、驻站人、日期、线路、车号', 'error');
+      toast('请填写：站点、驻站人、日期、过站时间、线路', 'error');
       return;
     }
     if (editingId) {
@@ -367,7 +367,7 @@ export default function StationRegPage() {
                   </Button>
                 </div>
               </Field>
-              <Field label="车号 *">
+              <Field label="车号">
                 <div className="flex gap-1.5">
                   <Input
                     ref={focusRef('f-plate')}
@@ -376,7 +376,7 @@ export default function StationRegPage() {
                     onFocus={() => setPicker('plate')}
                     onBlur={handlePlateBlur}
                     onKeyDown={(e) => onKeyDownEnter(e, 'f-plate', 5)}
-                    placeholder="如：沪A36401D"
+                    placeholder="如：沪A36401D，可留空"
                   />
                   <Button type="button" variant="outline" onClick={() => setPicker('plate')} aria-label="选择车号">
                     ▾
