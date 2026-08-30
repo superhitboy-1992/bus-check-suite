@@ -125,3 +125,63 @@ describe('旧数据一次性补线路归属', () => {
     expect(second.getBasicData().drivers[0].routeName).toBe('');
   });
 });
+
+describe('首启内置站点线路归属', () => {
+  it('全新存储时按种子填充带线路归属的站点，且无 站名|线路 重复', async () => {
+    localStorage.clear();
+    const storage = await importStorage();
+    const stations = storage.getBasicData().stations;
+    expect(stations).toHaveLength(CatalogSeed.stations.length);
+    expect(stations.every((s) => s.routeName)).toBe(true);
+    const keys = new Set(stations.map((s) => s.name + '|' + s.routeName));
+    expect(keys.size).toBe(stations.length);
+  });
+
+  it('旧数据一次性迁移：通用站点按内置资料转成线路记录，手工线路不覆盖、不重复添加', async () => {
+    // 选一个内置资料里的共线站，验证一站多线迁移
+    const counts = new Map();
+    CatalogSeed.stations.forEach((s) => counts.set(s.name, (counts.get(s.name) || 0) + 1));
+    const multiName = [...counts.entries()].find(([, c]) => c > 1)[0];
+    const seedRoutes = CatalogSeed.stations.filter((s) => s.name === multiName).map((s) => s.routeName);
+
+    localStorage.clear();
+    localStorage.setItem('busCheck.seeded.v2', '1');
+    localStorage.setItem(
+      'busCheck.basicData',
+      JSON.stringify({
+        routes: [],
+        stations: [
+          { id: 's1', name: multiName, routeName: '', sortOrder: 0 },
+          { id: 's2', name: '仅本机添加', routeName: '', sortOrder: 0 },
+          { id: 's3', name: multiName, routeName: seedRoutes[0], sortOrder: 9 },
+        ],
+        plates: [],
+        inspectors: [],
+        drivers: [],
+        conductors: [],
+        fleets: [],
+      })
+    );
+
+    const storage = await importStorage();
+    const stations = storage.getBasicData().stations;
+    // 手工维护的线路记录原样保留
+    expect(stations.find((s) => s.id === 's3').routeName).toBe(seedRoutes[0]);
+    expect(stations.find((s) => s.id === 's3').sortOrder).toBe(9);
+    // 通用站点 s1 被替换为按线路的记录，不产生与 s3 重复的同名同线路
+    expect(stations.some((s) => s.id === 's1')).toBe(false);
+    expect(stations.some((s) => s.name === multiName && s.routeName === seedRoutes[1])).toBe(true);
+    // 未匹配内置资料的站点保持通用
+    expect(stations.find((s) => s.name === '仅本机添加').routeName).toBe('');
+    // 迁移后仍无 站名|线路 重复
+    const keys = new Set(stations.map((s) => s.name + '|' + s.routeName));
+    expect(keys.size).toBe(stations.length);
+    expect(localStorage.getItem('busCheck.stationRoutes.v1')).toBe('1');
+
+    // 迁移只执行一次：把种子补出的线路记录清空后重新加载，不会被再次覆盖
+    const migrated = stations.find((s) => s.name === multiName && s.routeName === seedRoutes[1]);
+    storage.updateBasicItem('station', migrated.id, { routeName: '' });
+    const second = await importStorage();
+    expect(second.getBasicData().stations.find((s) => s.id === migrated.id).routeName).toBe('');
+  });
+});

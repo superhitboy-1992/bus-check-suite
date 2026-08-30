@@ -108,7 +108,7 @@ export default function BasicDataPage() {
   function openCreate() {
     setEditing(null);
     setNameInput('');
-    setRouteInput('');
+    setRouteInput(tab === 'station' ? selectedRoute : '');
     setDialogOpen(true);
   }
 
@@ -124,18 +124,41 @@ export default function BasicDataPage() {
       toast('名称不能为空', 'error');
       return;
     }
+    const name = nameInput.trim();
+    if (tab === 'station') {
+      const targetRoute = editing ? routeInput.trim() : routeInput.trim() || selectedRoute;
+      const dup = basicData.stations.find(
+        (s) => s.id !== (editing && editing.id) && s.name === name && s.routeName === targetRoute
+      );
+      if (dup) {
+        toast('该线路已存在同名站点', 'error');
+        return;
+      }
+    }
     setSaving(true);
     try {
       if (editing) {
-        const patch = { name: nameInput.trim() };
+        const patch = { name };
         if (tab === 'driver' || tab === 'conductor') patch.routeName = routeInput || '';
+        if (tab === 'station') {
+          const targetRoute = routeInput.trim();
+          if (targetRoute !== editing.routeName) {
+            patch.routeName = targetRoute;
+            patch.sortOrder = basicData.stations.filter(
+              (s) => s.id !== editing.id && s.routeName === targetRoute
+            ).length;
+          }
+        }
         updateBasicItem(tab, editing.id, patch);
         toast('更新成功');
       } else {
-        const item = { name: nameInput.trim() };
+        const item = { name };
         if (tab === 'driver' || tab === 'conductor') item.routeName = routeInput || '';
-        if (tab === 'station') item.routeName = selectedRoute;
-        if (tab === 'station') item.sortOrder = objList.filter((s) => s.routeName === selectedRoute).length;
+        if (tab === 'station') {
+          const targetRoute = routeInput.trim() || selectedRoute;
+          item.routeName = targetRoute;
+          item.sortOrder = objList.filter((s) => s.routeName === targetRoute).length;
+        }
         addBasicItem(tab, item);
         toast('创建成功');
       }
@@ -660,14 +683,14 @@ export default function BasicDataPage() {
           <Field label={tab === 'route' ? '线路名称' : tab === 'station' ? '站点名称' : '姓名'}>
             <Input value={nameInput} onChange={(e) => setNameInput(e.target.value)} placeholder="请输入名称" />
           </Field>
-          {(tab === 'driver' || tab === 'conductor') && (
+          {(tab === 'driver' || tab === 'conductor' || tab === 'station') && (
             <Field label="所属线路">
               <select
                 value={routeInput}
                 onChange={(e) => setRouteInput(e.target.value)}
                 className="h-11 w-full rounded-md border border-border bg-transparent px-3 text-base outline-none focus-visible:border-primary md:text-sm"
               >
-                <option value="">请选择线路</option>
+                <option value="">{tab === 'station' ? '通用站点（未归线路）' : '请选择线路'}</option>
                 {routes.map((r) => (
                   <option key={r.id} value={r.name}>
                     {r.name}

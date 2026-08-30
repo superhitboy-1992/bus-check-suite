@@ -260,11 +260,15 @@ function seedCatalogIfNeeded() {
     });
   });
   const stationKeys = new Set(b.stations.map((s) => s.name + '|' + s.routeName));
-  (seed.stations || []).forEach((name) => {
-    const key = name + '|';
+  (seed.stations || []).forEach((s) => {
+    const name = typeof s === 'string' ? s.trim() : String((s && s.name) || '').trim();
+    if (!name) return;
+    const routeName = s && typeof s === 'object' ? String(s.routeName || '').trim() : '';
+    const sortOrder = s && typeof s === 'object' && Number.isFinite(s.sortOrder) ? s.sortOrder : 0;
+    const key = name + '|' + routeName;
     if (!stationKeys.has(key)) {
       stationKeys.add(key);
-      b.stations.push({ id: uid(), name, routeName: '', sortOrder: 0 });
+      b.stations.push({ id: uid(), name, routeName, sortOrder });
     }
   });
   const inspectorSet = new Set(b.inspectors);
@@ -347,6 +351,58 @@ function migrateStaffRoutes() {
 }
 
 migrateStaffRoutes();
+
+// ---------- 旧数据一次性补站点线路归属 ----------
+// 新版内置资料带站点线路归属，但旧安装的 localStorage 里站点 routeName 为空；
+// 迁移按站名从内置资料补一次归属（一站多线时生成多条），不覆盖手工维护的线路，
+// 且只执行一次，避免后续手动清空被覆盖。
+const STATION_ROUTES_MIGRATION_KEY = 'busCheck.stationRoutes.v1';
+
+function migrateStationRoutes() {
+  try {
+    if (localStorage.getItem(STATION_ROUTES_MIGRATION_KEY) === '1') return;
+  } catch {
+    return;
+  }
+  if (!CatalogSeed) return;
+  const byName = new Map(); // 站名 -> [{ routeName, sortOrder }]
+  (CatalogSeed.stations || []).forEach((s) => {
+    const name = typeof s === 'string' ? s.trim() : String((s && s.name) || '').trim();
+    if (!name) return;
+    const routeName = s && typeof s === 'object' ? String(s.routeName || '').trim() : '';
+    if (!routeName) return;
+    const sortOrder = s && typeof s === 'object' && Number.isFinite(s.sortOrder) ? s.sortOrder : 0;
+    if (!byName.has(name)) byName.set(name, []);
+    byName.get(name).push({ routeName, sortOrder });
+  });
+  const b = state.basicData;
+  const existing = new Set(b.stations.map((s) => s.name + '|' + s.routeName));
+  let changed = false;
+  const next = [];
+  b.stations.forEach((s) => {
+    // 只转换完全无归属且能匹配内置资料的通用站点；已手工维护线路的保持原样
+    if (s.routeName || !byName.has(s.name)) {
+      next.push(s);
+      return;
+    }
+    byName.get(s.name).forEach((r) => {
+      const key = s.name + '|' + r.routeName;
+      if (existing.has(key)) return; // 该线路记录已存在（手工维护），不重复添加
+      existing.add(key);
+      next.push({ id: uid(), name: s.name, routeName: r.routeName, sortOrder: r.sortOrder });
+      changed = true;
+    });
+  });
+  b.stations = next;
+  try {
+    localStorage.setItem(STATION_ROUTES_MIGRATION_KEY, '1');
+  } catch {
+    /* 存储不可用时忽略 */
+  }
+  if (changed) emit();
+}
+
+migrateStationRoutes();
 
 // ---------- 跳车记录 ----------
 export function useRecords() {
@@ -542,16 +598,21 @@ export function deleteFleet(name) {
 }
 
 // 资料库合并（Excel 导入等场景）：只填充缺失项，返回新增数量。
+// 站点支持字符串（通用站点）与 {name, routeName, sortOrder} 对象（带线路归属）；
 // 司机/售票员按姓名补缺，并只为 routeName 为空的已有人员补充线路，不覆盖手工维护的归属。
 export function mergeCatalogItems({ stations = [], routes = [], checkers = [], drivers = [], conductors = [] }) {
   const b = state.basicData;
   const stationKeys = new Set(b.stations.map((s) => s.name + '|' + s.routeName));
   let addedStations = 0;
-  uniqueStrings(stations).forEach((name) => {
-    const key = name + '|';
+  (stations || []).forEach((s) => {
+    const name = typeof s === 'string' ? s.trim() : String((s && s.name) || '').trim();
+    if (!name) return;
+    const routeName = s && typeof s === 'object' ? String(s.routeName || '').trim() : '';
+    const sortOrder = s && typeof s === 'object' && Number.isFinite(s.sortOrder) ? s.sortOrder : 0;
+    const key = name + '|' + routeName;
     if (!stationKeys.has(key)) {
       stationKeys.add(key);
-      b.stations.push({ id: uid(), name, routeName: '', sortOrder: 0 });
+      b.stations.push({ id: uid(), name, routeName, sortOrder });
       addedStations++;
     }
   });
@@ -615,8 +676,8 @@ export function mergeCatalogItems({ stations = [], routes = [], checkers = [], d
 // ---------- 驻站登记时的联想学习 ----------
 export function learnStationValues(rec) {
   const b = state.basicData;
-  const stationKeys = new Set(b.stations.map((s) => s.name + '|' + s.routeName));
-  if (rec.station && !stationKeys.has(rec.station + '|')) {
+  // 站点已带线路归属时，登记过的新站名只补一条通用记录，避免与已有线路站点重复
+  if (rec.station && !b.stations.some((s) => s.name === rec.station)) {
     b.stations.push({ id: uid(), name: rec.station, routeName: '', sortOrder: 0 });
   }
   if (rec.checker) b.inspectors = uniqueStrings([rec.checker, ...b.inspectors]);

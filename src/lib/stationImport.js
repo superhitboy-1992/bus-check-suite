@@ -165,15 +165,41 @@ export function parseFile(rows) {
     });
   }
 
+  // 线路列：表头非空且不是「站点/线路/全部」等关键词的列，视为「每列一条线路」布局，
+  // 该列站点归属表头线路；共线站（同站名出现在多条线路）按 站名|线路 分别生成一条。
+  const routeCols = [];
+  if (headerIdx >= 0) {
+    grid[headerIdx].forEach((cell, c) => {
+      const v = normalizeSimple(cell);
+      if (v && !ANY_HEAD.test(v)) routeCols.push(c);
+    });
+  }
+
   const stations = [];
   const seenStation = {};
-  for (let r = dataStart; r < grid.length; r++) {
-    for (let c = 0; c < grid[r].length; c++) {
-      if (skipCols[c]) continue;
-      const v = normalizeStation(grid[r][c]);
-      if (v && !seenStation[v]) {
-        seenStation[v] = 1;
-        stations.push(v);
+  if (routeCols.length) {
+    routeCols.forEach((c) => {
+      const routeName = normalizeSimple(grid[headerIdx][c]);
+      let sortOrder = 0;
+      for (let r = dataStart; r < grid.length; r++) {
+        const v = normalizeStation(grid[r][c]);
+        if (!v) continue;
+        const key = v + '|' + routeName;
+        if (!seenStation[key]) {
+          seenStation[key] = 1;
+          stations.push({ name: v, routeName, sortOrder: sortOrder++ });
+        }
+      }
+    });
+  } else {
+    for (let r = dataStart; r < grid.length; r++) {
+      for (let c = 0; c < grid[r].length; c++) {
+        if (skipCols[c]) continue;
+        const v = normalizeStation(grid[r][c]);
+        if (v && !seenStation[v]) {
+          seenStation[v] = 1;
+          stations.push({ name: v, routeName: '', sortOrder: 0 });
+        }
       }
     }
   }

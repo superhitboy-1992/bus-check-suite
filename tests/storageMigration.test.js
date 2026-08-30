@@ -7,6 +7,7 @@ import {
   getRecords,
   getStationRecords,
   importBackupMerge,
+  learnStationValues,
   mergeCatalogItems,
   replaceAllData,
 } from '../src/lib/storage';
@@ -182,5 +183,51 @@ describe('资料库合并（Excel 导入场景）', () => {
     expect(getBasicData().routes.map((x) => x.name)).toEqual(expect.arrayContaining(['1路', '2路']));
     expect(getBasicData().inspectors).toEqual(expect.arrayContaining(['王五', '赵六']));
     expect(getBasicData().routes.find((x) => x.name === '1路').fleet).toBe('一车队');
+  });
+
+  it('合并支持带线路归属的站点对象，共线站按 站名|线路 去重', () => {
+    replaceAllData({
+      ...emptyData,
+      basicData: {
+        ...emptyData.basicData,
+        routes: [{ id: 'rt1', name: '1路', fleet: '' }],
+        stations: [{ id: 's1', name: '总站', routeName: '1路', sortOrder: 0 }],
+      },
+    });
+    const r = mergeCatalogItems({
+      stations: [
+        { name: '总站', routeName: '1路', sortOrder: 0 },
+        { name: '总站', routeName: '2路', sortOrder: 1 },
+        { name: '东站', routeName: '2路', sortOrder: 2 },
+      ],
+      routes: ['2路'],
+    });
+    expect(r.addedStations).toBe(2);
+    const stations = getBasicData().stations;
+    expect(stations.filter((s) => s.name === '总站')).toHaveLength(2);
+    expect(stations.find((s) => s.name === '总站' && s.routeName === '2路').sortOrder).toBe(1);
+    expect(stations.find((s) => s.name === '东站').routeName).toBe('2路');
+  });
+});
+
+describe('驻站登记站点联想', () => {
+  it('站点已有线路归属时不重复补通用记录，全新站名才补', () => {
+    replaceAllData({
+      ...emptyData,
+      basicData: {
+        ...emptyData.basicData,
+        stations: [
+          { id: 's1', name: '总站', routeName: '1路', sortOrder: 0 },
+          { id: 's2', name: '老站', routeName: '', sortOrder: 0 },
+        ],
+      },
+    });
+    learnStationValues({ station: '总站', checker: '王五', route: '1路', plate: '沪A36401D' });
+    expect(getBasicData().stations).toHaveLength(2);
+
+    learnStationValues({ station: '新站', checker: '王五', route: '1路', plate: '沪A36401D' });
+    const stations = getBasicData().stations;
+    expect(stations).toHaveLength(3);
+    expect(stations.find((s) => s.name === '新站').routeName).toBe('');
   });
 });
