@@ -6,7 +6,9 @@ import { useStationRecords } from '../../lib/storage';
 import { dateDot, groupRecords, humanSize, normalize, safeName, toRecordRows } from '../../lib/stationCore';
 import { generate, zip } from '../../lib/stationXlsx';
 
-function downloadBlob(blob, filename) {
+const IS_WECHAT = typeof navigator !== 'undefined' && /MicroMessenger/i.test(navigator.userAgent || '');
+
+function anchorDownload(blob, filename) {
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
@@ -17,6 +19,47 @@ function downloadBlob(blob, filename) {
     URL.revokeObjectURL(url);
     a.remove();
   }, 1200);
+  toast(`已开始下载：${filename}`);
+}
+
+function downloadBlob(blob, filename, mime = '') {
+  // 桌面 Chrome/Edge 优先使用系统「另存为」对话框，反馈更明确
+  if (typeof window.showSaveFilePicker === 'function') {
+    const ext = (String(filename).match(/\.([^.]+)$/) || [])[1] || '';
+    const types = mime && ext ? [{ description: `${ext.toUpperCase()} 文件`, accept: { [mime]: ['.' + ext] } }] : [];
+    try {
+      const picker = window.showSaveFilePicker({ suggestedName: filename, types });
+      picker
+        .then(async (handle) => {
+          const writable = await handle.createWritable();
+          await writable.write(blob);
+          await writable.close();
+          toast(`已保存：${filename}`);
+        })
+        .catch(() => anchorDownload(blob, filename));
+      return;
+    } catch {
+      /* 不支持或调用失败时走标准下载 */
+    }
+  }
+  anchorDownload(blob, filename);
+}
+
+function openInNewTab(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  let win = null;
+  try {
+    win = typeof window.open === 'function' ? window.open(url, '_blank') : null;
+  } catch {
+    win = null;
+  }
+  if (!win) {
+    toast('浏览器拦截了新窗口，请允许弹窗后重试，或改用「下载文件」', 'error');
+    URL.revokeObjectURL(url);
+    return;
+  }
+  setTimeout(() => URL.revokeObjectURL(url), 60000);
+  toast(`已在新的标签页打开：${filename}`);
 }
 
 function isMobileView() {
@@ -30,7 +73,7 @@ function shareOrDownload(blob, filename, mime) {
       const file = new File([blob], filename, { type: mime });
       if (navigator.canShare({ files: [file] })) {
         navigator.share({ files: [file], title: filename }).catch((err) => {
-          if (err && err.name !== 'AbortError') downloadBlob(blob, filename);
+          if (err && err.name !== 'AbortError') downloadBlob(blob, filename, mime);
         });
         return;
       }
@@ -38,7 +81,7 @@ function shareOrDownload(blob, filename, mime) {
       /* 继续走下载 */
     }
   }
-  downloadBlob(blob, filename);
+  downloadBlob(blob, filename, mime);
 }
 
 function buildGroupFile(group) {
@@ -133,7 +176,10 @@ export default function StationExportPage() {
   }
 
   const downloadResult = () => {
-    if (result) downloadBlob(result.blob, result.filename);
+    if (result) downloadBlob(result.blob, result.filename, result.mime);
+  };
+  const openResultInTab = () => {
+    if (result) openInNewTab(result.blob, result.filename);
   };
   const shareResult = () => {
     if (result) shareOrDownload(result.blob, result.filename, result.mime);
@@ -192,7 +238,10 @@ export default function StationExportPage() {
                     分享
                   </Button>
                 )}
-                <Button size="sm" variant="outline" onClick={() => downloadBlob(f.blob, f.filename)}>
+                <Button size="sm" variant="outline" onClick={() => openInNewTab(f.blob, f.filename)}>
+                  打开
+                </Button>
+                <Button size="sm" variant="outline" onClick={() => downloadBlob(f.blob, f.filename, f.mime)}>
                   下载
                 </Button>
               </div>
@@ -233,8 +282,10 @@ export default function StationExportPage() {
 
       <div className="rounded-lg border border-border bg-accent/40 p-4 text-xs leading-relaxed text-muted-foreground">
         说明：按「日期 + 站点」分组，每组自动生成一张《驻站记录表》（固定 30 行、A4 打印格式），与现成模板一致。
-        点击「导出表格」会先弹出导出结果，可在弹窗中下载或分享；已导出的文件会保留在本页列表中，可再次下载。
+        点击「导出表格」会先弹出导出结果，可在弹窗中下载、打开或分享；已导出的文件会保留在本页列表中，可再次下载。
         手机上可直接分享表格到微信/邮件；批量导出会把多张表打包成一个 ZIP 文件。
+        {IS_WECHAT &&
+          '微信内置浏览器可能无法直接下载文件，建议点右上角「···」→「在浏览器打开」后重新导出。'}
       </div>
 
       <Modal
@@ -245,6 +296,9 @@ export default function StationExportPage() {
           <>
             <Button variant="outline" onClick={() => setResult(null)}>
               完成
+            </Button>
+            <Button variant="outline" onClick={openResultInTab}>
+              打开文件
             </Button>
             {isMobile && (
               <Button variant="outline" onClick={shareResult}>
@@ -288,6 +342,11 @@ export default function StationExportPage() {
             <p className="text-xs leading-relaxed text-muted-foreground">
               点击「下载文件」保存到手机或电脑；手机上也可以直接分享到微信/邮件。
             </p>
+            {IS_WECHAT && (
+              <p className="rounded-lg border border-warning/40 bg-warning/10 px-3 py-2 text-xs leading-relaxed text-warning">
+                微信内置浏览器可能无法直接下载文件：可先点「打开文件」试试；若仍不行，请点右上角「···」→「在浏览器打开」后重新导出。
+              </p>
+            )}
           </div>
         )}
       </Modal>
