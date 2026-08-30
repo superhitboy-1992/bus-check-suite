@@ -7,6 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview --host",
+    "build:data": "node tools/build-data.js --from-json",
     "test": "vitest run",
     "test:watch": "vitest"
   },

@@ -35,6 +35,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Regenerate built-in catalog from JSON
+        run: node tools/build-data.js --from-json
+
+      - name: Test
+        run: pnpm test
+
       - name: Build
         run: pnpm build
 

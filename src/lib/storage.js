@@ -1,12 +1,24 @@
 import { useSyncExternalStore } from 'react';
 import { STORAGE_KEYS, DATA_VERSION } from './constants';
 import { CatalogSeed } from '../data/catalogSeed';
+import {
+  buildFleetMap,
+  hashCatalogData,
+  mergeCatalogData,
+  normalizeRemoteCatalog,
+  validateRemoteCatalog,
+} from './remoteCatalog';
 
 const DRAFT_KEY = STORAGE_KEYS.draft;
 const LEGACY_INSPECTORS_KEY = 'busCheck.inspectors';
 const SEEDED_KEY = 'busCheck.seeded.v2';
+const REMOTE_CATALOG_KEY = 'busCheck.basicDataRemote';
+const CATALOG_CHECK_INTERVAL_MS = 60 * 60 * 1000; // 页面重新可见时最多每小时检查一次
 const INSPECTORS_MAX = 20;
 const STORAGE_WARN_BYTES = 4 * 1024 * 1024; // 4MB
+
+let lastCatalogCheckAt = 0;
+let catalogCheckInFlight = null;
 
 function uid() {
   if (globalThis.crypto && typeof globalThis.crypto.randomUUID === 'function') {
@@ -403,6 +415,78 @@ function migrateStationRoutes() {
 }
 
 migrateStationRoutes();
+
+// ---------- 远程基础数据自动更新 ----------
+// 线上真源为 public/basic-data.json（仓库内、可在 GitHub 网页编辑、随站点发布）。
+// 每次启动与页面重新可见时（节流）拉取一次：内容哈希有变化则增量合并，
+// 远程同名条目覆盖、本地独有条目保留、不删除、不动检查记录；失败静默跳过。
+
+function loadRemoteCatalogMeta() {
+  try {
+    const raw = localStorage.getItem(REMOTE_CATALOG_KEY);
+    return raw ? JSON.parse(raw) : { hash: '', appliedAt: 0, updatedAt: '' };
+  } catch {
+    return { hash: '', appliedAt: 0, updatedAt: '' };
+  }
+}
+
+function notifyCatalogUpdated(updatedAt) {
+  if (typeof window === 'undefined' || typeof CustomEvent === 'undefined') return;
+  const date = typeof updatedAt === 'string' && updatedAt ? updatedAt.slice(0, 10) : '';
+  window.dispatchEvent(
+    new CustomEvent('app:toast', {
+      detail: { message: date ? `基础数据已更新（${date}）` : '基础数据已更新', type: 'success' },
+    })
+  );
+}
+
+export async function checkForCatalogUpdate() {
+  if (typeof fetch !== 'function') return null;
+  let raw;
+  try {
+    const res = await fetch('./basic-data.json', { cache: 'no-store' });
+    if (!res || !res.ok) return null;
+    raw = await res.json();
+  } catch (e) {
+    console.warn('基础数据更新检查失败（忽略）', e);
+    return null;
+  }
+  if (!validateRemoteCatalog(raw)) return null;
+  const hash = hashCatalogData(raw);
+  const meta = loadRemoteCatalogMeta();
+  if (meta.hash === hash) return null;
+  const remote = normalizeRemoteCatalog(raw);
+  const merged = mergeCatalogData(state.basicData, remote, buildFleetMap(raw));
+  const updatedAt = typeof raw.updatedAt === 'string' ? raw.updatedAt : '';
+  state = { ...state, basicData: merged };
+  try {
+    localStorage.setItem(REMOTE_CATALOG_KEY, JSON.stringify({ hash, appliedAt: Date.now(), updatedAt }));
+  } catch (e) {
+    console.warn('保存基础数据更新标记失败', e);
+  }
+  emit();
+  notifyCatalogUpdated(updatedAt);
+  return { hash, updatedAt };
+}
+
+// 应用启动时调用一次，并监听页面重新可见时再次检查（节流）
+export function initCatalogAutoUpdate() {
+  if (typeof window === 'undefined' || typeof fetch !== 'function') return;
+  const run = () => {
+    const now = Date.now();
+    if (now - lastCatalogCheckAt < CATALOG_CHECK_INTERVAL_MS) return;
+    lastCatalogCheckAt = now;
+    if (!catalogCheckInFlight) {
+      catalogCheckInFlight = checkForCatalogUpdate().finally(() => {
+        catalogCheckInFlight = null;
+      });
+    }
+  };
+  run();
+  window.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') run();
+  });
+}
 
 // ---------- 跳车记录 ----------
 export function useRecords() {
