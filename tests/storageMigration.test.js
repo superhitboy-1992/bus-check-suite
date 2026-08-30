@@ -92,6 +92,31 @@ describe('旧备份合并导入', () => {
     expect(getBasicData().routes.find((r2) => r2.name === '莲朱专线').fleet).toBe('一车队');
   });
 
+  it('导入备份时当前已有驾驶员/售票员不报错，按姓名并集合并', () => {
+    replaceAllData({
+      ...emptyData,
+      basicData: {
+        ...emptyData.basicData,
+        drivers: [{ id: 'd-old', name: '老驾驶员', routeName: '' }],
+        conductors: [{ id: 'c-old', name: '老售票员', routeName: '' }],
+      },
+    });
+    const payload = {
+      app: '公交跳车检查助手',
+      version: 1,
+      records: [],
+      basicData: {
+        routes: [],
+        drivers: [{ id: 'd-new', name: '新驾驶员', routeName: '1路' }],
+        conductors: [{ id: 'c-new', name: '新售票员', routeName: '' }],
+        stations: [],
+      },
+    };
+    expect(() => importBackupMerge(payload)).not.toThrow();
+    expect(getBasicData().drivers.map((d) => d.name)).toEqual(expect.arrayContaining(['老驾驶员', '新驾驶员']));
+    expect(getBasicData().conductors.map((c) => c.name)).toEqual(expect.arrayContaining(['老售票员', '新售票员']));
+  });
+
   it('v2 备份导出后可完整还原，且重复导入不去重覆盖', () => {
     replaceAllData({
       records: [{ id: 'j1', route: '1路', plateNumber: '粤B12345' }],

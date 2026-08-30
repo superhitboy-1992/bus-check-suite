@@ -4,7 +4,7 @@ import { CatalogSeed } from '../data/catalogSeed';
 
 const DRAFT_KEY = STORAGE_KEYS.draft;
 const LEGACY_INSPECTORS_KEY = 'busCheck.inspectors';
-const SEEDED_KEY = 'busCheck.seeded';
+const SEEDED_KEY = 'busCheck.seeded.v2';
 const INSPECTORS_MAX = 20;
 const STORAGE_WARN_BYTES = 4 * 1024 * 1024; // 4MB
 
@@ -273,6 +273,20 @@ function seedCatalogIfNeeded() {
       inspectorSet.add(name);
       b.inspectors.push(name);
     }
+  });
+  const driverNames = new Set(b.drivers.map((d) => d.name));
+  (seed.drivers || []).forEach((s) => {
+    const name = String((s && s.name !== undefined ? s.name : s) || '').trim();
+    if (!name || driverNames.has(name)) return;
+    driverNames.add(name);
+    b.drivers.push({ id: uid(), name, routeName: String((s && s.routeName) || '').trim() });
+  });
+  const conductorNames = new Set(b.conductors.map((c) => c.name));
+  (seed.conductors || []).forEach((s) => {
+    const name = String((s && s.name !== undefined ? s.name : s) || '').trim();
+    if (!name || conductorNames.has(name)) return;
+    conductorNames.add(name);
+    b.conductors.push({ id: uid(), name, routeName: String((s && s.routeName) || '').trim() });
   });
   try {
     localStorage.setItem(SEEDED_KEY, '1');
@@ -681,17 +695,17 @@ function mergeBasicData(current, incoming) {
   b.plates = uniqueStrings([...b.plates, ...(incoming.plates || [])]);
   b.inspectors = uniqueStrings([...b.inspectors, ...(incoming.inspectors || [])]);
   b.fleets = uniqueStrings([...b.fleets, ...(incoming.fleets || [])]);
-  const driverMap = new Map(b.drivers.map((d) => d.name));
+  const driverNames = new Set(b.drivers.map((d) => d.name));
   (incoming.drivers || []).forEach((d) => {
-    if (!driverMap.has(d.name)) {
-      driverMap.set(d.name, d.name);
+    if (!driverNames.has(d.name)) {
+      driverNames.add(d.name);
       b.drivers.push({ id: d.id || uid(), name: d.name, routeName: d.routeName || '' });
     }
   });
-  const conductorMap = new Map(b.conductors.map((c) => c.name));
+  const conductorNames = new Set(b.conductors.map((c) => c.name));
   (incoming.conductors || []).forEach((c) => {
-    if (!conductorMap.has(c.name)) {
-      conductorMap.set(c.name, c.name);
+    if (!conductorNames.has(c.name)) {
+      conductorNames.add(c.name);
       b.conductors.push({ id: c.id || uid(), name: c.name, routeName: c.routeName || '' });
     }
   });
