@@ -1,0 +1,7 @@
+node_modules
+dist
+*.local
+dev-server.log
+dev-server.err.log
+# 原始数据表格仅保留在本机，不入库
+database/

@@ -1,0 +1,38 @@
+@import "tailwindcss";
+
+html {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.pb-safe {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+body {
+  @apply bg-background text-foreground font-sans;
+  margin: 0;
+}
+
+@theme {
+  --color-background: hsl(0 0% 100%);
+  --color-foreground: hsl(215 25% 15%);
+  --color-card: hsl(0 0% 100%);
+  --color-primary: hsl(210 85% 48%);
+  --color-primary-foreground: hsl(0 0% 100%);
+  --color-muted: hsl(215 20% 96%);
+  --color-muted-foreground: hsl(215 15% 50%);
+  --color-accent: hsl(215 20% 96%);
+  --color-border: hsl(215 15% 88%);
+  --color-success: hsl(145 65% 42%);
+  --color-destructive: hsl(0 72% 51%);
+  --color-warning: hsl(35 90% 52%);
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  main {
+    padding: 0 !important;
+  }
+}

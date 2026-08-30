@@ -1,0 +1,161 @@
+import { useMemo, useState } from 'react';
+import { Button, Card, EmptyState, Field, Input, toast } from '../../components/ui';
+import { Icon } from '../../components/icons';
+import StationTabs from './StationTabs';
+import { useStationRecords } from '../../lib/storage';
+import { dateDot, groupRecords, normalize, safeName, toRecordRows } from '../../lib/stationCore';
+import { generate, zip } from '../../lib/stationXlsx';
+
+function downloadBlob(blob, filename) {
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    URL.revokeObjectURL(url);
+    a.remove();
+  }, 1200);
+}
+
+// 移动端优先走系统分享（微信/邮件等），不可用时降级为下载
+function shareOrDownload(blob, filename, mime) {
+  const isMobile = window.matchMedia('(max-width: 767px)').matches;
+  if (isMobile && navigator.share && navigator.canShare) {
+    try {
+      const file = new File([blob], filename, { type: mime });
+      if (navigator.canShare({ files: [file] })) {
+        navigator.share({ files: [file], title: filename }).catch((err) => {
+          if (err && err.name !== 'AbortError') downloadBlob(blob, filename);
+        });
+        return;
+      }
+    } catch {
+      /* 继续走下载 */
+    }
+  }
+  downloadBlob(blob, filename);
+}
+
+function buildGroupFile(group) {
+  return generate(
+    { station: group.station, checker: group.checker, dateLabel: group.dateLabel },
+    toRecordRows(group.records)
+  );
+}
+
+export default function StationExportPage() {
+  const records = useStationRecords();
+  const [from, setFrom] = useState('');
+  const [to, setTo] = useState('');
+  const [station, setStation] = useState('');
+  const [queried, setQueried] = useState(false);
+
+  const groups = useMemo(() => {
+    const list = records.filter((r) => {
+      if (from && r.date < from) return false;
+      if (to && r.date > to) return false;
+      if (station && r.station !== station) return false;
+      return true;
+    });
+    return groupRecords(list);
+  }, [records, from, to, station, queried]);
+
+  function exportGroup(g) {
+    if (g.count > 30) {
+      toast(`该分组有 ${g.count} 条记录，模板最多 30 行，已按时间取前 30 条`, 'error');
+    }
+    const bin = buildGroupFile(g);
+    const filename = `驻站记录表【${dateDot(g.date)}】.xlsx`;
+    shareOrDownload(
+      new Blob([bin], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }),
+      filename,
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+    );
+    toast(`已导出：${filename}`);
+  }
+
+  function exportAllZip() {
+    if (!groups.length) {
+      toast('当前条件下没有可导出的记录', 'error');
+      return;
+    }
+    const used = {};
+    const entries = groups.map((g) => {
+      const base = `驻站记录表【${dateDot(g.date)}】`;
+      let name = base + '.xlsx';
+      let n = 0;
+      while (used[name]) {
+        n++;
+        name = base + '_' + safeName(g.station) + (n > 1 ? n : '') + '.xlsx';
+      }
+      used[name] = true;
+      return { name, data: buildGroupFile(g) };
+    });
+    const bin = zip(entries);
+    downloadBlob(new Blob([bin], { type: 'application/zip' }), `驻站记录表_${from || '起始'}_${to || '结束'}.zip`);
+    toast(`已导出 ${entries.length} 张表格（ZIP）`);
+  }
+
+  return (
+    <div className="space-y-4">
+      <StationTabs />
+
+      <Card className="p-4">
+        <div className="grid gap-3 sm:grid-cols-3">
+          <Field label="日期从">
+            <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+          </Field>
+          <Field label="至">
+            <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+          </Field>
+          <Field label="站点">
+            <Input value={station} onChange={(e) => setStation(e.target.value)} placeholder="全部" />
+          </Field>
+        </div>
+        <div className="mt-3 flex flex-wrap items-center gap-2">
+          <Button size="sm" onClick={() => setQueried((v) => !v)}>
+            查询分组
+          </Button>
+          <Button size="sm" variant="outline" onClick={exportAllZip}>
+            批量导出 ZIP
+          </Button>
+          <span className="ml-auto text-sm text-muted-foreground">共 {groups.length} 个分组</span>
+        </div>
+      </Card>
+
+      {groups.length === 0 ? (
+        <Card>
+          <EmptyState icon="file" title="当前条件下没有记录" description="调整日期或站点范围后重新查询" />
+        </Card>
+      ) : (
+        <div className="space-y-3">
+          {groups.map((g) => (
+            <Card key={g.date + '|' + g.station} className="flex flex-wrap items-center gap-3 p-4">
+              <div className="flex size-10 items-center justify-center rounded-lg bg-accent text-muted-foreground">
+                <Icon name="calendar" className="size-5" />
+              </div>
+              <div className="min-w-0 flex-1">
+                <p className="text-sm font-semibold text-foreground">
+                  {g.date} · {g.station}
+                </p>
+                <p className="mt-0.5 text-xs text-muted-foreground">
+                  驻站人：{g.checker || '—'} · {g.count} 条记录
+                </p>
+              </div>
+              <Button size="sm" variant="outline" onClick={() => exportGroup(g)}>
+                导出表格
+              </Button>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      <div className="rounded-lg border border-border bg-accent/40 p-4 text-xs leading-relaxed text-muted-foreground">
+        说明：按「日期 + 站点」分组，每组自动生成一张《驻站记录表》（固定 30 行、A4 打印格式），与现成模板一致。
+        手机上可直接分享表格到微信/邮件；批量导出会把多张表打包成一个 ZIP 文件。
+      </div>
+    </div>
+  );
+}
