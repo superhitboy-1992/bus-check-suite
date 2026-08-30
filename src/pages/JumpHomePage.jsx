@@ -360,9 +360,10 @@ export default function HomePage() {
             <Icon name="alert" className="size-4 shrink-0 text-warning" />
             本地存储空间不足，记录可能无法保存
           </span>
-          <Button size="sm" variant="outline" onClick={() => navigate('/basic-data')}>
+          {/* 已隐藏「去备份」入口；如需恢复，取消下面这段的注释即可（路由已保留）。 */}
+          {/* <Button size="sm" variant="outline" onClick={() => navigate('/basic-data')}>
             去备份
-          </Button>
+          </Button> */}
         </div>
       )}
       <div className="flex flex-wrap items-center justify-between gap-3">

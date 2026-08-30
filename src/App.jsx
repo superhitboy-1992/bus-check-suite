@@ -16,7 +16,8 @@ const NAV = [
   { path: '/', label: '首页', icon: 'home', end: true },
   { path: '/station/reg', label: '驻站检查', icon: 'station', end: false },
   { path: '/jump', label: '跳车检查', icon: 'bus', end: false },
-  { path: '/basic-data', label: '基础数据', icon: 'database', end: false },
+  // 已隐藏「基础数据」导航入口；如需恢复，取消下面这一行的注释即可（路由已保留）。
+  // { path: '/basic-data', label: '基础数据', icon: 'database', end: false },
 ];
 
 function Shell() {

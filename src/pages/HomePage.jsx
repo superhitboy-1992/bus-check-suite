@@ -102,7 +102,8 @@ export default function HomePage() {
         ))}
       </section>
 
-      <Card className="flex flex-col items-start justify-between gap-3 p-4 sm:flex-row sm:items-center">
+      {/* 已隐藏「基础资料与备份」入口；如需恢复，取消下面这段的注释即可（路由已保留）。 */}
+      {/* <Card className="flex flex-col items-start justify-between gap-3 p-4 sm:flex-row sm:items-center">
         <div className="flex items-center gap-3">
           <div className="flex size-10 items-center justify-center rounded-lg bg-accent text-muted-foreground">
             <Icon name="database" className="size-5" />
@@ -115,7 +116,7 @@ export default function HomePage() {
         <Button variant="outline" size="sm" onClick={() => navigate('/basic-data')}>
           管理基础数据
         </Button>
-      </Card>
+      </Card> */}
     </div>
   );
 }

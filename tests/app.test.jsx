@@ -24,14 +24,14 @@ beforeEach(() => {
 });
 
 describe('应用冒烟测试', () => {
-  it('渲染外壳与四个导航入口', () => {
+  it('渲染外壳与三个导航入口（基础数据入口已隐藏）', () => {
     render(<App />);
     expect(screen.getByText('公交检查助手')).toBeTruthy();
     expect(screen.getByText('首页')).toBeTruthy();
     expect(screen.getAllByText('驻站检查').length).toBeGreaterThanOrEqual(1);
     expect(screen.getAllByText('跳车检查').length).toBeGreaterThanOrEqual(1);
     expect(screen.queryByText('统计')).toBeNull();
-    expect(screen.getByText('基础数据')).toBeTruthy();
+    expect(screen.queryByText('基础数据')).toBeNull();
   });
 
   it('首页双入口：驻站检查与跳车检查入口可点击进入', () => {

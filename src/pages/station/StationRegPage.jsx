@@ -248,9 +248,10 @@ export default function StationRegPage() {
         <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-amber-300 bg-amber-50 px-4 py-3 text-sm text-amber-800">
           <span>{reminder.msg}</span>
           <span className="flex gap-2">
-            <Button size="sm" onClick={() => navigate('/basic-data', { state: { tab: 'backup' } })}>
+            {/* 已隐藏「去备份」入口；如需恢复，取消下面这段的注释即可（路由已保留）。 */}
+            {/* <Button size="sm" onClick={() => navigate('/basic-data', { state: { tab: 'backup' } })}>
               去备份
-            </Button>
+            </Button> */}
             <Button size="sm" variant="ghost" onClick={() => setReminder(null)}>
               稍后
             </Button>
