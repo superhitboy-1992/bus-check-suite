@@ -340,7 +340,13 @@ export default function StationRegPage() {
                     onChange={(e) => setTime(e.target.value)}
                     onKeyDown={(e) => onKeyDownEnter(e, 'f-time', 3)}
                   />
-                  <Button type="button" variant="outline" onClick={() => setTime(nowTime())} aria-label="登记当前时间">
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="whitespace-nowrap"
+                    onClick={() => setTime(nowTime())}
+                    aria-label="登记当前时间"
+                  >
                     现在
                   </Button>
                 </div>
