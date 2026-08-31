@@ -25,7 +25,8 @@
 
 - 台账：列表/当日表格视图、筛选、分页、编辑、删除；
 - 新建：14 项检查项三态（合格/不合格/待确认）、驾驶员/售票员、上下车时间/地点；
-- 导出：Excel (.xlsx) / CSV，表头与原版应用一致。
+- 导出：以官方《营运检查表-跳车及服务检查》模板生成 Excel（20 行/页，超出自动追加工作表；
+  右下角自动填写检查人与检查日期；跨天记录在备注前置日期标记，如 `8.31,备注`），另支持 CSV。
 
 ### 基础数据（`#/basic-data`）
 
@@ -129,15 +130,19 @@ src/lib/search.js           汉字 + 拼音模糊搜索
 src/lib/stationImport.js    Excel 资料导入解析
 src/lib/stationXlsx.js      模板 Excel 导出 + ZIP（零依赖）
 src/lib/stationTemplate.js  内置《驻站记录表》模板（由 build-template.js 生成，勿手改）
+src/lib/export.js           跳车 CSV 导出与导出文件名
+src/lib/jumpXlsx.js         跳车模板 Excel 导出（20 行/页、多工作表）
+src/lib/jumpTemplate.js     内置《营运检查表-跳车及服务检查》模板（由 build-template.js 生成，勿手改）
 src/lib/remoteCatalog.js    线上基础数据拉取：哈希/校验/增量合并
 src/data/catalogSeed.js     内置初始资料库（由 basic-data.json 生成，勿手改）
 public/basic-data.json      线上基础数据真源（可在 GitHub 网页直接编辑）
 src/pages/HomePage.jsx      首页双入口
 src/pages/station/          驻站模块（登记/查询/导出）
 src/pages/JumpHomePage.jsx  跳车台账（原跳车检查首页）
-tools/build-template.js     重新打包模板（node tools/build-template.js）
+tools/build-template.js     重新打包模板（node tools/build-template.js / --which jump）
 tools/build-data.js         基础数据生成（--from-excel 读表格 / --from-json 读 JSON）
 ```
 
 > 原始 Excel（`database/` 目录）仅保留在本机，不入库；模板源文件
-> 《驻站记录表【日期】.xlsx》《车队线路信息.xlsx》保留在仓库根目录。
+> 《驻站记录表【日期】.xlsx》《营运检查表-跳车及服务检查【日期】.xlsx》
+> 《车队线路信息.xlsx》保留在仓库根目录。

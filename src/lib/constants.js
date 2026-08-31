@@ -17,24 +17,8 @@ export const CHECK_ITEMS = [
 
 export const ITEM_KEYS = CHECK_ITEMS.map((i) => i.key);
 
-// 原版导出的表头为旧版检查项名称，按要求照搬（含与原版一致的瑕疵）
-export const EXPORT_ITEM_NAMES = [
-  '按规范佩戴安全带',
-  '开启转向灯',
-  '平稳起步',
-  '平稳靠站',
-  '规范进出站',
-  '匀速行驶',
-  '安全跟车距离',
-  '规范变道',
-  '正确使用灯光',
-  '禁止手持接打手机',
-  '禁止与他人闲聊',
-  '禁止吸烟饮食',
-  '礼貌服务用语',
-  '拒载甩站改线',
-];
-
+// 导出表头：检查项名称与模板《营运检查表》一致（由 CHECK_ITEMS 派生），
+// 保留每行检查人/检查日期两列（CSV 用）
 export const EXPORT_HEADER = [
   '序号',
   '线路',
@@ -45,7 +29,7 @@ export const EXPORT_HEADER = [
   '上车地点',
   '下车时间',
   '下车地点',
-  ...EXPORT_ITEM_NAMES,
+  ...CHECK_ITEMS.map((i) => i.name),
   '备注',
   '检查人',
   '检查日期',

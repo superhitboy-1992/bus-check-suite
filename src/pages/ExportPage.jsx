@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useRecords } from '../lib/storage';
 import { matchRecord } from '../lib/filter';
-import { buildCSVBlob, buildRows, buildXLSXBlob, downloadBlob, exportFilename } from '../lib/export';
+import { buildCSVBlob, downloadBlob, exportFilename } from '../lib/export';
+import { generate as generateJumpXlsx } from '../lib/jumpXlsx';
 import { monthStartStr, todayStr } from '../lib/dates';
 import { Icon } from '../components/icons';
 import { Button, Card, DateInput, Field, Input, toast } from '../components/ui';
@@ -60,8 +61,13 @@ export default function ExportPage() {
       return;
     }
     try {
-      const rows = buildRows(matched);
-      const blob = format === 'xlsx' ? buildXLSXBlob(rows) : buildCSVBlob(matched);
+      const blob =
+        format === 'xlsx'
+          ? new Blob(
+              [generateJumpXlsx({ startDate: dateFrom, inspector: matched[0]?.inspector || '' }, matched)],
+              { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }
+            )
+          : buildCSVBlob(matched);
       setResult({
         filename: exportFilename(dateFrom, format),
         recordCount: matched.length,

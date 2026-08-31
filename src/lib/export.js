@@ -1,4 +1,3 @@
-import * as XLSX from 'xlsx';
 import { EXPORT_HEADER, ITEM_KEYS } from './constants';
 import { formatM_D } from './dates';
 
@@ -40,14 +39,6 @@ export function toCSV(rows) {
 
 export function buildCSVBlob(records) {
   return new Blob([toCSV([EXPORT_HEADER, ...buildRows(records)])], { type: 'text/csv;charset=utf-8;' });
-}
-
-export function buildXLSXBlob(rows) {
-  const ws = XLSX.utils.aoa_to_sheet([EXPORT_HEADER, ...rows]);
-  const wb = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(wb, ws, '检查记录');
-  const out = XLSX.write(wb, { bookType: 'xlsx', type: 'array' });
-  return new Blob([out], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
 }
 
 export function downloadBlob(blob, filename) {
