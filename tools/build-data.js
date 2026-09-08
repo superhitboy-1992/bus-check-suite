@@ -109,6 +109,34 @@ function assertPayload(data) {
   if (!data.stations.length || !data.routes.length || !data.checkers.length) {
     throw new Error('basic-data.json 的站点/线路/驻站人不能为空');
   }
+  ['stationRenames', 'stationRemovals'].forEach((k) => {
+    if (data[k] != null && !Array.isArray(data[k])) {
+      throw new Error(`basic-data.json 的 ${k} 必须为数组`);
+    }
+  });
+  const textOk = (v) => typeof v === 'string' && v.trim();
+  (data.stationRenames || []).forEach((e, i) => {
+    if (
+      !e ||
+      typeof e !== 'object' ||
+      !textOk(e.routeName) ||
+      !textOk(e.oldName) ||
+      !textOk(e.newName)
+    ) {
+      throw new Error(`stationRenames[${i}] 缺少 routeName/oldName/newName`);
+    }
+  });
+  (data.stationRemovals || []).forEach((e, i) => {
+    if (!e || typeof e !== 'object' || !textOk(e.routeName) || !textOk(e.name)) {
+      throw new Error(`stationRemovals[${i}] 缺少 routeName/name`);
+    }
+  });
+  const fullwidth = data.stations.filter((s) => /[（）]/.test(String((s && s.name) || '')));
+  if (fullwidth.length) {
+    throw new Error(
+      `站点名不允许使用全角括号（请统一半角 ()）：${fullwidth.slice(0, 3).map((s) => s.name).join('、')}`
+    );
+  }
 }
 
 function writeJson(seed) {

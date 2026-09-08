@@ -1,6 +1,7 @@
 import { useSyncExternalStore } from 'react';
 import { STORAGE_KEYS, DATA_VERSION } from './constants';
 import { CatalogSeed } from '../data/catalogSeed';
+import { canonicalStationName } from './catalogFormat';
 import {
   buildFleetMap,
   hashCatalogData,
@@ -89,12 +90,14 @@ function normalizeStations(arr) {
       const key = name + '|' + routeName;
       if (!name || seen.has(key)) return;
       seen.add(key);
-      out.push({
+      const item = {
         id: it.id || uid(),
         name,
         routeName,
         sortOrder: Number.isFinite(it.sortOrder) ? it.sortOrder : 0,
-      });
+      };
+      if (it.retired === true) item.retired = true;
+      out.push(item);
     }
   });
   return out;
@@ -424,9 +427,9 @@ migrateStationRoutes();
 function loadRemoteCatalogMeta() {
   try {
     const raw = localStorage.getItem(REMOTE_CATALOG_KEY);
-    return raw ? JSON.parse(raw) : { hash: '', appliedAt: 0, updatedAt: '' };
+    return raw ? JSON.parse(raw) : { hash: '', appliedAt: 0, updatedAt: '', catalogVersion: 0 };
   } catch {
-    return { hash: '', appliedAt: 0, updatedAt: '' };
+    return { hash: '', appliedAt: 0, updatedAt: '', catalogVersion: 0 };
   }
 }
 
@@ -454,19 +457,24 @@ export async function checkForCatalogUpdate() {
   if (!validateRemoteCatalog(raw)) return null;
   const hash = hashCatalogData(raw);
   const meta = loadRemoteCatalogMeta();
-  if (meta.hash === hash) return null;
+  const catalogVersion = Number.isFinite(raw.catalogVersion) ? raw.catalogVersion : 0;
+  // 旧版本应用可能已保存过相同哈希但未应用过新指令；catalogVersion 兜底触发一次重放
+  if (meta.hash === hash && meta.catalogVersion === catalogVersion) return null;
   const remote = normalizeRemoteCatalog(raw);
   const merged = mergeCatalogData(state.basicData, remote, buildFleetMap(raw));
   const updatedAt = typeof raw.updatedAt === 'string' ? raw.updatedAt : '';
   state = { ...state, basicData: merged };
   try {
-    localStorage.setItem(REMOTE_CATALOG_KEY, JSON.stringify({ hash, appliedAt: Date.now(), updatedAt }));
+    localStorage.setItem(
+      REMOTE_CATALOG_KEY,
+      JSON.stringify({ hash, appliedAt: Date.now(), updatedAt, catalogVersion })
+    );
   } catch (e) {
     console.warn('保存基础数据更新标记失败', e);
   }
   emit();
   notifyCatalogUpdated(updatedAt);
-  return { hash, updatedAt };
+  return { hash, updatedAt, catalogVersion };
 }
 
 // 应用启动时调用一次，并监听页面重新可见时再次检查（节流）
@@ -576,7 +584,11 @@ export function getBasicData() {
 
 export function addBasicItem(type, item) {
   const listKey = `${type}s`;
-  const next = { id: uid(), ...item };
+  const patch =
+    type === 'station' && item && typeof item.name === 'string'
+      ? { ...item, name: canonicalStationName(item.name) }
+      : item;
+  const next = { id: uid(), ...patch };
   state = { ...state, basicData: { ...state.basicData, [listKey]: [...state.basicData[listKey], next] } };
   emit();
   return next;
@@ -584,11 +596,17 @@ export function addBasicItem(type, item) {
 
 export function updateBasicItem(type, id, patch) {
   const listKey = `${type}s`;
+  const applied =
+    type === 'station' && patch && typeof patch.name === 'string'
+      ? { ...patch, name: canonicalStationName(patch.name) }
+      : patch;
   state = {
     ...state,
     basicData: {
       ...state.basicData,
-      [listKey]: state.basicData[listKey].map((it) => (it.id === id ? { ...it, ...patch } : it)),
+      [listKey]: state.basicData[listKey].map((it) =>
+        it.id === id ? { ...it, ...applied } : it
+      ),
     },
   };
   emit();
@@ -603,8 +621,10 @@ export function deleteBasicItem(type, id) {
   emit();
 }
 
-export function swapStations(i, j, routeName) {
-  const stations = state.basicData.stations.filter((s) => s.routeName === routeName);
+export function swapStations(i, j, routeName, includeRetired = false) {
+  const stations = state.basicData.stations.filter(
+    (s) => s.routeName === routeName && (includeRetired || s.retired !== true)
+  );
   if (i < 0 || j < 0 || i >= stations.length || j >= stations.length) return;
   const a = stations[i];
   const b = stations[j];
@@ -689,7 +709,7 @@ export function mergeCatalogItems({ stations = [], routes = [], checkers = [], d
   const stationKeys = new Set(b.stations.map((s) => s.name + '|' + s.routeName));
   let addedStations = 0;
   (stations || []).forEach((s) => {
-    const name = typeof s === 'string' ? s.trim() : String((s && s.name) || '').trim();
+    const name = canonicalStationName(typeof s === 'string' ? s : s && s.name);
     if (!name) return;
     const routeName = s && typeof s === 'object' ? String(s.routeName || '').trim() : '';
     const sortOrder = s && typeof s === 'object' && Number.isFinite(s.sortOrder) ? s.sortOrder : 0;
@@ -761,8 +781,12 @@ export function mergeCatalogItems({ stations = [], routes = [], checkers = [], d
 export function learnStationValues(rec) {
   const b = state.basicData;
   // 站点已带线路归属时，登记过的新站名只补一条通用记录，避免与已有线路站点重复
-  if (rec.station && !b.stations.some((s) => s.name === rec.station)) {
-    b.stations.push({ id: uid(), name: rec.station, routeName: '', sortOrder: 0 });
+  const canonicalRec = canonicalStationName(rec.station);
+  if (
+    canonicalRec &&
+    !b.stations.some((s) => canonicalStationName(s.name) === canonicalRec)
+  ) {
+    b.stations.push({ id: uid(), name: canonicalRec, routeName: '', sortOrder: 0 });
   }
   if (rec.checker) b.inspectors = uniqueStrings([rec.checker, ...b.inspectors]);
   if (rec.route && !b.routes.some((r) => r.name === rec.route)) {
@@ -919,7 +943,14 @@ function mergeBasicData(current, incoming) {
     const key = s.name + '|' + (s.routeName || '');
     if (!stationKeys.has(key)) {
       stationKeys.add(key);
-      b.stations.push({ id: s.id || uid(), name: s.name, routeName: s.routeName || '', sortOrder: s.sortOrder || 0 });
+      const item = {
+        id: s.id || uid(),
+        name: s.name,
+        routeName: s.routeName || '',
+        sortOrder: s.sortOrder || 0,
+      };
+      if (s.retired === true) item.retired = true;
+      b.stations.push(item);
     }
   });
   b.plates = uniqueStrings([...b.plates, ...(incoming.plates || [])]);

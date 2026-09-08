@@ -23,6 +23,7 @@ export default function StationListPage() {
     const seen = new Set();
     const out = [];
     basicData.stations.forEach((s) => {
+      if (s.retired === true) return;
       if (!seen.has(s.name)) {
         seen.add(s.name);
         out.push(s.name);

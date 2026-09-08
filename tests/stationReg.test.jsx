@@ -63,6 +63,25 @@ describe('驻站登记', () => {
     expect(screen.getAllByText('留空').length).toBeGreaterThanOrEqual(1);
   });
 
+  it('站点选择器只显示未停用站点', () => {
+    replaceAllData({
+      ...emptyData,
+      basicData: {
+        ...emptyData.basicData,
+        stations: [
+          { id: 'a1', name: '汽车站(北)', routeName: '1路', sortOrder: 0 },
+          { id: 'a2', name: '汽车站（北）', routeName: '1路', sortOrder: 0, retired: true },
+          { id: 'a3', name: '停用老站', routeName: '2路', sortOrder: 0, retired: true },
+        ],
+      },
+    });
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: '选择站点' }));
+    expect(screen.getByText('汽车站(北)')).toBeTruthy();
+    expect(screen.queryByText('汽车站（北）')).toBeNull();
+    expect(screen.queryByText('停用老站')).toBeNull();
+  });
+
   it('必填校验：缺日期/过站时间/线路时提示', () => {
     render(<App />);
     fireEvent.change(screen.getByPlaceholderText('如：汽车站'), { target: { value: '汽车站' } });

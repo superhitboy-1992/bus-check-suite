@@ -230,4 +230,20 @@ describe('驻站登记站点联想', () => {
     expect(stations).toHaveLength(3);
     expect(stations.find((s) => s.name === '新站').routeName).toBe('');
   });
+
+  it('编辑含全角括号旧写法记录时不会把旧写法重新加回选择器', () => {
+    replaceAllData({
+      ...emptyData,
+      basicData: {
+        ...emptyData.basicData,
+        stations: [
+          { id: 's1', name: '人民广场(北)', routeName: '1路', sortOrder: 0 },
+          { id: 's2', name: '人民广场（北）', routeName: '1路', sortOrder: 0, retired: true },
+        ],
+      },
+    });
+    learnStationValues({ station: '人民广场（北）', checker: '王五', route: '1路', plate: '沪A36401D' });
+    expect(getBasicData().stations).toHaveLength(2);
+    expect(getBasicData().stations.filter((s) => s.name === '人民广场（北）')).toHaveLength(1);
+  });
 });

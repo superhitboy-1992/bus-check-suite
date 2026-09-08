@@ -154,6 +154,110 @@ describe('增量合并（纯函数）', () => {
     expect(twice.drivers).toHaveLength(once.drivers.length);
     expect(twice.inspectors).toEqual(once.inspectors);
   });
+
+  it('改名指令：旧写法停用、半角活跃站保留，重复合并幂等', () => {
+    const raw = validRemote({
+      stations: [
+        { name: '人民广场(北)', routeName: '1路', sortOrder: 0 },
+        { name: '人民广场', routeName: '2路', sortOrder: 0 },
+      ],
+      routes: ['1路', '2路'],
+      stationRenames: [
+        { routeName: '1路', oldName: '人民广场（北）', newName: '人民广场(北)' },
+      ],
+    });
+    const remote = normalizeRemoteCatalog(raw);
+    const localData = {
+      routes: [{ id: 'r1', name: '1路', fleet: '' }],
+      stations: [{ id: 'a', name: '人民广场（北）', routeName: '1路', sortOrder: 0 }],
+      plates: [],
+      inspectors: [],
+      drivers: [],
+      conductors: [],
+      fleets: [],
+    };
+    const once = mergeCatalogData(localData, remote, buildFleetMap(raw));
+    const oldItem = once.stations.find((s) => s.name === '人民广场（北）');
+    const newItem = once.stations.find((s) => s.name === '人民广场(北)' && s.routeName === '1路');
+    expect(oldItem.retired).toBe(true);
+    expect(newItem).toBeTruthy();
+    expect(newItem.retired).toBeUndefined();
+    const twice = mergeCatalogData(once, remote, buildFleetMap(raw));
+    expect(twice.stations).toEqual(once.stations);
+  });
+
+  it('停用指令：只停用本地仍有且线上活跃表缺失的站点，记录不受影响', () => {
+    const raw = validRemote({
+      stations: [{ name: '保留站', routeName: '1路', sortOrder: 0 }],
+      routes: ['1路'],
+      stationRemovals: [{ routeName: '1路', name: '老站' }],
+    });
+    const remote = normalizeRemoteCatalog(raw);
+    const merged = mergeCatalogData(
+      {
+        routes: [],
+        stations: [
+          { id: 's1', name: '老站', routeName: '1路', sortOrder: 0 },
+          { id: 's2', name: '独有站', routeName: '2路', sortOrder: 0 },
+        ],
+        plates: [],
+        inspectors: [],
+        drivers: [],
+        conductors: [],
+        fleets: [],
+      },
+      remote
+    );
+    expect(merged.stations.find((s) => s.id === 's1').retired).toBe(true);
+    expect(merged.stations.find((s) => s.id === 's2').retired).toBeUndefined();
+    expect(merged.stations.find((s) => s.name === '保留站')).toBeTruthy();
+  });
+
+  it('线路恢复时清除停用标记：同一条停用指令不会反向再停用', () => {
+    const makeRaw = (active) =>
+      validRemote({
+        stations: [{ name: active, routeName: '1路', sortOrder: 0 }],
+        routes: ['1路'],
+        stationRemovals: [{ routeName: '1路', name: '总站' }],
+      });
+    const first = mergeCatalogData(
+      {
+        routes: [],
+        stations: [{ id: 's1', name: '总站', routeName: '1路', sortOrder: 0 }],
+        plates: [],
+        inspectors: [],
+        drivers: [],
+        conductors: [],
+        fleets: [],
+      },
+      normalizeRemoteCatalog(makeRaw('甲站'))
+    );
+    expect(first.stations.find((s) => s.id === 's1').retired).toBe(true);
+
+    const second = mergeCatalogData(
+      first,
+      normalizeRemoteCatalog(makeRaw('总站'))
+    );
+    const revived = second.stations.find((s) => s.name === '总站' && s.routeName === '1路');
+    expect(revived.retired).toBeUndefined();
+  });
+});
+
+describe('远程指令结构校验', () => {
+  it('stationRenames 缺字段/新旧同名时拒绝', () => {
+    expect(validateRemoteCatalog(validRemote({ stationRenames: [{ routeName: '', oldName: '旧', newName: '新' }] }))).toBe(false);
+    expect(validateRemoteCatalog(validRemote({ stationRenames: [{ routeName: '1路', oldName: '', newName: '新' }] }))).toBe(false);
+    expect(validateRemoteCatalog(validRemote({ stationRenames: [{ routeName: '1路', oldName: '同', newName: '同' }] }))).toBe(false);
+    expect(validateRemoteCatalog(validRemote({ stationRenames: 'x' }))).toBe(false);
+    expect(validateRemoteCatalog(validRemote({ stationRenames: [{ routeName: '1路', oldName: '旧', newName: '新' }] }))).toBe(true);
+  });
+
+  it('stationRemovals 缺字段或类型错误时拒绝', () => {
+    expect(validateRemoteCatalog(validRemote({ stationRemovals: [{ routeName: '1路', name: '' }] }))).toBe(false);
+    expect(validateRemoteCatalog(validRemote({ stationRemovals: [{ routeName: '', name: '站' }] }))).toBe(false);
+    expect(validateRemoteCatalog(validRemote({ stationRemovals: 'x' }))).toBe(false);
+    expect(validateRemoteCatalog(validRemote({ stationRemovals: [{ routeName: '1路', name: '站' }] }))).toBe(true);
+  });
 });
 
 describe('运行时远程更新（storage.checkForCatalogUpdate）', () => {
@@ -216,6 +320,56 @@ describe('运行时远程更新（storage.checkForCatalogUpdate）', () => {
   it('响应非 200 时跳过', async () => {
     const before = storage.getBasicData();
     mockFetch(validRemote(), { ok: false });
+    const result = await storage.checkForCatalogUpdate();
+    expect(result).toBeNull();
+    expect(storage.getBasicData()).toEqual(before);
+  });
+
+  it('运行时应用改名/停用指令：旧写法停用、新写法活跃且幂等', async () => {
+    storage.replaceAllData({
+      records: [],
+      stationRecords: [],
+      basicData: {
+        routes: [{ id: 'r1', name: '1路', fleet: '' }],
+        stations: [
+          { id: 's1', name: '人民广场（北）', routeName: '1路', sortOrder: 0 },
+          { id: 's2', name: '老站', routeName: '1路', sortOrder: 1 },
+        ],
+        plates: [],
+        inspectors: [],
+        drivers: [],
+        conductors: [],
+        fleets: [],
+      },
+    });
+    const raw = validRemote({
+      catalogVersion: 2,
+      stations: [{ name: '人民广场(北)', routeName: '1路', sortOrder: 0 }],
+      routes: ['1路'],
+      stationRenames: [{ routeName: '1路', oldName: '人民广场（北）', newName: '人民广场(北)' }],
+      stationRemovals: [{ routeName: '1路', name: '老站' }],
+    });
+    mockFetch(raw);
+    const result = await storage.checkForCatalogUpdate();
+    expect(result).not.toBeNull();
+    const b = storage.getBasicData();
+    expect(b.stations.find((s) => s.name === '人民广场（北）').retired).toBe(true);
+    expect(b.stations.find((s) => s.name === '人民广场(北)').retired).toBeUndefined();
+    expect(b.stations.find((s) => s.name === '老站').retired).toBe(true);
+
+    mockFetch(raw);
+    const again = await storage.checkForCatalogUpdate();
+    expect(again).toBeNull();
+    expect(storage.getBasicData().stations).toEqual(b.stations);
+  });
+
+  it('非法指令整份忽略，不污染本地数据', async () => {
+    const before = storage.getBasicData();
+    mockFetch(
+      validRemote({
+        stationRenames: [{ routeName: '1路', oldName: '', newName: '新' }],
+      })
+    );
     const result = await storage.checkForCatalogUpdate();
     expect(result).toBeNull();
     expect(storage.getBasicData()).toEqual(before);

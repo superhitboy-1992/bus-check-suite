@@ -6,6 +6,7 @@ import { search } from '../lib/search';
 import { readFile } from '../lib/stationImport';
 import { todayStr } from '../lib/dates';
 import { normalizePlate } from '../lib/stationCore';
+import { canonicalStationName } from '../lib/catalogFormat';
 import { downloadBlob } from '../lib/export';
 import {
   addBasicItem,
@@ -54,6 +55,7 @@ export default function BasicDataPage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [nameInput, setNameInput] = useState('');
   const [routeInput, setRouteInput] = useState('');
+  const [showRetired, setShowRetired] = useState(false);
   const [saving, setSaving] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
   const [deleteBusy, setDeleteBusy] = useState(false);
@@ -89,6 +91,7 @@ export default function BasicDataPage() {
   const displayObj = useMemo(() => {
     let list = objList;
     if (tab === 'station') {
+      if (!showRetired) list = list.filter((s) => s.retired !== true);
       list = list.filter((s) => s.routeName === selectedRoute);
     }
     if (tab === 'route' || tab === 'driver' || tab === 'conductor' || tab === 'station') {
@@ -96,7 +99,7 @@ export default function BasicDataPage() {
       list = list.filter((i) => names.has(i.name));
     }
     return list;
-  }, [tab, objList, query, selectedRoute]);
+  }, [tab, objList, query, selectedRoute, showRetired]);
 
   const displayStr = useMemo(() => {
     if (!query) return strList;
@@ -120,11 +123,11 @@ export default function BasicDataPage() {
   }
 
   function saveObj() {
-    if (!nameInput.trim()) {
+    const name = tab === 'station' ? canonicalStationName(nameInput) : nameInput.trim();
+    if (!name) {
       toast('名称不能为空', 'error');
       return;
     }
-    const name = nameInput.trim();
     if (tab === 'station') {
       const targetRoute = editing ? routeInput.trim() : routeInput.trim() || selectedRoute;
       const dup = basicData.stations.find(
@@ -142,6 +145,7 @@ export default function BasicDataPage() {
         if (tab === 'driver' || tab === 'conductor') patch.routeName = routeInput || '';
         if (tab === 'station') {
           const targetRoute = routeInput.trim();
+          if (editing.retired === true) patch.retired = false;
           if (targetRoute !== editing.routeName) {
             patch.routeName = targetRoute;
             patch.sortOrder = basicData.stations.filter(
@@ -221,7 +225,7 @@ export default function BasicDataPage() {
   function moveStation(idx, dir) {
     const target = idx + dir;
     if (target < 0 || target >= displayObj.length) return;
-    swapStations(idx, target, selectedRoute);
+    swapStations(idx, target, selectedRoute, showRetired);
     toast('排序已更新');
   }
 
@@ -593,6 +597,17 @@ export default function BasicDataPage() {
                     ))}
                   </select>
                 )}
+                {tab === 'station' && (
+                  <label className="flex shrink-0 items-center gap-1.5 whitespace-nowrap text-xs text-muted-foreground">
+                    <input
+                      type="checkbox"
+                      checked={showRetired}
+                      onChange={(e) => setShowRetired(e.target.checked)}
+                      className="size-3.5 accent-primary"
+                    />
+                    显示已停用
+                  </label>
+                )}
                 <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="搜索…" className="h-10 max-w-xs" />
               </div>
               <Button onClick={openCreate}>
@@ -608,7 +623,14 @@ export default function BasicDataPage() {
                 {displayObj.map((item, idx) => (
                   <div key={item.id} className="flex h-14 items-center justify-between px-1">
                     <div className="min-w-0 flex-1">
-                      <div className="truncate text-base font-medium">{item.name}</div>
+                      <div className="flex items-center gap-2">
+                        <span className="truncate text-base font-medium">{item.name}</span>
+                        {item.retired === true && (
+                          <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">
+                            已停用
+                          </span>
+                        )}
+                      </div>
                       {tab === 'station' && selectedRoute && <div className="truncate text-sm text-muted-foreground">{item.routeName}</div>}
                       {(tab === 'driver' || tab === 'conductor') && item.routeName && (
                         <div className="truncate text-sm text-muted-foreground">{item.routeName}</div>

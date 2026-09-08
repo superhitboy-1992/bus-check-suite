@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-08-30T07:52:58.658Z",
+  "updatedAt": "2026-09-08T14:16:09.701Z",
   "stations": [
     {
       "name": "德贤路中侨大学",
@@ -7,12 +7,12 @@
       "sortOrder": 0
     },
     {
-      "name": "东贤路康和路（三附中）",
+      "name": "东贤路康和路(三附中)",
       "routeName": "莲张专线",
       "sortOrder": 1
     },
     {
-      "name": "东贤路康德路（招呼站）",
+      "name": "东贤路康德路(招呼站)",
       "routeName": "莲张专线",
       "sortOrder": 2
     },
@@ -62,7 +62,7 @@
       "sortOrder": 11
     },
     {
-      "name": "九工路时代大道（和辉光电）",
+      "name": "九工路时代大道(和辉光电)",
       "routeName": "莲张专线",
       "sortOrder": 12
     },
@@ -107,7 +107,7 @@
       "sortOrder": 20
     },
     {
-      "name": "莲花路地铁站（北广场）",
+      "name": "莲花路地铁站(北广场)",
       "routeName": "莲张专线",
       "sortOrder": 21
     },
@@ -122,12 +122,12 @@
       "sortOrder": 23
     },
     {
-      "name": "东贤路康和路（北）",
+      "name": "东贤路康和路(北)",
       "routeName": "莲张专线",
       "sortOrder": 24
     },
     {
-      "name": "莲花路地铁站（北广场）",
+      "name": "莲花路地铁站(北广场)",
       "routeName": "莲卫专线",
       "sortOrder": 0
     },
@@ -232,7 +232,7 @@
       "sortOrder": 20
     },
     {
-      "name": "东贤路康和路（三附中）",
+      "name": "东贤路康和路(三附中)",
       "routeName": "莲卫专线",
       "sortOrder": 21
     },
@@ -247,7 +247,7 @@
       "sortOrder": 23
     },
     {
-      "name": "杭州湾大道体育场北环路（金山体育中心）",
+      "name": "杭州湾大道体育场北环路(金山体育中心)",
       "routeName": "莲卫专线",
       "sortOrder": 24
     },
@@ -382,7 +382,7 @@
       "sortOrder": 6
     },
     {
-      "name": "九工路春丽路（和辉光电）",
+      "name": "九工路春丽路(和辉光电)",
       "routeName": "1652路",
       "sortOrder": 7
     },
@@ -462,7 +462,7 @@
       "sortOrder": 0
     },
     {
-      "name": "亭卫公路朱漕公路（朱行）",
+      "name": "亭卫公路朱漕公路(朱行)",
       "routeName": "1655路",
       "sortOrder": 1
     },
@@ -552,7 +552,7 @@
       "sortOrder": 8
     },
     {
-      "name": "天工路亭卫公路（西）",
+      "name": "天工路亭卫公路(西)",
       "routeName": "1656路",
       "sortOrder": 9
     },
@@ -562,7 +562,7 @@
       "sortOrder": 0
     },
     {
-      "name": "天工路亭卫公路（西）",
+      "name": "天工路亭卫公路(西)",
       "routeName": "1658路",
       "sortOrder": 1
     },
@@ -607,57 +607,57 @@
       "sortOrder": 0
     },
     {
-      "name": "泾宾路枫湾路（枫岸华庭）",
+      "name": "泾宾路枫湾路(枫岸华庭)",
       "routeName": "1665路",
       "sortOrder": 1
     },
     {
-      "name": "枫湾路白牛路（科创小镇）",
+      "name": "枫湾路白牛路(科创小镇)",
       "routeName": "1665路",
       "sortOrder": 2
     },
     {
-      "name": "枫湾路泾蓉路（农贸市场）",
+      "name": "枫湾路泾蓉路(农贸市场)",
       "routeName": "1665路",
       "sortOrder": 3
     },
     {
-      "name": "泾蓉路枫阳路（步行街）",
+      "name": "泾蓉路枫阳路(步行街)",
       "routeName": "1665路",
       "sortOrder": 4
     },
     {
-      "name": "枫阳路北大街（枫阳新村）",
+      "name": "枫阳路北大街(枫阳新村)",
       "routeName": "1665路",
       "sortOrder": 5
     },
     {
-      "name": "泾波路新泾路（佳田苑）",
+      "name": "泾波路新泾路(佳田苑)",
       "routeName": "1665路",
       "sortOrder": 6
     },
     {
-      "name": "新泾路泾波路（大新桥）",
+      "name": "新泾路泾波路(大新桥)",
       "routeName": "1665路",
       "sortOrder": 7
     },
     {
-      "name": "新泾路白牛路（枫溪公园）",
+      "name": "新泾路白牛路(枫溪公园)",
       "routeName": "1665路",
       "sortOrder": 8
     },
     {
-      "name": "白牛路枫杰路（枫泾中学）",
+      "name": "白牛路枫杰路(枫泾中学)",
       "routeName": "1665路",
       "sortOrder": 9
     },
     {
-      "name": "白牛路枫阳路（枫泾医院东门）",
+      "name": "白牛路枫阳路(枫泾医院东门)",
       "routeName": "1665路",
       "sortOrder": 10
     },
     {
-      "name": "枫阳路泾宾路（农兴苑）",
+      "name": "枫阳路泾宾路(农兴苑)",
       "routeName": "1665路",
       "sortOrder": 11
     },
@@ -667,12 +667,12 @@
       "sortOrder": 0
     },
     {
-      "name": "枫兰路泾宾路（枫香名苑）",
+      "name": "枫兰路泾宾路(枫香名苑)",
       "routeName": "1666路",
       "sortOrder": 1
     },
     {
-      "name": "枫兰路白牛路（响水港）",
+      "name": "枫兰路白牛路(响水港)",
       "routeName": "1666路",
       "sortOrder": 2
     },
@@ -682,47 +682,47 @@
       "sortOrder": 3
     },
     {
-      "name": "枫沛路枫馨路（桃源名庭北门）",
+      "name": "枫沛路枫馨路(桃源名庭北门)",
       "routeName": "1666路",
       "sortOrder": 4
     },
     {
-      "name": "泾波路枫沛路（桃源幼儿园）",
+      "name": "泾波路枫沛路(桃源幼儿园)",
       "routeName": "1666路",
       "sortOrder": 5
     },
     {
-      "name": "泾波路枫美路（中冶枫郡）",
+      "name": "泾波路枫美路(中冶枫郡)",
       "routeName": "1666路",
       "sortOrder": 6
     },
     {
-      "name": "泾波路泾荷路（枫泾派出所）",
+      "name": "泾波路泾荷路(枫泾派出所)",
       "routeName": "1666路",
       "sortOrder": 7
     },
     {
-      "name": "枫湾路泾波路（正荣璟园）",
+      "name": "枫湾路泾波路(正荣璟园)",
       "routeName": "1666路",
       "sortOrder": 8
     },
     {
-      "name": "泾蓉路枫阳路（步行街）",
+      "name": "泾蓉路枫阳路(步行街)",
       "routeName": "1666路",
       "sortOrder": 9
     },
     {
-      "name": "枫阳路白牛路（枫泾医院北门）",
+      "name": "枫阳路白牛路(枫泾医院北门)",
       "routeName": "1666路",
       "sortOrder": 10
     },
     {
-      "name": "枫阳路泾宾路（农兴苑）",
+      "name": "枫阳路泾宾路(农兴苑)",
       "routeName": "1666路",
       "sortOrder": 11
     },
     {
-      "name": "泾宾路枫湾路（枫岸华庭）",
+      "name": "泾宾路枫湾路(枫岸华庭)",
       "routeName": "1666路",
       "sortOrder": 12
     },
@@ -747,7 +747,7 @@
       "sortOrder": 3
     },
     {
-      "name": "朱吕公路金廊公路（吕巷镇政府）",
+      "name": "朱吕公路金廊公路(吕巷镇政府)",
       "routeName": "1668路",
       "sortOrder": 4
     },
@@ -807,7 +807,7 @@
       "sortOrder": 15
     },
     {
-      "name": "浦银路新洲路（农业银行）",
+      "name": "浦银路新洲路(农业银行)",
       "routeName": "1669路",
       "sortOrder": 0
     },
@@ -872,7 +872,7 @@
       "sortOrder": 0
     },
     {
-      "name": "新利路（万年7组）",
+      "name": "新利路(万年7组)",
       "routeName": "1670路",
       "sortOrder": 1
     },
@@ -882,7 +882,7 @@
       "sortOrder": 2
     },
     {
-      "name": "慧丹路新利路（慧农村）",
+      "name": "慧丹路新利路(慧农村)",
       "routeName": "1670路",
       "sortOrder": 3
     },
@@ -917,7 +917,7 @@
       "sortOrder": 9
     },
     {
-      "name": "浦银路新洲路（农业银行）",
+      "name": "浦银路新洲路(农业银行)",
       "routeName": "1670路",
       "sortOrder": 10
     },
@@ -1012,7 +1012,7 @@
       "sortOrder": 16
     },
     {
-      "name": "众安街罗星南路（广缘大酒店）",
+      "name": "众安街罗星南路(广缘大酒店)",
       "routeName": "1671路",
       "sortOrder": 17
     },
@@ -1042,7 +1042,7 @@
       "sortOrder": 22
     },
     {
-      "name": "罗星南路众安街（广缘大酒店）",
+      "name": "罗星南路众安街(广缘大酒店)",
       "routeName": "1671路",
       "sortOrder": 23
     },
@@ -1062,7 +1062,7 @@
       "sortOrder": 0
     },
     {
-      "name": "健康南路金龙新街（金山体育馆）",
+      "name": "健康南路金龙新街(金山体育馆)",
       "routeName": "1672路",
       "sortOrder": 1
     },
@@ -1082,7 +1082,7 @@
       "sortOrder": 4
     },
     {
-      "name": "健康路临源街（南）",
+      "name": "健康路临源街(南)",
       "routeName": "1672路",
       "sortOrder": 5
     },
@@ -1092,7 +1092,7 @@
       "sortOrder": 6
     },
     {
-      "name": "秀州街南圩路（红菱苑）",
+      "name": "秀州街南圩路(红菱苑)",
       "routeName": "1672路",
       "sortOrder": 7
     },
@@ -1132,7 +1132,7 @@
       "sortOrder": 14
     },
     {
-      "name": "罗星南路众安街（广缘大酒店）",
+      "name": "罗星南路众安街(广缘大酒店)",
       "routeName": "1672路",
       "sortOrder": 15
     },
@@ -1152,7 +1152,7 @@
       "sortOrder": 18
     },
     {
-      "name": "健康南路金龙新街（体育馆）",
+      "name": "健康南路金龙新街(体育馆)",
       "routeName": "1672路",
       "sortOrder": 19
     },
@@ -1187,7 +1187,7 @@
       "sortOrder": 3
     },
     {
-      "name": "兴豪路亭枫公路（南）",
+      "name": "兴豪路亭枫公路(南)",
       "routeName": "1673路",
       "sortOrder": 4
     },
@@ -1352,7 +1352,7 @@
       "sortOrder": 2
     },
     {
-      "name": "朱吕公路金廊公路（吕巷镇政府）",
+      "name": "朱吕公路金廊公路(吕巷镇政府)",
       "routeName": "1676路",
       "sortOrder": 3
     },
@@ -1392,7 +1392,7 @@
       "sortOrder": 10
     },
     {
-      "name": "金石北路漾平路（南）",
+      "name": "金石北路漾平路(南)",
       "routeName": "1676路",
       "sortOrder": 11
     },
@@ -1407,12 +1407,12 @@
       "sortOrder": 13
     },
     {
-      "name": "金石北路新泾路（水果公园）",
+      "name": "金石北路新泾路(水果公园)",
       "routeName": "1676路",
       "sortOrder": 14
     },
     {
-      "name": "金石北路新泾路（水果公园）",
+      "name": "金石北路新泾路(水果公园)",
       "routeName": "1677路",
       "sortOrder": 0
     },
@@ -1647,7 +1647,7 @@
       "sortOrder": 2
     },
     {
-      "name": "廊下中学（西）",
+      "name": "廊下中学(西)",
       "routeName": "1680路",
       "sortOrder": 3
     },
@@ -1747,12 +1747,12 @@
       "sortOrder": 11
     },
     {
-      "name": "浦银路新洲路（农业银行）",
+      "name": "浦银路新洲路(农业银行)",
       "routeName": "1681路",
       "sortOrder": 12
     },
     {
-      "name": "贸易路浦银路（敬老院）",
+      "name": "贸易路浦银路(敬老院)",
       "routeName": "1681路",
       "sortOrder": 13
     },
@@ -2002,7 +2002,7 @@
       "sortOrder": 23
     },
     {
-      "name": "罗星南路众安街（广缘大酒店）",
+      "name": "罗星南路众安街(广缘大酒店)",
       "routeName": "1684路",
       "sortOrder": 0
     },
@@ -2037,7 +2037,7 @@
       "sortOrder": 6
     },
     {
-      "name": "亭枫公路朱平公路（上海永太）",
+      "name": "亭枫公路朱平公路(上海永太)",
       "routeName": "1684路",
       "sortOrder": 7
     },
@@ -2092,7 +2092,7 @@
       "sortOrder": 1
     },
     {
-      "name": "亭枫公路花开海上（秀泾）",
+      "name": "亭枫公路花开海上(秀泾)",
       "routeName": "DZ乐莲线",
       "sortOrder": 2
     },
@@ -2107,7 +2107,7 @@
       "sortOrder": 4
     },
     {
-      "name": "莲花路地铁站（北广场）",
+      "name": "莲花路地铁站(北广场)",
       "routeName": "DZ乐莲线",
       "sortOrder": 5
     },
@@ -2117,12 +2117,12 @@
       "sortOrder": 0
     },
     {
-      "name": "亭枫公路花开海上（秀泾）",
+      "name": "亭枫公路花开海上(秀泾)",
       "routeName": "DZ乐张线",
       "sortOrder": 1
     },
     {
-      "name": "朱吕公路金廊公路（吕巷镇政府）",
+      "name": "朱吕公路金廊公路(吕巷镇政府)",
       "routeName": "DZ乐张线",
       "sortOrder": 2
     },
@@ -2197,7 +2197,7 @@
       "sortOrder": 8
     },
     {
-      "name": "朱枫公路中洪支路（中洪村）",
+      "name": "朱枫公路中洪支路(中洪村)",
       "routeName": "枫泾1路",
       "sortOrder": 9
     },
@@ -2227,22 +2227,22 @@
       "sortOrder": 14
     },
     {
-      "name": "枫阳路北大街（枫阳新村）",
+      "name": "枫阳路北大街(枫阳新村)",
       "routeName": "枫泾1路",
       "sortOrder": 15
     },
     {
-      "name": "枫阳路白牛路（枫泾医院北门）",
+      "name": "枫阳路白牛路(枫泾医院北门)",
       "routeName": "枫泾1路",
       "sortOrder": 16
     },
     {
-      "name": "枫阳路泾宾路（农兴苑）",
+      "name": "枫阳路泾宾路(农兴苑)",
       "routeName": "枫泾1路",
       "sortOrder": 17
     },
     {
-      "name": "泾宾路枫湾路（枫岸华庭）",
+      "name": "泾宾路枫湾路(枫岸华庭)",
       "routeName": "枫泾1路",
       "sortOrder": 18
     },
@@ -2252,17 +2252,17 @@
       "sortOrder": 19
     },
     {
-      "name": "枫湾路白牛路（科创小镇）",
+      "name": "枫湾路白牛路(科创小镇)",
       "routeName": "枫泾1路",
       "sortOrder": 20
     },
     {
-      "name": "枫湾路泾蓉路（农贸市场）",
+      "name": "枫湾路泾蓉路(农贸市场)",
       "routeName": "枫泾1路",
       "sortOrder": 21
     },
     {
-      "name": "枫湾路泾波路（正荣璟园）",
+      "name": "枫湾路泾波路(正荣璟园)",
       "routeName": "枫泾1路",
       "sortOrder": 22
     },
@@ -2282,17 +2282,17 @@
       "sortOrder": 2
     },
     {
-      "name": "枫湾路泾波路（正荣璟园）",
+      "name": "枫湾路泾波路(正荣璟园)",
       "routeName": "枫泾2路",
       "sortOrder": 3
     },
     {
-      "name": "枫湾路泾蓉路（农贸市场）",
+      "name": "枫湾路泾蓉路(农贸市场)",
       "routeName": "枫泾2路",
       "sortOrder": 4
     },
     {
-      "name": "白牛路枫湾路（枫岸华庭）西门",
+      "name": "白牛路枫湾路(枫岸华庭)西门",
       "routeName": "枫泾2路",
       "sortOrder": 5
     },
@@ -2307,37 +2307,37 @@
       "sortOrder": 7
     },
     {
-      "name": "泾宾路枫湾路（枫岸华庭）",
+      "name": "泾宾路枫湾路(枫岸华庭)",
       "routeName": "枫泾2路",
       "sortOrder": 8
     },
     {
-      "name": "枫阳路泾宾路（农兴苑）",
+      "name": "枫阳路泾宾路(农兴苑)",
       "routeName": "枫泾2路",
       "sortOrder": 9
     },
     {
-      "name": "枫阳路白牛路（枫泾医院北门）",
+      "name": "枫阳路白牛路(枫泾医院北门)",
       "routeName": "枫泾2路",
       "sortOrder": 10
     },
     {
-      "name": "枫阳路北大街（枫阳新村）",
+      "name": "枫阳路北大街(枫阳新村)",
       "routeName": "枫泾2路",
       "sortOrder": 11
     },
     {
-      "name": "朱枫公路新泾路（芙蓉新村）",
+      "name": "朱枫公路新泾路(芙蓉新村)",
       "routeName": "枫泾2路",
       "sortOrder": 12
     },
     {
-      "name": "朱枫公路（枫泾人民政府）",
+      "name": "朱枫公路(枫泾人民政府)",
       "routeName": "枫泾2路",
       "sortOrder": 13
     },
     {
-      "name": "朱枫公路亭枫公路（枫景家园）",
+      "name": "朱枫公路亭枫公路(枫景家园)",
       "routeName": "枫泾2路",
       "sortOrder": 14
     },
@@ -2347,7 +2347,7 @@
       "sortOrder": 15
     },
     {
-      "name": "潮枫路亭枫公路（野米泾）",
+      "name": "潮枫路亭枫公路(野米泾)",
       "routeName": "枫泾2路",
       "sortOrder": 16
     },
@@ -2397,7 +2397,7 @@
       "sortOrder": 25
     },
     {
-      "name": "枫阳路白牛路（枫泾医院）",
+      "name": "枫阳路白牛路(枫泾医院)",
       "routeName": "枫泾2路",
       "sortOrder": 26
     },
@@ -2417,12 +2417,12 @@
       "sortOrder": 2
     },
     {
-      "name": "泾波路枫湾路（正荣璟园）",
+      "name": "泾波路枫湾路(正荣璟园)",
       "routeName": "枫泾6路",
       "sortOrder": 3
     },
     {
-      "name": "泾波路枫翠路（枫泾派出所）",
+      "name": "泾波路枫翠路(枫泾派出所)",
       "routeName": "枫泾6路",
       "sortOrder": 4
     },
@@ -2442,37 +2442,37 @@
       "sortOrder": 7
     },
     {
-      "name": "泾宾路枫湾路（枫岸华庭）",
+      "name": "泾宾路枫湾路(枫岸华庭)",
       "routeName": "枫泾6路",
       "sortOrder": 8
     },
     {
-      "name": "枫阳路泾宾路（农兴苑）",
+      "name": "枫阳路泾宾路(农兴苑)",
       "routeName": "枫泾6路",
       "sortOrder": 9
     },
     {
-      "name": "枫阳路白牛路（枫泾医院北门）",
+      "name": "枫阳路白牛路(枫泾医院北门)",
       "routeName": "枫泾6路",
       "sortOrder": 10
     },
     {
-      "name": "枫阳路北大街（枫阳新村）",
+      "name": "枫阳路北大街(枫阳新村)",
       "routeName": "枫泾6路",
       "sortOrder": 11
     },
     {
-      "name": "朱枫公路新泾路（芙蓉新村）",
+      "name": "朱枫公路新泾路(芙蓉新村)",
       "routeName": "枫泾6路",
       "sortOrder": 12
     },
     {
-      "name": "朱枫公路（枫泾人民政府）",
+      "name": "朱枫公路(枫泾人民政府)",
       "routeName": "枫泾6路",
       "sortOrder": 13
     },
     {
-      "name": "朱枫公路亭枫公路（枫景家园）",
+      "name": "朱枫公路亭枫公路(枫景家园)",
       "routeName": "枫泾6路",
       "sortOrder": 14
     },
@@ -2487,12 +2487,12 @@
       "sortOrder": 16
     },
     {
-      "name": "新义路网埭港（北）",
+      "name": "新义路网埭港(北)",
       "routeName": "枫泾6路",
       "sortOrder": 17
     },
     {
-      "name": "新义路网埭港（南）",
+      "name": "新义路网埭港(南)",
       "routeName": "枫泾6路",
       "sortOrder": 18
     },
@@ -2687,7 +2687,7 @@
       "sortOrder": 5
     },
     {
-      "name": "松卫南路康贤路（留溪家园）",
+      "name": "松卫南路康贤路(留溪家园)",
       "routeName": "金山115路",
       "sortOrder": 6
     },
@@ -2712,7 +2712,7 @@
       "sortOrder": 10
     },
     {
-      "name": "杭州湾大道体育场北环路（金山体育中心）",
+      "name": "杭州湾大道体育场北环路(金山体育中心)",
       "routeName": "金山115路",
       "sortOrder": 11
     },
@@ -2802,12 +2802,12 @@
       "sortOrder": 28
     },
     {
-      "name": "金山卫站（南广场东站）",
+      "name": "金山卫站(南广场东站)",
       "routeName": "金山115路",
       "sortOrder": 29
     },
     {
-      "name": "亭耀路林冠路（亭林大居）",
+      "name": "亭耀路林冠路(亭林大居)",
       "routeName": "金山206路",
       "sortOrder": 0
     },
@@ -2932,7 +2932,7 @@
       "sortOrder": 24
     },
     {
-      "name": "东贤路康和路（北）",
+      "name": "东贤路康和路(北)",
       "routeName": "金山206路",
       "sortOrder": 25
     },
@@ -2942,7 +2942,7 @@
       "sortOrder": 26
     },
     {
-      "name": "东贤路康和路（三附中）",
+      "name": "东贤路康和路(三附中)",
       "routeName": "金山206路",
       "sortOrder": 27
     },
@@ -2967,7 +2967,7 @@
       "sortOrder": 2
     },
     {
-      "name": "廊下中学（西）",
+      "name": "廊下中学(西)",
       "routeName": "廊下2路",
       "sortOrder": 3
     },
@@ -3017,7 +3017,7 @@
       "sortOrder": 12
     },
     {
-      "name": "中丰路横码头（徐家楼）",
+      "name": "中丰路横码头(徐家楼)",
       "routeName": "廊下2路",
       "sortOrder": 13
     },
@@ -3042,7 +3042,7 @@
       "sortOrder": 2
     },
     {
-      "name": "廊下中学（西）",
+      "name": "廊下中学(西)",
       "routeName": "廊下3路A",
       "sortOrder": 3
     },
@@ -3117,7 +3117,7 @@
       "sortOrder": 17
     },
     {
-      "name": "中联村（陆家浜）",
+      "name": "中联村(陆家浜)",
       "routeName": "廊下3路A",
       "sortOrder": 18
     },
@@ -3137,7 +3137,7 @@
       "sortOrder": 2
     },
     {
-      "name": "廊下中学（西）",
+      "name": "廊下中学(西)",
       "routeName": "廊下3路B",
       "sortOrder": 3
     },
@@ -3232,7 +3232,7 @@
       "sortOrder": 2
     },
     {
-      "name": "廊下中学（东）",
+      "name": "廊下中学(东)",
       "routeName": "廊下4路",
       "sortOrder": 3
     },
@@ -3312,7 +3312,7 @@
       "sortOrder": 1
     },
     {
-      "name": "亭枫公路花开海上（秀泾）",
+      "name": "亭枫公路花开海上(秀泾)",
       "routeName": "乐松专线",
       "sortOrder": 2
     },
@@ -3352,217 +3352,217 @@
       "sortOrder": 9
     },
     {
-      "name": "莲花路地铁站（北广场）",
+      "name": "莲花路地铁站(北广场)",
       "routeName": "莲浜专线",
       "sortOrder": 0
     },
     {
-      "name": "莲花路地铁站（南方商城）",
+      "name": "莲花路地铁站(南方商城)",
       "routeName": "莲浜专线",
       "sortOrder": 1
     },
     {
-      "name": "思源路叶新公路（招呼站）",
+      "name": "思源路叶新公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 2
     },
     {
-      "name": "思源公路富荣公路（招呼站）",
+      "name": "思源公路富荣公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 3
     },
     {
-      "name": "富荣公路叶车路（招呼站）",
+      "name": "富荣公路叶车路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 4
     },
     {
-      "name": "叶榭（招呼站）",
+      "name": "叶榭(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 5
     },
     {
-      "name": "叶权路车亭公路（招呼站）",
+      "name": "叶权路车亭公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 6
     },
     {
-      "name": "叶校路叶政路（招呼站）",
+      "name": "叶校路叶政路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 7
     },
     {
-      "name": "叶政路叶乐路（招呼站）",
+      "name": "叶政路叶乐路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 8
     },
     {
-      "name": "叶新公路叶达公路（招呼站）",
+      "name": "叶新公路叶达公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 9
     },
     {
-      "name": "叶新公路民发公路（招呼站）",
+      "name": "叶新公路民发公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 10
     },
     {
-      "name": "叶新公路浦亭路（招呼站）",
+      "name": "叶新公路浦亭路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 11
     },
     {
-      "name": "叶新公路张泽（招呼站）",
+      "name": "叶新公路张泽(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 12
     },
     {
-      "name": "叶新公路张米公路（招呼站）",
+      "name": "叶新公路张米公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 13
     },
     {
-      "name": "叶新公路兴东公路（招呼站）",
+      "name": "叶新公路兴东公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 14
     },
     {
-      "name": "叶新公路兴艺公路（招呼站）",
+      "name": "叶新公路兴艺公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 15
     },
     {
-      "name": "叶新公路姚厍村（招呼站）",
+      "name": "叶新公路姚厍村(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 16
     },
     {
-      "name": "叶新公路松金公路（招呼站）",
+      "name": "叶新公路松金公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 17
     },
     {
-      "name": "叶新公路中天路（招呼站）",
+      "name": "叶新公路中天路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 18
     },
     {
-      "name": "叶新公路新龚村（招呼站）",
+      "name": "叶新公路新龚村(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 19
     },
     {
-      "name": "叶新公路泖唐公路（招呼站）",
+      "name": "叶新公路泖唐公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 20
     },
     {
-      "name": "叶新公路泖港工业区（招呼站）",
+      "name": "叶新公路泖港工业区(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 21
     },
     {
-      "name": "叶新公路晨光生态林（招呼站）",
+      "name": "叶新公路晨光生态林(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 22
     },
     {
-      "name": "叶新公路中二公路（招呼站）",
+      "name": "叶新公路中二公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 23
     },
     {
-      "name": "叶新公路陆庄公路（招呼站）",
+      "name": "叶新公路陆庄公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 24
     },
     {
-      "name": "叶新公路黄桥中心路（招呼站）",
+      "name": "叶新公路黄桥中心路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 25
     },
     {
-      "name": "叶新公路黄桥公路（招呼站）",
+      "name": "叶新公路黄桥公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 26
     },
     {
-      "name": "叶新公路浦南陵园（招呼站）",
+      "name": "叶新公路浦南陵园(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 27
     },
     {
-      "name": "叶新公路六里庵公路（招呼站）",
+      "name": "叶新公路六里庵公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 28
     },
     {
-      "name": "叶新公路朱定公路（招呼站）",
+      "name": "叶新公路朱定公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 29
     },
     {
-      "name": "叶新支路田黄公路（招呼站）",
+      "name": "叶新支路田黄公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 30
     },
     {
-      "name": "叶新支路田叶路（招呼站）",
+      "name": "叶新支路田叶路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 31
     },
     {
-      "name": "叶新支路新五公路（招呼站）",
+      "name": "叶新支路新五公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 32
     },
     {
-      "name": "叶新支路西厍公路（招呼站）",
+      "name": "叶新支路西厍公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 33
     },
     {
-      "name": "叶新支路农场（招呼站）",
+      "name": "叶新支路农场(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 34
     },
     {
-      "name": "叶新支路花卉公路（招呼站）",
+      "name": "叶新支路花卉公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 35
     },
     {
-      "name": "叶新支路番茄农庄（招呼站）",
+      "name": "叶新支路番茄农庄(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 36
     },
     {
-      "name": "叶新支路叶新公路（招呼站）",
+      "name": "叶新支路叶新公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 37
     },
     {
-      "name": "叶新公路泾文公路（招呼站）",
+      "name": "叶新公路泾文公路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 38
     },
     {
-      "name": "叶新公路五小村（招呼站）",
+      "name": "叶新公路五小村(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 39
     },
     {
-      "name": "叶新公路胡家埭（招呼站）",
+      "name": "叶新公路胡家埭(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 40
     },
     {
-      "name": "叶新公路新工南路（招呼站）",
+      "name": "叶新公路新工南路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 41
     },
     {
-      "name": "叶新公路旺兴路（招呼站）",
+      "name": "叶新公路旺兴路(招呼站)",
       "routeName": "莲浜专线",
       "sortOrder": 42
     },
@@ -3572,7 +3572,7 @@
       "sortOrder": 43
     },
     {
-      "name": "莲花路地铁站（北广场）",
+      "name": "莲花路地铁站(北广场)",
       "routeName": "莲漕专线",
       "sortOrder": 0
     },
@@ -3657,7 +3657,7 @@
       "sortOrder": 3
     },
     {
-      "name": "朱枫公路中洪路（中洪村）",
+      "name": "朱枫公路中洪路(中洪村)",
       "routeName": "莲枫专线",
       "sortOrder": 4
     },
@@ -3672,7 +3672,7 @@
       "sortOrder": 6
     },
     {
-      "name": "叶新公路横埭（招呼站）",
+      "name": "叶新公路横埭(招呼站)",
       "routeName": "莲枫专线",
       "sortOrder": 7
     },
@@ -3702,12 +3702,12 @@
       "sortOrder": 12
     },
     {
-      "name": "莲花路地铁站（北广场）",
+      "name": "莲花路地铁站(北广场)",
       "routeName": "莲枫专线",
       "sortOrder": 13
     },
     {
-      "name": "莲花路地铁站（南方商城）",
+      "name": "莲花路地铁站(南方商城)",
       "routeName": "莲枫专线",
       "sortOrder": 14
     },
@@ -3717,32 +3717,32 @@
       "sortOrder": 15
     },
     {
-      "name": "枫阳路北大街（枫阳新村）单向",
+      "name": "枫阳路北大街(枫阳新村)单向",
       "routeName": "莲枫专线",
       "sortOrder": 16
     },
     {
-      "name": "枫阳路白牛路（枫泾医院北门）单向",
+      "name": "枫阳路白牛路(枫泾医院北门)单向",
       "routeName": "莲枫专线",
       "sortOrder": 17
     },
     {
-      "name": "枫阳路泾宾路（农兴苑）单向",
+      "name": "枫阳路泾宾路(农兴苑)单向",
       "routeName": "莲枫专线",
       "sortOrder": 18
     },
     {
-      "name": "泾宾路枫湾路（枫岸华庭）",
+      "name": "泾宾路枫湾路(枫岸华庭)",
       "routeName": "莲枫专线",
       "sortOrder": 19
     },
     {
-      "name": "莲花路地铁站（北广场）",
+      "name": "莲花路地铁站(北广场)",
       "routeName": "莲金专线",
       "sortOrder": 0
     },
     {
-      "name": "莲花路地铁站（南方商城）",
+      "name": "莲花路地铁站(南方商城)",
       "routeName": "莲金专线",
       "sortOrder": 1
     },
@@ -3782,7 +3782,7 @@
       "sortOrder": 8
     },
     {
-      "name": "车亭公路北松公路（车墩）",
+      "name": "车亭公路北松公路(车墩)",
       "routeName": "莲金专线",
       "sortOrder": 9
     },
@@ -3807,7 +3807,7 @@
       "sortOrder": 13
     },
     {
-      "name": "车亭公路叶新公路（叶榭）",
+      "name": "车亭公路叶新公路(叶榭)",
       "routeName": "莲金专线",
       "sortOrder": 14
     },
@@ -3932,7 +3932,7 @@
       "sortOrder": 38
     },
     {
-      "name": "莲花路地铁站（北广场）",
+      "name": "莲花路地铁站(北广场)",
       "routeName": "莲廊专线",
       "sortOrder": 0
     },
@@ -3977,7 +3977,7 @@
       "sortOrder": 8
     },
     {
-      "name": "朱吕公路金廊公路（吕巷镇政府）",
+      "name": "朱吕公路金廊公路(吕巷镇政府)",
       "routeName": "莲廊专线",
       "sortOrder": 9
     },
@@ -4037,7 +4037,7 @@
       "sortOrder": 20
     },
     {
-      "name": "廊下中学（东）",
+      "name": "廊下中学(东)",
       "routeName": "莲廊专线",
       "sortOrder": 21
     },
@@ -4092,116 +4092,6 @@
       "sortOrder": 31
     },
     {
-      "name": "金山铁路亭林站",
-      "routeName": "莲亭专线",
-      "sortOrder": 0
-    },
-    {
-      "name": "车亭公路亭枫公路",
-      "routeName": "莲亭专线",
-      "sortOrder": 1
-    },
-    {
-      "name": "车亭公路红阳",
-      "routeName": "莲亭专线",
-      "sortOrder": 2
-    },
-    {
-      "name": "车亭公路红亭路",
-      "routeName": "莲亭专线",
-      "sortOrder": 3
-    },
-    {
-      "name": "车亭公路施家埭",
-      "routeName": "莲亭专线",
-      "sortOrder": 4
-    },
-    {
-      "name": "车亭公路同建村十四号桥",
-      "routeName": "莲亭专线",
-      "sortOrder": 5
-    },
-    {
-      "name": "车亭公路立达职业技术学院",
-      "routeName": "莲亭专线",
-      "sortOrder": 6
-    },
-    {
-      "name": "车亭公路叶榭车站",
-      "routeName": "莲亭专线",
-      "sortOrder": 7
-    },
-    {
-      "name": "车亭公路浦南农副批发市场",
-      "routeName": "莲亭专线",
-      "sortOrder": 8
-    },
-    {
-      "name": "松浦大桥",
-      "routeName": "莲亭专线",
-      "sortOrder": 9
-    },
-    {
-      "name": "车亭公路泖亭路",
-      "routeName": "莲亭专线",
-      "sortOrder": 10
-    },
-    {
-      "name": "车亭公路影佳路",
-      "routeName": "莲亭专线",
-      "sortOrder": 11
-    },
-    {
-      "name": "车亭公路北松公路车墩站",
-      "routeName": "莲亭专线",
-      "sortOrder": 12
-    },
-    {
-      "name": "新车公路车墩小学",
-      "routeName": "莲亭专线",
-      "sortOrder": 13
-    },
-    {
-      "name": "新车公路车泾路",
-      "routeName": "莲亭专线",
-      "sortOrder": 14
-    },
-    {
-      "name": "新车公路松江出口加工区",
-      "routeName": "莲亭专线",
-      "sortOrder": 15
-    },
-    {
-      "name": "新车公路三浜路",
-      "routeName": "莲亭专线",
-      "sortOrder": 16
-    },
-    {
-      "name": "新车公路新加路",
-      "routeName": "莲亭专线",
-      "sortOrder": 17
-    },
-    {
-      "name": "新车公路书林路",
-      "routeName": "莲亭专线",
-      "sortOrder": 18
-    },
-    {
-      "name": "新车公路民益路",
-      "routeName": "莲亭专线",
-      "sortOrder": 19
-    },
-    {
-      "name": "莲花路地铁站（北广场）",
-      "routeName": "莲亭专线",
-      "sortOrder": 20
-    },
-    {
-      "name": "莲花路地铁站（南方商城）",
-      "routeName": "莲亭专线",
-      "sortOrder": 21
-    },
-    {
       "name": "松育路松隐中学",
       "routeName": "亭林1路",
       "sortOrder": 0
@@ -4237,7 +4127,7 @@
       "sortOrder": 6
     },
     {
-      "name": "松前路周界栅（南）",
+      "name": "松前路周界栅(南)",
       "routeName": "亭林1路",
       "sortOrder": 7
     },
@@ -4352,7 +4242,7 @@
       "sortOrder": 29
     },
     {
-      "name": "亭耀路林冠路（亭林大居）",
+      "name": "亭耀路林冠路(亭林大居)",
       "routeName": "亭林1路",
       "sortOrder": 30
     },
@@ -4372,12 +4262,12 @@
       "sortOrder": 1
     },
     {
-      "name": "金廊公路红星（锦山公司）",
+      "name": "金廊公路红星(锦山公司)",
       "routeName": "张朱专线",
       "sortOrder": 2
     },
     {
-      "name": "金廊公路后陈港（马术运动场）",
+      "name": "金廊公路后陈港(马术运动场)",
       "routeName": "张朱专线",
       "sortOrder": 3
     },
@@ -4512,27 +4402,27 @@
       "sortOrder": 0
     },
     {
-      "name": "泾宾路枫湾路（枫岸华庭）",
+      "name": "泾宾路枫湾路(枫岸华庭)",
       "routeName": "朱枫线",
       "sortOrder": 1
     },
     {
-      "name": "枫湾路白牛路（科创小镇）",
+      "name": "枫湾路白牛路(科创小镇)",
       "routeName": "朱枫线",
       "sortOrder": 2
     },
     {
-      "name": "枫湾路泾蓉路（农贸市场）",
+      "name": "枫湾路泾蓉路(农贸市场)",
       "routeName": "朱枫线",
       "sortOrder": 3
     },
     {
-      "name": "枫湾路泾波路（正荣璟园）",
+      "name": "枫湾路泾波路(正荣璟园)",
       "routeName": "朱枫线",
       "sortOrder": 4
     },
     {
-      "name": "朱枫公路新泾路（芙蓉新村）",
+      "name": "朱枫公路新泾路(芙蓉新村)",
       "routeName": "朱枫线",
       "sortOrder": 5
     },
@@ -4542,7 +4432,7 @@
       "sortOrder": 6
     },
     {
-      "name": "朱枫公路亭枫公路（枫景家园）",
+      "name": "朱枫公路亭枫公路(枫景家园)",
       "routeName": "朱枫线",
       "sortOrder": 7
     },
@@ -4552,7 +4442,7 @@
       "sortOrder": 8
     },
     {
-      "name": "枫展路亭枫公路（野米泾）",
+      "name": "枫展路亭枫公路(野米泾)",
       "routeName": "朱枫线",
       "sortOrder": 9
     },
@@ -4707,17 +4597,17 @@
       "sortOrder": 39
     },
     {
-      "name": "枫阳路北大街（枫阳新村）",
+      "name": "枫阳路北大街(枫阳新村)",
       "routeName": "朱枫线",
       "sortOrder": 40
     },
     {
-      "name": "枫阳路白牛路（枫泾医院北门）",
+      "name": "枫阳路白牛路(枫泾医院北门)",
       "routeName": "朱枫线",
       "sortOrder": 41
     },
     {
-      "name": "枫阳路泾宾路（农兴苑）",
+      "name": "枫阳路泾宾路(农兴苑)",
       "routeName": "朱枫线",
       "sortOrder": 42
     },
@@ -4732,12 +4622,12 @@
       "sortOrder": 1
     },
     {
-      "name": "金廊公路红星（锦山公司）",
+      "name": "金廊公路红星(锦山公司)",
       "routeName": "朱石专线",
       "sortOrder": 2
     },
     {
-      "name": "金廊公路后陈港（马术运动场）",
+      "name": "金廊公路后陈港(马术运动场)",
       "routeName": "朱石专线",
       "sortOrder": 3
     },
@@ -5002,7 +4892,7 @@
       "sortOrder": 55
     },
     {
-      "name": "金山卫站（南广场东站）",
+      "name": "金山卫站(南广场东站)",
       "routeName": "朱石专线",
       "sortOrder": 56
     },
@@ -5257,7 +5147,7 @@
       "sortOrder": 11
     },
     {
-      "name": "新车公路北松公路（车墩）",
+      "name": "新车公路北松公路(车墩)",
       "routeName": "莲亭专线区间",
       "sortOrder": 12
     },
@@ -5297,9 +5187,124 @@
       "sortOrder": 19
     },
     {
-      "name": "莲花路地铁站（北广场）",
+      "name": "莲花路地铁站(北广场)",
       "routeName": "莲亭专线区间",
       "sortOrder": 20
+    },
+    {
+      "name": "金山铁路亭林站",
+      "routeName": "莲亭专线",
+      "sortOrder": 0
+    },
+    {
+      "name": "大亭公路亭虹路(瑞金医院)",
+      "routeName": "莲亭专线",
+      "sortOrder": 1
+    },
+    {
+      "name": "车亭公路亭枫公路",
+      "routeName": "莲亭专线",
+      "sortOrder": 2
+    },
+    {
+      "name": "车亭公路红阳",
+      "routeName": "莲亭专线",
+      "sortOrder": 3
+    },
+    {
+      "name": "车亭公路红亭路",
+      "routeName": "莲亭专线",
+      "sortOrder": 4
+    },
+    {
+      "name": "车亭公路施家埭",
+      "routeName": "莲亭专线",
+      "sortOrder": 5
+    },
+    {
+      "name": "车亭公路同建公路",
+      "routeName": "莲亭专线",
+      "sortOrder": 6
+    },
+    {
+      "name": "车亭公路叶权路",
+      "routeName": "莲亭专线",
+      "sortOrder": 7
+    },
+    {
+      "name": "车亭公路叶新公路(叶榭)",
+      "routeName": "莲亭专线",
+      "sortOrder": 8
+    },
+    {
+      "name": "车亭公路中原公路",
+      "routeName": "莲亭专线",
+      "sortOrder": 9
+    },
+    {
+      "name": "车亭公路旺盛路",
+      "routeName": "莲亭专线",
+      "sortOrder": 10
+    },
+    {
+      "name": "车亭公路泖亭路",
+      "routeName": "莲亭专线",
+      "sortOrder": 11
+    },
+    {
+      "name": "车亭公路影佳路",
+      "routeName": "莲亭专线",
+      "sortOrder": 12
+    },
+    {
+      "name": "新车公路北松公路(车墩)",
+      "routeName": "莲亭专线",
+      "sortOrder": 13
+    },
+    {
+      "name": "新车公路南姚路",
+      "routeName": "莲亭专线",
+      "sortOrder": 14
+    },
+    {
+      "name": "新车公路车泾路",
+      "routeName": "莲亭专线",
+      "sortOrder": 15
+    },
+    {
+      "name": "新车公路南乐路",
+      "routeName": "莲亭专线",
+      "sortOrder": 16
+    },
+    {
+      "name": "新车公路三浜路",
+      "routeName": "莲亭专线",
+      "sortOrder": 17
+    },
+    {
+      "name": "新车公路新加路",
+      "routeName": "莲亭专线",
+      "sortOrder": 18
+    },
+    {
+      "name": "新车公路书林路",
+      "routeName": "莲亭专线",
+      "sortOrder": 19
+    },
+    {
+      "name": "新车公路民益路",
+      "routeName": "莲亭专线",
+      "sortOrder": 20
+    },
+    {
+      "name": "莲花路地铁站(北广场)",
+      "routeName": "莲亭专线",
+      "sortOrder": 21
+    },
+    {
+      "name": "莲花路地铁站(南方商城)",
+      "routeName": "莲亭专线",
+      "sortOrder": 22
     }
   ],
   "routes": [
@@ -7825,5 +7830,1154 @@
       "name": "顾新娟",
       "routeName": "朱松专线"
     }
-  ]
+  ],
+  "stationRenames": [
+    {
+      "routeName": "莲张专线",
+      "oldName": "东贤路康和路（三附中）",
+      "newName": "东贤路康和路(三附中)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲张专线",
+      "oldName": "东贤路康德路（招呼站）",
+      "newName": "东贤路康德路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲张专线",
+      "oldName": "九工路时代大道（和辉光电）",
+      "newName": "九工路时代大道(和辉光电)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲张专线",
+      "oldName": "莲花路地铁站（北广场）",
+      "newName": "莲花路地铁站(北广场)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲张专线",
+      "oldName": "东贤路康和路（北）",
+      "newName": "东贤路康和路(北)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲卫专线",
+      "oldName": "莲花路地铁站（北广场）",
+      "newName": "莲花路地铁站(北广场)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲卫专线",
+      "oldName": "东贤路康和路（三附中）",
+      "newName": "东贤路康和路(三附中)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲卫专线",
+      "oldName": "杭州湾大道体育场北环路（金山体育中心）",
+      "newName": "杭州湾大道体育场北环路(金山体育中心)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1652路",
+      "oldName": "九工路春丽路（和辉光电）",
+      "newName": "九工路春丽路(和辉光电)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1655路",
+      "oldName": "亭卫公路朱漕公路（朱行）",
+      "newName": "亭卫公路朱漕公路(朱行)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1656路",
+      "oldName": "天工路亭卫公路（西）",
+      "newName": "天工路亭卫公路(西)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1658路",
+      "oldName": "天工路亭卫公路（西）",
+      "newName": "天工路亭卫公路(西)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1665路",
+      "oldName": "泾宾路枫湾路（枫岸华庭）",
+      "newName": "泾宾路枫湾路(枫岸华庭)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1665路",
+      "oldName": "枫湾路白牛路（科创小镇）",
+      "newName": "枫湾路白牛路(科创小镇)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1665路",
+      "oldName": "枫湾路泾蓉路（农贸市场）",
+      "newName": "枫湾路泾蓉路(农贸市场)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1665路",
+      "oldName": "泾蓉路枫阳路（步行街）",
+      "newName": "泾蓉路枫阳路(步行街)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1665路",
+      "oldName": "枫阳路北大街（枫阳新村）",
+      "newName": "枫阳路北大街(枫阳新村)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1665路",
+      "oldName": "泾波路新泾路（佳田苑）",
+      "newName": "泾波路新泾路(佳田苑)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1665路",
+      "oldName": "新泾路泾波路（大新桥）",
+      "newName": "新泾路泾波路(大新桥)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1665路",
+      "oldName": "新泾路白牛路（枫溪公园）",
+      "newName": "新泾路白牛路(枫溪公园)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1665路",
+      "oldName": "白牛路枫杰路（枫泾中学）",
+      "newName": "白牛路枫杰路(枫泾中学)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1665路",
+      "oldName": "白牛路枫阳路（枫泾医院东门）",
+      "newName": "白牛路枫阳路(枫泾医院东门)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1665路",
+      "oldName": "枫阳路泾宾路（农兴苑）",
+      "newName": "枫阳路泾宾路(农兴苑)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1666路",
+      "oldName": "枫兰路泾宾路（枫香名苑）",
+      "newName": "枫兰路泾宾路(枫香名苑)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1666路",
+      "oldName": "枫兰路白牛路（响水港）",
+      "newName": "枫兰路白牛路(响水港)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1666路",
+      "oldName": "枫沛路枫馨路（桃源名庭北门）",
+      "newName": "枫沛路枫馨路(桃源名庭北门)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1666路",
+      "oldName": "泾波路枫沛路（桃源幼儿园）",
+      "newName": "泾波路枫沛路(桃源幼儿园)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1666路",
+      "oldName": "泾波路枫美路（中冶枫郡）",
+      "newName": "泾波路枫美路(中冶枫郡)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1666路",
+      "oldName": "泾波路泾荷路（枫泾派出所）",
+      "newName": "泾波路泾荷路(枫泾派出所)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1666路",
+      "oldName": "枫湾路泾波路（正荣璟园）",
+      "newName": "枫湾路泾波路(正荣璟园)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1666路",
+      "oldName": "泾蓉路枫阳路（步行街）",
+      "newName": "泾蓉路枫阳路(步行街)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1666路",
+      "oldName": "枫阳路白牛路（枫泾医院北门）",
+      "newName": "枫阳路白牛路(枫泾医院北门)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1666路",
+      "oldName": "枫阳路泾宾路（农兴苑）",
+      "newName": "枫阳路泾宾路(农兴苑)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1666路",
+      "oldName": "泾宾路枫湾路（枫岸华庭）",
+      "newName": "泾宾路枫湾路(枫岸华庭)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1668路",
+      "oldName": "朱吕公路金廊公路（吕巷镇政府）",
+      "newName": "朱吕公路金廊公路(吕巷镇政府)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1669路",
+      "oldName": "浦银路新洲路（农业银行）",
+      "newName": "浦银路新洲路(农业银行)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1670路",
+      "oldName": "新利路（万年7组）",
+      "newName": "新利路(万年7组)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1670路",
+      "oldName": "慧丹路新利路（慧农村）",
+      "newName": "慧丹路新利路(慧农村)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1670路",
+      "oldName": "浦银路新洲路（农业银行）",
+      "newName": "浦银路新洲路(农业银行)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1671路",
+      "oldName": "众安街罗星南路（广缘大酒店）",
+      "newName": "众安街罗星南路(广缘大酒店)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1671路",
+      "oldName": "罗星南路众安街（广缘大酒店）",
+      "newName": "罗星南路众安街(广缘大酒店)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1672路",
+      "oldName": "健康南路金龙新街（金山体育馆）",
+      "newName": "健康南路金龙新街(金山体育馆)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1672路",
+      "oldName": "健康路临源街（南）",
+      "newName": "健康路临源街(南)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1672路",
+      "oldName": "秀州街南圩路（红菱苑）",
+      "newName": "秀州街南圩路(红菱苑)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1672路",
+      "oldName": "罗星南路众安街（广缘大酒店）",
+      "newName": "罗星南路众安街(广缘大酒店)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1672路",
+      "oldName": "健康南路金龙新街（体育馆）",
+      "newName": "健康南路金龙新街(体育馆)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1673路",
+      "oldName": "兴豪路亭枫公路（南）",
+      "newName": "兴豪路亭枫公路(南)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1676路",
+      "oldName": "朱吕公路金廊公路（吕巷镇政府）",
+      "newName": "朱吕公路金廊公路(吕巷镇政府)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1676路",
+      "oldName": "金石北路漾平路（南）",
+      "newName": "金石北路漾平路(南)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1676路",
+      "oldName": "金石北路新泾路（水果公园）",
+      "newName": "金石北路新泾路(水果公园)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1677路",
+      "oldName": "金石北路新泾路（水果公园）",
+      "newName": "金石北路新泾路(水果公园)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1680路",
+      "oldName": "廊下中学（西）",
+      "newName": "廊下中学(西)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1681路",
+      "oldName": "浦银路新洲路（农业银行）",
+      "newName": "浦银路新洲路(农业银行)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1681路",
+      "oldName": "贸易路浦银路（敬老院）",
+      "newName": "贸易路浦银路(敬老院)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1684路",
+      "oldName": "罗星南路众安街（广缘大酒店）",
+      "newName": "罗星南路众安街(广缘大酒店)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "1684路",
+      "oldName": "亭枫公路朱平公路（上海永太）",
+      "newName": "亭枫公路朱平公路(上海永太)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "DZ乐莲线",
+      "oldName": "亭枫公路花开海上（秀泾）",
+      "newName": "亭枫公路花开海上(秀泾)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "DZ乐莲线",
+      "oldName": "莲花路地铁站（北广场）",
+      "newName": "莲花路地铁站(北广场)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "DZ乐张线",
+      "oldName": "亭枫公路花开海上（秀泾）",
+      "newName": "亭枫公路花开海上(秀泾)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "DZ乐张线",
+      "oldName": "朱吕公路金廊公路（吕巷镇政府）",
+      "newName": "朱吕公路金廊公路(吕巷镇政府)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾1路",
+      "oldName": "朱枫公路中洪支路（中洪村）",
+      "newName": "朱枫公路中洪支路(中洪村)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾1路",
+      "oldName": "枫阳路北大街（枫阳新村）",
+      "newName": "枫阳路北大街(枫阳新村)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾1路",
+      "oldName": "枫阳路白牛路（枫泾医院北门）",
+      "newName": "枫阳路白牛路(枫泾医院北门)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾1路",
+      "oldName": "枫阳路泾宾路（农兴苑）",
+      "newName": "枫阳路泾宾路(农兴苑)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾1路",
+      "oldName": "泾宾路枫湾路（枫岸华庭）",
+      "newName": "泾宾路枫湾路(枫岸华庭)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾1路",
+      "oldName": "枫湾路白牛路（科创小镇）",
+      "newName": "枫湾路白牛路(科创小镇)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾1路",
+      "oldName": "枫湾路泾蓉路（农贸市场）",
+      "newName": "枫湾路泾蓉路(农贸市场)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾1路",
+      "oldName": "枫湾路泾波路（正荣璟园）",
+      "newName": "枫湾路泾波路(正荣璟园)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾2路",
+      "oldName": "枫湾路泾波路（正荣璟园）",
+      "newName": "枫湾路泾波路(正荣璟园)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾2路",
+      "oldName": "枫湾路泾蓉路（农贸市场）",
+      "newName": "枫湾路泾蓉路(农贸市场)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾2路",
+      "oldName": "白牛路枫湾路（枫岸华庭）西门",
+      "newName": "白牛路枫湾路(枫岸华庭)西门",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾2路",
+      "oldName": "泾宾路枫湾路（枫岸华庭）",
+      "newName": "泾宾路枫湾路(枫岸华庭)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾2路",
+      "oldName": "枫阳路泾宾路（农兴苑）",
+      "newName": "枫阳路泾宾路(农兴苑)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾2路",
+      "oldName": "枫阳路白牛路（枫泾医院北门）",
+      "newName": "枫阳路白牛路(枫泾医院北门)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾2路",
+      "oldName": "枫阳路北大街（枫阳新村）",
+      "newName": "枫阳路北大街(枫阳新村)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾2路",
+      "oldName": "朱枫公路新泾路（芙蓉新村）",
+      "newName": "朱枫公路新泾路(芙蓉新村)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾2路",
+      "oldName": "朱枫公路（枫泾人民政府）",
+      "newName": "朱枫公路(枫泾人民政府)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾2路",
+      "oldName": "朱枫公路亭枫公路（枫景家园）",
+      "newName": "朱枫公路亭枫公路(枫景家园)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾2路",
+      "oldName": "潮枫路亭枫公路（野米泾）",
+      "newName": "潮枫路亭枫公路(野米泾)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾2路",
+      "oldName": "枫阳路白牛路（枫泾医院）",
+      "newName": "枫阳路白牛路(枫泾医院)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾6路",
+      "oldName": "泾波路枫湾路（正荣璟园）",
+      "newName": "泾波路枫湾路(正荣璟园)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾6路",
+      "oldName": "泾波路枫翠路（枫泾派出所）",
+      "newName": "泾波路枫翠路(枫泾派出所)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾6路",
+      "oldName": "泾宾路枫湾路（枫岸华庭）",
+      "newName": "泾宾路枫湾路(枫岸华庭)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾6路",
+      "oldName": "枫阳路泾宾路（农兴苑）",
+      "newName": "枫阳路泾宾路(农兴苑)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾6路",
+      "oldName": "枫阳路白牛路（枫泾医院北门）",
+      "newName": "枫阳路白牛路(枫泾医院北门)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾6路",
+      "oldName": "枫阳路北大街（枫阳新村）",
+      "newName": "枫阳路北大街(枫阳新村)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾6路",
+      "oldName": "朱枫公路新泾路（芙蓉新村）",
+      "newName": "朱枫公路新泾路(芙蓉新村)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾6路",
+      "oldName": "朱枫公路（枫泾人民政府）",
+      "newName": "朱枫公路(枫泾人民政府)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾6路",
+      "oldName": "朱枫公路亭枫公路（枫景家园）",
+      "newName": "朱枫公路亭枫公路(枫景家园)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾6路",
+      "oldName": "新义路网埭港（北）",
+      "newName": "新义路网埭港(北)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "枫泾6路",
+      "oldName": "新义路网埭港（南）",
+      "newName": "新义路网埭港(南)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "金山115路",
+      "oldName": "松卫南路康贤路（留溪家园）",
+      "newName": "松卫南路康贤路(留溪家园)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "金山115路",
+      "oldName": "杭州湾大道体育场北环路（金山体育中心）",
+      "newName": "杭州湾大道体育场北环路(金山体育中心)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "金山115路",
+      "oldName": "金山卫站（南广场东站）",
+      "newName": "金山卫站(南广场东站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "金山206路",
+      "oldName": "亭耀路林冠路（亭林大居）",
+      "newName": "亭耀路林冠路(亭林大居)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "金山206路",
+      "oldName": "东贤路康和路（北）",
+      "newName": "东贤路康和路(北)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "金山206路",
+      "oldName": "东贤路康和路（三附中）",
+      "newName": "东贤路康和路(三附中)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "廊下2路",
+      "oldName": "廊下中学（西）",
+      "newName": "廊下中学(西)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "廊下2路",
+      "oldName": "中丰路横码头（徐家楼）",
+      "newName": "中丰路横码头(徐家楼)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "廊下3路A",
+      "oldName": "廊下中学（西）",
+      "newName": "廊下中学(西)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "廊下3路A",
+      "oldName": "中联村（陆家浜）",
+      "newName": "中联村(陆家浜)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "廊下3路B",
+      "oldName": "廊下中学（西）",
+      "newName": "廊下中学(西)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "廊下4路",
+      "oldName": "廊下中学（东）",
+      "newName": "廊下中学(东)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "乐松专线",
+      "oldName": "亭枫公路花开海上（秀泾）",
+      "newName": "亭枫公路花开海上(秀泾)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "莲花路地铁站（北广场）",
+      "newName": "莲花路地铁站(北广场)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "莲花路地铁站（南方商城）",
+      "newName": "莲花路地铁站(南方商城)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "思源路叶新公路（招呼站）",
+      "newName": "思源路叶新公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "思源公路富荣公路（招呼站）",
+      "newName": "思源公路富荣公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "富荣公路叶车路（招呼站）",
+      "newName": "富荣公路叶车路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶榭（招呼站）",
+      "newName": "叶榭(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶权路车亭公路（招呼站）",
+      "newName": "叶权路车亭公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶校路叶政路（招呼站）",
+      "newName": "叶校路叶政路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶政路叶乐路（招呼站）",
+      "newName": "叶政路叶乐路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路叶达公路（招呼站）",
+      "newName": "叶新公路叶达公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路民发公路（招呼站）",
+      "newName": "叶新公路民发公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路浦亭路（招呼站）",
+      "newName": "叶新公路浦亭路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路张泽（招呼站）",
+      "newName": "叶新公路张泽(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路张米公路（招呼站）",
+      "newName": "叶新公路张米公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路兴东公路（招呼站）",
+      "newName": "叶新公路兴东公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路兴艺公路（招呼站）",
+      "newName": "叶新公路兴艺公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路姚厍村（招呼站）",
+      "newName": "叶新公路姚厍村(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路松金公路（招呼站）",
+      "newName": "叶新公路松金公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路中天路（招呼站）",
+      "newName": "叶新公路中天路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路新龚村（招呼站）",
+      "newName": "叶新公路新龚村(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路泖唐公路（招呼站）",
+      "newName": "叶新公路泖唐公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路泖港工业区（招呼站）",
+      "newName": "叶新公路泖港工业区(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路晨光生态林（招呼站）",
+      "newName": "叶新公路晨光生态林(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路中二公路（招呼站）",
+      "newName": "叶新公路中二公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路陆庄公路（招呼站）",
+      "newName": "叶新公路陆庄公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路黄桥中心路（招呼站）",
+      "newName": "叶新公路黄桥中心路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路黄桥公路（招呼站）",
+      "newName": "叶新公路黄桥公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路浦南陵园（招呼站）",
+      "newName": "叶新公路浦南陵园(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路六里庵公路（招呼站）",
+      "newName": "叶新公路六里庵公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路朱定公路（招呼站）",
+      "newName": "叶新公路朱定公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新支路田黄公路（招呼站）",
+      "newName": "叶新支路田黄公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新支路田叶路（招呼站）",
+      "newName": "叶新支路田叶路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新支路新五公路（招呼站）",
+      "newName": "叶新支路新五公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新支路西厍公路（招呼站）",
+      "newName": "叶新支路西厍公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新支路农场（招呼站）",
+      "newName": "叶新支路农场(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新支路花卉公路（招呼站）",
+      "newName": "叶新支路花卉公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新支路番茄农庄（招呼站）",
+      "newName": "叶新支路番茄农庄(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新支路叶新公路（招呼站）",
+      "newName": "叶新支路叶新公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路泾文公路（招呼站）",
+      "newName": "叶新公路泾文公路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路五小村（招呼站）",
+      "newName": "叶新公路五小村(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路胡家埭（招呼站）",
+      "newName": "叶新公路胡家埭(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路新工南路（招呼站）",
+      "newName": "叶新公路新工南路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲浜专线",
+      "oldName": "叶新公路旺兴路（招呼站）",
+      "newName": "叶新公路旺兴路(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲漕专线",
+      "oldName": "莲花路地铁站（北广场）",
+      "newName": "莲花路地铁站(北广场)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲枫专线",
+      "oldName": "朱枫公路中洪路（中洪村）",
+      "newName": "朱枫公路中洪路(中洪村)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲枫专线",
+      "oldName": "叶新公路横埭（招呼站）",
+      "newName": "叶新公路横埭(招呼站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲枫专线",
+      "oldName": "莲花路地铁站（北广场）",
+      "newName": "莲花路地铁站(北广场)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲枫专线",
+      "oldName": "莲花路地铁站（南方商城）",
+      "newName": "莲花路地铁站(南方商城)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲枫专线",
+      "oldName": "枫阳路北大街（枫阳新村）单向",
+      "newName": "枫阳路北大街(枫阳新村)单向",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲枫专线",
+      "oldName": "枫阳路白牛路（枫泾医院北门）单向",
+      "newName": "枫阳路白牛路(枫泾医院北门)单向",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲枫专线",
+      "oldName": "枫阳路泾宾路（农兴苑）单向",
+      "newName": "枫阳路泾宾路(农兴苑)单向",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲枫专线",
+      "oldName": "泾宾路枫湾路（枫岸华庭）",
+      "newName": "泾宾路枫湾路(枫岸华庭)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲金专线",
+      "oldName": "莲花路地铁站（北广场）",
+      "newName": "莲花路地铁站(北广场)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲金专线",
+      "oldName": "莲花路地铁站（南方商城）",
+      "newName": "莲花路地铁站(南方商城)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲金专线",
+      "oldName": "车亭公路北松公路（车墩）",
+      "newName": "车亭公路北松公路(车墩)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲金专线",
+      "oldName": "车亭公路叶新公路（叶榭）",
+      "newName": "车亭公路叶新公路(叶榭)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲廊专线",
+      "oldName": "莲花路地铁站（北广场）",
+      "newName": "莲花路地铁站(北广场)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲廊专线",
+      "oldName": "朱吕公路金廊公路（吕巷镇政府）",
+      "newName": "朱吕公路金廊公路(吕巷镇政府)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲廊专线",
+      "oldName": "廊下中学（东）",
+      "newName": "廊下中学(东)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲亭专线",
+      "oldName": "莲花路地铁站（北广场）",
+      "newName": "莲花路地铁站(北广场)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲亭专线",
+      "oldName": "莲花路地铁站（南方商城）",
+      "newName": "莲花路地铁站(南方商城)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "亭林1路",
+      "oldName": "松前路周界栅（南）",
+      "newName": "松前路周界栅(南)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "亭林1路",
+      "oldName": "亭耀路林冠路（亭林大居）",
+      "newName": "亭耀路林冠路(亭林大居)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "张朱专线",
+      "oldName": "金廊公路红星（锦山公司）",
+      "newName": "金廊公路红星(锦山公司)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "张朱专线",
+      "oldName": "金廊公路后陈港（马术运动场）",
+      "newName": "金廊公路后陈港(马术运动场)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "朱枫线",
+      "oldName": "泾宾路枫湾路（枫岸华庭）",
+      "newName": "泾宾路枫湾路(枫岸华庭)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "朱枫线",
+      "oldName": "枫湾路白牛路（科创小镇）",
+      "newName": "枫湾路白牛路(科创小镇)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "朱枫线",
+      "oldName": "枫湾路泾蓉路（农贸市场）",
+      "newName": "枫湾路泾蓉路(农贸市场)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "朱枫线",
+      "oldName": "枫湾路泾波路（正荣璟园）",
+      "newName": "枫湾路泾波路(正荣璟园)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "朱枫线",
+      "oldName": "朱枫公路新泾路（芙蓉新村）",
+      "newName": "朱枫公路新泾路(芙蓉新村)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "朱枫线",
+      "oldName": "朱枫公路亭枫公路（枫景家园）",
+      "newName": "朱枫公路亭枫公路(枫景家园)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "朱枫线",
+      "oldName": "枫展路亭枫公路（野米泾）",
+      "newName": "枫展路亭枫公路(野米泾)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "朱枫线",
+      "oldName": "枫阳路北大街（枫阳新村）",
+      "newName": "枫阳路北大街(枫阳新村)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "朱枫线",
+      "oldName": "枫阳路白牛路（枫泾医院北门）",
+      "newName": "枫阳路白牛路(枫泾医院北门)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "朱枫线",
+      "oldName": "枫阳路泾宾路（农兴苑）",
+      "newName": "枫阳路泾宾路(农兴苑)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "朱石专线",
+      "oldName": "金廊公路红星（锦山公司）",
+      "newName": "金廊公路红星(锦山公司)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "朱石专线",
+      "oldName": "金廊公路后陈港（马术运动场）",
+      "newName": "金廊公路后陈港(马术运动场)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "朱石专线",
+      "oldName": "金山卫站（南广场东站）",
+      "newName": "金山卫站(南广场东站)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲亭专线区间",
+      "oldName": "新车公路北松公路（车墩）",
+      "newName": "新车公路北松公路(车墩)",
+      "source": "全角括号统一为半角"
+    },
+    {
+      "routeName": "莲亭专线区间",
+      "oldName": "莲花路地铁站（北广场）",
+      "newName": "莲花路地铁站(北广场)",
+      "source": "全角括号统一为半角"
+    }
+  ],
+  "stationRemovals": [
+    {
+      "routeName": "莲亭专线",
+      "name": "车亭公路同建村十四号桥",
+      "source": "莲亭专线双向站牌图（用户提供，2026-09-08）"
+    },
+    {
+      "routeName": "莲亭专线",
+      "name": "车亭公路立达职业技术学院",
+      "source": "莲亭专线双向站牌图（用户提供，2026-09-08）"
+    },
+    {
+      "routeName": "莲亭专线",
+      "name": "车亭公路叶榭车站",
+      "source": "莲亭专线双向站牌图（用户提供，2026-09-08）"
+    },
+    {
+      "routeName": "莲亭专线",
+      "name": "车亭公路浦南农副批发市场",
+      "source": "莲亭专线双向站牌图（用户提供，2026-09-08）"
+    },
+    {
+      "routeName": "莲亭专线",
+      "name": "松浦大桥",
+      "source": "莲亭专线双向站牌图（用户提供，2026-09-08）"
+    },
+    {
+      "routeName": "莲亭专线",
+      "name": "车亭公路北松公路车墩站",
+      "source": "莲亭专线双向站牌图（用户提供，2026-09-08）"
+    },
+    {
+      "routeName": "莲亭专线",
+      "name": "新车公路车墩小学",
+      "source": "莲亭专线双向站牌图（用户提供，2026-09-08）"
+    },
+    {
+      "routeName": "莲亭专线",
+      "name": "新车公路松江出口加工区",
+      "source": "莲亭专线双向站牌图（用户提供，2026-09-08）"
+    }
+  ],
+  "catalogVersion": 2
 }

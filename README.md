@@ -103,6 +103,10 @@ node tools/build-data.js --from-excel
 - 六个数组字段：`stations`（`name`/`routeName`/`sortOrder`）、`routes`（线路名数组）、
   `checkers`（驻站人/检查人）、`fleets`（`{name, routes[]}`）、`drivers` 与
   `conductors`（`{name, routeName}`）；
+- 站名一律使用**半角括号**并紧贴前文（如 `莲花路地铁站(北广场)`），不允许全角 `（）`；
+- 可选指令数组：`stationRenames`（`{routeName, oldName, newName}`，供老用户把旧写法
+  本地停用并收敛到线上活跃名）与 `stationRemovals`（`{routeName, name}`，停用该线路旧站）；
+  客户端执行后只从选择器隐藏/改名，不删除已保存记录；
 - 站点、线路、驻站人不能为空，字段缺失会导致 CI 构建失败（线上保持上一个可用版本）；
 - 自动更新采用**并集合并**：远程同名条目覆盖、本地独有条目保留、不删除任何条目；
   如需移除某条目，请在应用内「基础数据」页手动删除；

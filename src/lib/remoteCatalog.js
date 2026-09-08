@@ -1,6 +1,9 @@
 /* 远程基础数据更新：内容哈希、结构校验、增量合并（纯函数，便于单元测试）
    线上真源为 public/basic-data.json（可在 GitHub 网页直接编辑），
-   应用启动时静默拉取并在内容变化时合入本地基础数据。 */
+   应用启动时静默拉取并在内容变化时合入本地基础数据。
+   站名统一使用半角括号；stationRenames/stationRemovals 是给老用户本地的
+   增量指令（旧写法/旧站停用、并入线上活跃站），记录数据永不参与合并。 */
+import { canonicalStationName, stationKey } from './catalogFormat';
 
 let idSeq = 0;
 function nextId() {
@@ -46,22 +49,48 @@ export function hashCatalogData(value) {
 export function validateRemoteCatalog(raw) {
   if (!raw || typeof raw !== 'object' || Array.isArray(raw)) return false;
   const requiredArrays = ['stations', 'routes', 'checkers'];
-  const optionalArrays = ['fleets', 'drivers', 'conductors'];
+  const optionalArrays = ['fleets', 'drivers', 'conductors', 'stationRenames', 'stationRemovals'];
   if (!requiredArrays.every((k) => Array.isArray(raw[k]))) return false;
   if (!optionalArrays.every((k) => raw[k] == null || Array.isArray(raw[k]))) return false;
   if (!raw.stations.length || !raw.routes.length || !raw.checkers.length) return false;
+  const validText = (v) => typeof v === 'string' && v.trim().length > 0;
+  if (
+    !(raw.stationRenames || []).every(
+      (e) =>
+        e &&
+        typeof e === 'object' &&
+        !Array.isArray(e) &&
+        validText(e.routeName) &&
+        validText(e.oldName) &&
+        validText(e.newName) &&
+        String(e.oldName).trim() !== String(e.newName).trim()
+    )
+  ) {
+    return false;
+  }
+  if (
+    !(raw.stationRemovals || []).every(
+      (e) => e && typeof e === 'object' && !Array.isArray(e) && validText(e.routeName) && validText(e.name)
+    )
+  ) {
+    return false;
+  }
   return true;
 }
 
 // 把远程原始数据归一化为与本地 basicData 相同形态（不含 id）
 export function normalizeRemoteCatalog(raw) {
   const src = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
-  const asObjects = (arr, extra = {}) =>
+  const asObjects = (arr, extra = {}, opts = {}) =>
     (Array.isArray(arr) ? arr : [])
       .map((it) => {
-        if (typeof it === 'string') return { name: it.trim(), ...extra };
+        const normalize = opts.canonicalName ? canonicalStationName : (v) => String(v || '').trim();
+        if (typeof it === 'string') {
+          const name = normalize(it);
+          return name ? { name, ...extra } : null;
+        }
         if (it && typeof it === 'object') {
-          const name = String(it.name ?? '').trim();
+          const name = normalize(String(it.name ?? ''));
           if (!name) return null;
           const out = { name, ...extra };
           Object.keys(extra).forEach((k) => {
@@ -86,14 +115,32 @@ export function normalizeRemoteCatalog(raw) {
     });
     return out;
   };
+  const textChanges = (arr, kind) =>
+    (Array.isArray(arr) ? arr : [])
+      .map((e) => {
+        if (!e || typeof e !== 'object' || Array.isArray(e)) return null;
+        const routeName = String(e.routeName || '').trim();
+        if (kind === 'rename') {
+          const oldName = String(e.oldName || '').trim();
+          const newName = canonicalStationName(String(e.newName || ''));
+          if (!routeName || !oldName || !newName) return null;
+          return { routeName, oldName, newName };
+        }
+        const name = String(e.name || '').trim();
+        if (!routeName || !name) return null;
+        return { routeName, name };
+      })
+      .filter(Boolean);
   return {
     routes: asObjects(src.routes, { fleet: '' }),
-    stations: asObjects(src.stations, { routeName: '', sortOrder: 0 }),
+    stations: asObjects(src.stations, { routeName: '', sortOrder: 0 }, { canonicalName: true }),
     plates: uniqueStrings(src.plates),
     inspectors: uniqueStrings(src.checkers),
     drivers: asObjects(src.drivers, { routeName: '' }),
     conductors: asObjects(src.conductors, { routeName: '' }),
     fleets: uniqueStrings((src.fleets || []).map((f) => (typeof f === 'string' ? f : f && f.name))),
+    renames: textChanges(src.stationRenames, 'rename'),
+    removals: textChanges(src.stationRemovals, 'remove'),
   };
 }
 
@@ -143,13 +190,77 @@ function upsert(localItems, remoteItems, keyOf, applyRemote) {
   return out;
 }
 
+// 站点专用 upsert：线上活跃同名条目覆盖字段并清除停用标记（支持撤销/恢复）
+function upsertStations(localItems, remoteItems) {
+  const out = (localItems || []).map((it) => ({ ...it }));
+  const index = new Map(out.map((it) => [stationKey(it.name, it.routeName), it]));
+  (remoteItems || []).forEach((r) => {
+    const key = stationKey(r.name, r.routeName);
+    const patch = {
+      name: r.name,
+      routeName: String(r.routeName || '').trim(),
+      sortOrder: Number.isFinite(r.sortOrder) ? r.sortOrder : 0,
+    };
+    const existing = index.get(key);
+    if (existing) {
+      Object.assign(existing, patch);
+      delete existing.retired;
+    } else {
+      const item = { id: nextId(), ...patch };
+      index.set(key, item);
+      out.push(item);
+    }
+  });
+  return out;
+}
+
+// 对老用户本地的旧条目执行改名/停用指令：
+// - 只有当旧键已不在线上活跃站表时才生效（之后若官方恢复该站，可重新激活）；
+// - 改名旧条目标记为停用（不物理删除，防止编辑旧记录时被联想学习重新加回）；
+// - 停用同样只打标记，已保存记录不受影响。
+function applyStationInstructions(stations, remote) {
+  const activeKeys = new Set(
+    (remote.stations || []).map((s) => stationKey(s.name, s.routeName))
+  );
+  const retireKey = (key) => {
+    stations.forEach((s) => {
+      if (stationKey(s.name, s.routeName) === key) s.retired = true;
+    });
+  };
+  (remote.renames || []).forEach((r) => {
+    const oldKey = stationKey(r.oldName, r.routeName);
+    if (activeKeys.has(oldKey)) return; // 线上仍活跃，不是需收敛的旧写法
+    const oldItems = stations.filter((s) => stationKey(s.name, s.routeName) === oldKey);
+    if (!oldItems.length) return;
+    const newKey = stationKey(r.newName, r.routeName);
+    let target = stations.find((s) => stationKey(s.name, s.routeName) === newKey);
+    if (!target) {
+      const sortOrder = Math.min(
+        ...oldItems.map((s) => (Number.isFinite(s.sortOrder) ? s.sortOrder : 0))
+      );
+      target = { id: nextId(), name: r.newName, routeName: r.routeName, sortOrder };
+      stations.push(target);
+    }
+    delete target.retired;
+    oldItems.forEach((s) => {
+      s.retired = true;
+    });
+  });
+  (remote.removals || []).forEach((r) => {
+    const key = stationKey(r.name, r.routeName);
+    if (activeKeys.has(key)) return; // 线上已恢复该站
+    retireKey(key);
+  });
+}
+
 /**
  * 增量合并：local 为当前本地 basicData，remote 为 normalizeRemoteCatalog 的结果，
  * fleetMap 为 buildFleetMap(原始远程数据) 的结果。返回新的 basicData 对象。
  * - routes/检查人(→inspectors)/车队/车号：按名称并集，远程同名覆盖字段；
- * - stations 按 name|routeName 为键，远程同名覆盖 sortOrder；
+ * - stations 按 name|routeName 为键，远程同名覆盖并清除停用标记；
+ *   远程 stationRenames/stationRemovals 只停用/收敛本地旧条目；
  * - drivers/conductors 按姓名，远程同名覆盖 routeName；
- * - 所有本地独有条目保留，不删除任何条目；记录数据不参与合并。
+ * - 本地独有条目保留，不删除；记录数据不参与合并。
  */
 export function mergeCatalogData(local, remote, fleetMap = new Map()) {
   const l = local && typeof local === 'object' ? local : {};
@@ -164,17 +275,7 @@ export function mergeCatalogData(local, remote, fleetMap = new Map()) {
         fleet: ex && ex.fleet ? ex.fleet : String(r.fleet || '').trim(),
       })
     ),
-    stations: upsert(
-      l.stations,
-      remote.stations,
-      (s) => String(s.name || '').trim() + '|' + String(s.routeName || '').trim(),
-      (ex, s) => ({
-        id: ex ? ex.id : nextId(),
-        name: s.name,
-        routeName: String(s.routeName || '').trim(),
-        sortOrder: Number.isFinite(s.sortOrder) ? s.sortOrder : ex ? ex.sortOrder : 0,
-      })
-    ),
+    stations: upsertStations(l.stations, remote.stations),
     plates: uniqueStrings([...(l.plates || []), ...(remote.plates || [])]),
     inspectors: uniqueStrings([...(l.inspectors || []), ...(remote.inspectors || [])]),
     drivers: upsert(
@@ -203,5 +304,6 @@ export function mergeCatalogData(local, remote, fleetMap = new Map()) {
   b.routes.forEach((r) => {
     if (!r.fleet && fleetMap.has(r.name)) r.fleet = fleetMap.get(r.name);
   });
+  applyStationInstructions(b.stations, remote);
   return b;
 }

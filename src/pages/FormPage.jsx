@@ -117,6 +117,7 @@ export default function FormPage() {
     const out = [];
     const r = route.trim();
     basicData.stations.forEach((s) => {
+      if (s.retired === true) return;
       if (r && s.routeName !== r) return;
       if (!seen.has(s.name)) {
         seen.add(s.name);

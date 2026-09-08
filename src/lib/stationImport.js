@@ -1,14 +1,10 @@
 /* Excel 导入解析：按表头自动识别 站点/线路/驻站人（复用 npm xlsx） */
 import * as XLSX from 'xlsx';
+import { canonicalStationName } from './catalogFormat.js';
 
-// 站点名规范化：去开头 *、统一全角括号、去掉空白
+// 站点名规范化：去开头 *、括号统一半角 ()、紧贴前文、去掉空白
 export function normalizeStation(s) {
-  return String(s === null || s === undefined ? '' : s)
-    .trim()
-    .replace(/^\*+/, '')
-    .replace(/\(/g, '（')
-    .replace(/\)/g, '）')
-    .replace(/\s+/g, '');
+  return canonicalStationName(s);
 }
 
 function normalizeSimple(s) {
