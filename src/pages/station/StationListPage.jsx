@@ -5,6 +5,7 @@ import { Icon } from '../../components/icons';
 import StationTabs from './StationTabs';
 import { deleteStationRecord, useBasicData, useStationRecords } from '../../lib/storage';
 import { normalize, normalizePlate } from '../../lib/stationCore';
+import { stationNameOptions } from '../../lib/stationOrder';
 
 function TickBadge({ value }) {
   if (value === '√') return <Badge variant="success">√</Badge>;
@@ -19,18 +20,11 @@ export default function StationListPage() {
   const [filters, setFilters] = useState({ from: '', to: '', station: '', route: '', keyword: '' });
   const [deleteTarget, setDeleteTarget] = useState(null);
 
-  const stationNames = useMemo(() => {
-    const seen = new Set();
-    const out = [];
-    basicData.stations.forEach((s) => {
-      if (s.retired === true) return;
-      if (!seen.has(s.name)) {
-        seen.add(s.name);
-        out.push(s.name);
-      }
-    });
-    return out;
-  }, [basicData.stations]);
+  // 站点联想顺序与选择弹层一致：线路顺序 + 线路内站序
+  const stationNames = useMemo(
+    () => stationNameOptions(basicData.stations, basicData.routes),
+    [basicData.stations, basicData.routes]
+  );
   const routeNames = basicData.routes.map((r) => r.name);
 
   const list = useMemo(() => {

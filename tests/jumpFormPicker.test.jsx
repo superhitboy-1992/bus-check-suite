@@ -45,7 +45,54 @@ function seedData() {
   });
 }
 
+// 断言若干文本在页面中按给定先后出现（用于校验弹层渲染顺序）
+function renderedInOrder(names) {
+  const text = document.body.textContent;
+  const positions = names.map((n) => text.indexOf(n));
+  if (positions.some((p) => p < 0)) return false;
+  return positions.every((p, i) => i === 0 || positions[i - 1] < p);
+}
+
 describe('跳车表单选择弹层', () => {
+  it('更新后站点弹层按线路站序显示，选定线路后只显示该线路站点', () => {
+    replaceAllData({
+      records: [],
+      stationRecords: [],
+      basicData: {
+        routes: [
+          { id: 'rt1', name: '莲金专线', fleet: '' },
+          { id: 'rt2', name: '莲卫专线', fleet: '' },
+        ],
+        // 本地数组顺序与 sortOrder 不一致（更新后老站留原位、新站追加到末尾）
+        stations: [
+          { id: 's1', name: '莲金末站', routeName: '莲金专线', sortOrder: 2 },
+          { id: 's2', name: '莲卫首站', routeName: '莲卫专线', sortOrder: 0 },
+          { id: 's3', name: '莲金首站', routeName: '莲金专线', sortOrder: 0 },
+          { id: 's4', name: '莲金新增站', routeName: '莲金专线', sortOrder: 1 },
+        ],
+        plates: [],
+        inspectors: [],
+        drivers: [],
+        conductors: [],
+        fleets: [],
+      },
+    });
+    window.location.hash = '#/new';
+    render(<App />);
+
+    // 未选线路：按线路分组（线路顺序 + 线路内站序）
+    fireEvent.click(screen.getByLabelText('选择上车站点'));
+    expect(renderedInOrder(['莲金首站', '莲金新增站', '莲金末站', '莲卫首站'])).toBe(true);
+    fireEvent.click(screen.getByText('清空'));
+
+    // 选定线路：只看该线路，且按站序
+    fireEvent.click(screen.getByLabelText('选择线路'));
+    fireEvent.click(screen.getByText('全部线路'));
+    fireEvent.click(screen.getByText('莲金专线'));
+    fireEvent.click(screen.getByLabelText('选择下车站点'));
+    expect(renderedInOrder(['莲金首站', '莲金新增站', '莲金末站'])).toBe(true);
+  });
+
   it('未选线路时驾驶员/售票员弹层显示全部人员', () => {
     seedData();
     window.location.hash = '#/new';

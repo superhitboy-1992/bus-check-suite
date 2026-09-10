@@ -62,8 +62,18 @@ export const DATA_VERSION = 2;
 
 export const APP_NAME = '公交检查助手';
 
-export function emptyItems() {
-  return Object.fromEntries(ITEM_KEYS.map((k) => [k, null]));
+// 新建记录的默认检查项：全部合格（√），检查员只需把不合格项改成 ×
+export function defaultItems() {
+  return Object.fromEntries(ITEM_KEYS.map((k) => [k, 'pass']));
+}
+
+// 检查项是否仍是「未填写」状态：默认的全合格，或旧数据/旧草稿里的整组留空。
+// 用于判断新建页草稿是否为空（避免一进页面就写一份没内容的草稿）。
+export function isDefaultCheckState(items) {
+  return ITEM_KEYS.every((k) => {
+    const v = items ? items[k] : null;
+    return v === 'pass' || v === null || v === undefined;
+  });
 }
 
 // ---------- 驻站检查 ----------

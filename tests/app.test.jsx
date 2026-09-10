@@ -196,6 +196,18 @@ describe('应用冒烟测试', () => {
     expect(screen.getAllByText('1 项不合格').length).toBeGreaterThanOrEqual(1);
   });
 
+  it('新建表单的 14 个检查项默认全部合格，只需改不合格项', () => {
+    window.location.hash = '#/new';
+    render(<App />);
+
+    const passButtons = screen.getAllByLabelText(/合格$/).filter((b) => !b.getAttribute('aria-label').endsWith('不合格'));
+    expect(passButtons).toHaveLength(14);
+    passButtons.forEach((b) => expect(b.getAttribute('aria-pressed')).toBe('true'));
+    // 不合格/待确认默认都未选中
+    screen.getAllByLabelText(/不合格$/).forEach((b) => expect(b.getAttribute('aria-pressed')).toBe('false'));
+    screen.getAllByLabelText(/待确认$/).forEach((b) => expect(b.getAttribute('aria-pressed')).toBe('false'));
+  });
+
   it('新建检查记录全链路：选线路→填信息→勾选→提交→出现在台账', () => {
     replaceAllData({
       records: [],
@@ -218,7 +230,6 @@ describe('应用冒烟测试', () => {
 
     fireEvent.change(screen.getByPlaceholderText('车牌号或自编号'), { target: { value: '粤B12345' } });
     fireEvent.change(screen.getByPlaceholderText('检查人姓名'), { target: { value: '王五' } });
-    fireEvent.click(screen.getByLabelText('按规范佩戴安全带合格'));
     fireEvent.click(screen.getByLabelText('开启转向灯不合格'));
 
     fireEvent.click(screen.getByText('提交检查记录'));
@@ -229,7 +240,47 @@ describe('应用冒烟测试', () => {
     const stored = JSON.parse(localStorage.getItem('busCheck.records'));
     expect(stored).toHaveLength(1);
     expect(stored[0].route).toBe('1路');
-    expect(stored[0].item01).toBe('pass');
+    expect(stored[0].item01).toBe('pass'); // 未操作的项目按默认合格保存
     expect(stored[0].item02).toBe('fail');
+    expect(stored[0].item14).toBe('pass');
+  });
+
+  it('编辑旧记录时留空的检查项保持留空，不被默认值覆盖', () => {
+    const now = new Date().toISOString();
+    replaceAllData({
+      records: [
+        {
+          id: 'r1',
+          route: '1路',
+          plateNumber: '粤B12345',
+          driver: '',
+          conductor: '',
+          boardTime: '',
+          boardLocation: '',
+          alightTime: '',
+          alightLocation: '',
+          item01: null,
+          item02: 'pass',
+          item03: 'fail',
+          remark: '',
+          inspector: '王五',
+          inspectionDate: '2026-08-30',
+          createdAt: now,
+          updatedAt: now,
+        },
+      ],
+      basicData: { routes: [{ id: 'rt1', name: '1路' }], drivers: [], conductors: [], stations: [] },
+    });
+    window.location.hash = '#/edit/r1';
+    render(<App />);
+
+    expect(screen.getByLabelText('按规范佩戴安全带待确认').getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByLabelText('开启转向灯合格').getAttribute('aria-pressed')).toBe('true');
+    expect(screen.getByLabelText('多车道未靠右行车不合格').getAttribute('aria-pressed')).toBe('true');
+
+    fireEvent.click(screen.getByText('保存修改'));
+    const stored = JSON.parse(localStorage.getItem('busCheck.records'));
+    expect(stored[0].item01).toBeNull();
+    expect(stored[0].item02).toBe('pass');
   });
 });

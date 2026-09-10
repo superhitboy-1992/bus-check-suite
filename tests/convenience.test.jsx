@@ -61,6 +61,14 @@ describe('草稿恢复', () => {
     expect(screen.getByText('清空草稿')).toBeTruthy();
   });
 
+  it('新建页未做任何操作时不写入草稿（默认全合格不算内容）', async () => {
+    window.location.hash = '#/new';
+    render(<App />);
+    await new Promise((resolve) => setTimeout(resolve, 800)); // 等过 500ms 草稿防抖
+    expect(localStorage.getItem('busCheck.draft')).toBeNull();
+    expect(screen.queryByText('清空草稿')).toBeNull();
+  });
+
   it('清空草稿会清除本地草稿并清空表单', async () => {
     window.location.hash = '#/new';
     const { unmount } = render(<App />);
@@ -78,6 +86,8 @@ describe('草稿恢复', () => {
     fireEvent.click(screen.getByText('清空草稿'));
     expect(localStorage.getItem('busCheck.draft')).toBeNull();
     expect(screen.getByPlaceholderText('车牌号或自编号').value).toBe('');
+    // 检查项回到默认全合格
+    expect(screen.getByLabelText('按规范佩戴安全带合格').getAttribute('aria-pressed')).toBe('true');
   });
 
   it('storage 层草稿保存与清除', () => {

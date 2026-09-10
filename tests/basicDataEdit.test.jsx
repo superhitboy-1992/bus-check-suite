@@ -38,15 +38,44 @@ beforeEach(() => {
   replaceAllData(fixture);
 });
 
-function openStationTab() {
+function openStationTab(routeName = '1路', openEdit = true) {
   window.location.hash = '#/basic-data';
   render(<App />);
   fireEvent.click(screen.getByText('站点'));
-  fireEvent.change(screen.getByRole('combobox'), { target: { value: '1路' } });
-  fireEvent.click(screen.getByLabelText('编辑'));
+  fireEvent.change(screen.getByRole('combobox'), { target: { value: routeName } });
+  if (openEdit) fireEvent.click(screen.getByLabelText('编辑'));
+}
+
+// 断言若干文本在页面中按给定先后出现（用于校验列表渲染顺序）
+function renderedInOrder(names) {
+  const text = document.body.textContent;
+  const positions = names.map((n) => text.indexOf(n));
+  if (positions.some((p) => p < 0)) return false;
+  return positions.every((p, i) => i === 0 || positions[i - 1] < p);
 }
 
 describe('基础数据站点归属编辑', () => {
+  it('站点列表按站序显示，下移后立刻生效且 sortOrder 连续重编号', () => {
+    replaceAllData({
+      ...fixture,
+      basicData: {
+        ...fixture.basicData,
+        stations: [
+          { id: 's1', name: '丙站', routeName: '1路', sortOrder: 2 },
+          { id: 's2', name: '甲站', routeName: '1路', sortOrder: 0 },
+          { id: 's3', name: '乙站', routeName: '1路', sortOrder: 1 },
+        ],
+      },
+    });
+    openStationTab('1路', false);
+    expect(renderedInOrder(['甲站', '乙站', '丙站'])).toBe(true);
+
+    fireEvent.click(screen.getAllByLabelText('下移')[0]); // 甲站 下移
+    expect(renderedInOrder(['乙站', '甲站', '丙站'])).toBe(true);
+    const byId = Object.fromEntries(getBasicData().stations.map((s) => [s.id, s.sortOrder]));
+    expect(byId).toEqual({ s1: 2, s2: 1, s3: 0 });
+  });
+
   it('编辑站点可修改所属线路，并排到目标线路末尾', () => {
     openStationTab();
     // 弹窗内的线路下拉在页面下拉之后渲染，取最后一个 select

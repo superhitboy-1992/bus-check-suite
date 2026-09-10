@@ -1,5 +1,5 @@
 {
-  "updatedAt": "2026-09-08T14:16:09.701Z",
+  "updatedAt": "2026-09-10T14:08:00.000Z",
   "stations": [
     {
       "name": "德贤路中侨大学",
@@ -5305,6 +5305,51 @@
       "name": "莲花路地铁站(南方商城)",
       "routeName": "莲亭专线",
       "sortOrder": 22
+    },
+    {
+      "name": "朱泾汽车站",
+      "routeName": "莲朱专线",
+      "sortOrder": 0
+    },
+    {
+      "name": "莲花路地铁站(北广场)",
+      "routeName": "莲朱专线",
+      "sortOrder": 1
+    },
+    {
+      "name": "朱泾汽车站",
+      "routeName": "莲朱专线B线",
+      "sortOrder": 0
+    },
+    {
+      "name": "亭枫公路朱泾工业区",
+      "routeName": "莲朱专线B线",
+      "sortOrder": 1
+    },
+    {
+      "name": "亭枫公路杨家村",
+      "routeName": "莲朱专线B线",
+      "sortOrder": 2
+    },
+    {
+      "name": "亭枫公路新农",
+      "routeName": "莲朱专线B线",
+      "sortOrder": 3
+    },
+    {
+      "name": "亭枫公路贸易路",
+      "routeName": "莲朱专线B线",
+      "sortOrder": 4
+    },
+    {
+      "name": "鸿尊路东日路",
+      "routeName": "莲朱专线B线",
+      "sortOrder": 5
+    },
+    {
+      "name": "莲花路地铁站(北广场)",
+      "routeName": "莲朱专线B线",
+      "sortOrder": 6
     }
   ],
   "routes": [

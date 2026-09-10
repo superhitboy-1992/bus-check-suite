@@ -7,6 +7,7 @@ import { readFile } from '../lib/stationImport';
 import { todayStr } from '../lib/dates';
 import { normalizePlate } from '../lib/stationCore';
 import { canonicalStationName } from '../lib/catalogFormat';
+import { sortStationsByRoute } from '../lib/stationOrder';
 import { downloadBlob } from '../lib/export';
 import {
   addBasicItem,
@@ -23,7 +24,7 @@ import {
   replaceBasicStrings,
   saveStationReminder,
   setRouteFleet,
-  swapStations,
+  moveStation,
   updateBasicItem,
   useBasicData,
   useStationRecords,
@@ -92,14 +93,15 @@ export default function BasicDataPage() {
     let list = objList;
     if (tab === 'station') {
       if (!showRetired) list = list.filter((s) => s.retired !== true);
-      list = list.filter((s) => s.routeName === selectedRoute);
+      // 与选择弹层同一顺序：线路内按 sortOrder 显示
+      list = sortStationsByRoute(list.filter((s) => s.routeName === selectedRoute), routes);
     }
     if (tab === 'route' || tab === 'driver' || tab === 'conductor' || tab === 'station') {
       const names = new Set(search(list.map((i) => i.name), query, 0).map((m) => m.value));
       list = list.filter((i) => names.has(i.name));
     }
     return list;
-  }, [tab, objList, query, selectedRoute, showRetired]);
+  }, [tab, objList, query, selectedRoute, showRetired, routes]);
 
   const displayStr = useMemo(() => {
     if (!query) return strList;
@@ -222,10 +224,10 @@ export default function BasicDataPage() {
     toast('已保存车号选项');
   }
 
-  function moveStation(idx, dir) {
-    const target = idx + dir;
-    if (target < 0 || target >= displayObj.length) return;
-    swapStations(idx, target, selectedRoute, showRetired);
+  function handleMoveStation(idx, dir) {
+    const item = displayObj[idx];
+    if (!item) return;
+    moveStation(item.id, dir, selectedRoute, showRetired);
     toast('排序已更新');
   }
 
@@ -657,7 +659,7 @@ export default function BasicDataPage() {
                       )}
                       {tab === 'station' && (
                         <>
-                          <Button variant="ghost" size="iconSm" aria-label="上移" disabled={idx === 0} onClick={() => moveStation(idx, -1)}>
+                          <Button variant="ghost" size="iconSm" aria-label="上移" disabled={idx === 0} onClick={() => handleMoveStation(idx, -1)}>
                             <Icon name="chevronUp" className="size-4" />
                           </Button>
                           <Button
@@ -665,7 +667,7 @@ export default function BasicDataPage() {
                             size="iconSm"
                             aria-label="下移"
                             disabled={idx === displayObj.length - 1}
-                            onClick={() => moveStation(idx, 1)}
+                            onClick={() => handleMoveStation(idx, 1)}
                           >
                             <Icon name="chevronDown" className="size-4" />
                           </Button>

@@ -6,6 +6,7 @@ import StationTabs from './StationTabs';
 import StationPicker from './StationPicker';
 import { RESULT_PRESETS, TICK_SEQ, TICK_LABEL } from '../../lib/constants';
 import { todayStr, nowTime, normalizePlate, validRecord } from '../../lib/stationCore';
+import { stationNameOptions } from '../../lib/stationOrder';
 import {
   createStationRecord,
   deleteStationRecord,
@@ -62,18 +63,11 @@ export default function StationRegPage() {
   const formRef = useRef(null);
   const fieldRefs = useRef({});
 
-  const stationNames = useMemo(() => {
-    const seen = new Set();
-    const out = [];
-    basicData.stations.forEach((s) => {
-      if (s.retired === true) return;
-      if (!seen.has(s.name)) {
-        seen.add(s.name);
-        out.push(s.name);
-      }
-    });
-    return out;
-  }, [basicData.stations]);
+  // 站点选项按「线路顺序 + 线路内站序」排列（更新后不再按本地数组插入顺序）
+  const stationNames = useMemo(
+    () => stationNameOptions(basicData.stations, basicData.routes),
+    [basicData.stations, basicData.routes]
+  );
   const inspectorNames = basicData.inspectors;
   const routeNames = basicData.routes.map((r) => r.name);
   const plateNames = basicData.plates;

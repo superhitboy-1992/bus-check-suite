@@ -18,7 +18,38 @@ beforeEach(() => {
   replaceAllData(emptyData);
 });
 
+// 断言若干文本在页面中按给定先后出现（用于校验列表渲染顺序）
+function renderedInOrder(names) {
+  const text = document.body.textContent;
+  const positions = names.map((n) => text.indexOf(n));
+  if (positions.some((p) => p < 0)) return false;
+  return positions.every((p, i) => i === 0 || positions[i - 1] < p);
+}
+
 describe('驻站登记', () => {
+  it('基础数据更新后，站点弹层按线路站序显示（不再按本地数组插入顺序）', () => {
+    replaceAllData({
+      ...emptyData,
+      basicData: {
+        ...emptyData.basicData,
+        routes: [
+          { id: 'rt1', name: '1路', fleet: '' },
+          { id: 'rt2', name: '2路', fleet: '' },
+        ],
+        // 模拟更新后的本地数组：老站留在原位、sortOrder 被远程覆盖、新站追加到末尾
+        stations: [
+          { id: 'a1', name: '老站甲', routeName: '1路', sortOrder: 2 },
+          { id: 'b1', name: '二路首站', routeName: '2路', sortOrder: 0 },
+          { id: 'a2', name: '老站乙', routeName: '1路', sortOrder: 0 },
+          { id: 'a3', name: '更新新增站', routeName: '1路', sortOrder: 1 },
+        ],
+      },
+    });
+    render(<App />);
+    fireEvent.click(screen.getByRole('button', { name: '选择站点' }));
+    expect(renderedInOrder(['老站乙', '更新新增站', '老站甲', '二路首站'])).toBe(true);
+  });
+
   it('填写并保存一条记录：固定信息保留、车辆信息清空、自动学习资料', () => {
     const { container } = render(<App />);
 

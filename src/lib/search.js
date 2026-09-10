@@ -62,7 +62,9 @@ export function search(list, query, max) {
   }
   results.sort((a, b) => {
     if (a.score !== b.score) return a.score - b.score;
-    if (a.value.length !== b.value.length) return a.value.length - b.value.length;
+    // 空查询用于「浏览列表」，必须保持调用方给的顺序（如站点按线路站序）；
+    // 名称长度只作为有查询时的相关性兜底。
+    if (q && a.value.length !== b.value.length) return a.value.length - b.value.length;
     return a.order - b.order;
   });
   if (max > 0 && results.length > max) results.length = max;

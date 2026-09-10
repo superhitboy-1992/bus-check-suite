@@ -2,6 +2,7 @@ import { useSyncExternalStore } from 'react';
 import { STORAGE_KEYS, DATA_VERSION } from './constants';
 import { CatalogSeed } from '../data/catalogSeed';
 import { canonicalStationName } from './catalogFormat';
+import { sortStationsByRoute } from './stationOrder';
 import {
   buildFleetMap,
   hashCatalogData,
@@ -621,15 +622,34 @@ export function deleteBasicItem(type, id) {
   emit();
 }
 
-export function swapStations(i, j, routeName, includeRetired = false) {
-  const stations = state.basicData.stations.filter(
-    (s) => s.routeName === routeName && (includeRetired || s.retired !== true)
+// 站点上移/下移：先按展示顺序（线路 + sortOrder）取该线路列表，
+// 与相邻站点交换位置后把整条线路的 sortOrder 连续重编号（0..n-1）。
+// 重编号保证「显示顺序 == 数据顺序」，即使历史数据里存在重复/缺失的 sortOrder。
+export function moveStation(id, direction, routeName, includeRetired = false) {
+  const route = String(routeName || '').trim();
+  const ordered = sortStationsByRoute(
+    state.basicData.stations.filter(
+      (s) => String(s.routeName || '').trim() === route && (includeRetired || s.retired !== true)
+    ),
+    state.basicData.routes
   );
-  if (i < 0 || j < 0 || i >= stations.length || j >= stations.length) return;
-  const a = stations[i];
-  const b = stations[j];
-  updateBasicItem('station', a.id, { sortOrder: b.sortOrder });
-  updateBasicItem('station', b.id, { sortOrder: a.sortOrder });
+  const from = ordered.findIndex((s) => s.id === id);
+  const to = from + direction;
+  if (from < 0 || to < 0 || to >= ordered.length) return;
+  const next = ordered.slice();
+  next[from] = ordered[to];
+  next[to] = ordered[from];
+  const orderById = new Map(next.map((s, i) => [s.id, i]));
+  let changed = false;
+  const stations = state.basicData.stations.map((s) => {
+    const order = orderById.get(s.id);
+    if (order === undefined || s.sortOrder === order) return s;
+    changed = true;
+    return { ...s, sortOrder: order };
+  });
+  if (!changed) return;
+  state = { ...state, basicData: { ...state.basicData, stations } };
+  emit();
 }
 
 // 字符串型资料（车号/检查人/车队）

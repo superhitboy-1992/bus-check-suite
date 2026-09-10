@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { CHECK_ITEMS, emptyItems } from '../lib/constants';
+import { CHECK_ITEMS, defaultItems, isDefaultCheckState } from '../lib/constants';
 import {
   addInspector,
   clearDraft,
@@ -13,6 +13,7 @@ import {
   useBasicData,
 } from '../lib/storage';
 import { todayStr } from '../lib/dates';
+import { stationNameOptions } from '../lib/stationOrder';
 import { Icon } from '../components/icons';
 import { Button, Card, Field, Input, Modal, Textarea, toast } from '../components/ui';
 import StationPicker from './station/StationPicker';
@@ -30,7 +31,7 @@ function isDraftEmpty(p) {
     !p.remark &&
     !p.inspector &&
     p.inspectionDate === todayStr() &&
-    !Object.values(p.items || {}).some(Boolean)
+    isDefaultCheckState(p.items)
   );
 }
 
@@ -43,6 +44,7 @@ function ItemToggle({ item, value, onChange }) {
       <button
         type="button"
         aria-label={`${item.name}合格`}
+        aria-pressed={value === 'pass'}
         onClick={() => set('pass')}
         className={`h-11 w-11 rounded-l-lg border text-white transition-colors active:scale-95 ${
           value === 'pass'
@@ -55,6 +57,7 @@ function ItemToggle({ item, value, onChange }) {
       <button
         type="button"
         aria-label={`${item.name}不合格`}
+        aria-pressed={value === 'fail'}
         onClick={() => set('fail')}
         className={`h-11 w-11 border-l-0 border text-white transition-colors active:scale-95 ${
           value === 'fail'
@@ -67,6 +70,7 @@ function ItemToggle({ item, value, onChange }) {
       <button
         type="button"
         aria-label={`${item.name}待确认`}
+        aria-pressed={value === null}
         onClick={() => set(null)}
         className={`h-11 w-11 rounded-r-lg border-l-0 border transition-colors active:scale-95 ${
           value === null
@@ -97,7 +101,7 @@ export default function FormPage() {
   const [remark, setRemark] = useState('');
   const [inspector, setInspector] = useState('');
   const [inspectionDate, setInspectionDate] = useState(() => todayStr());
-  const [items, setItems] = useState(() => emptyItems());
+  const [items, setItems] = useState(() => defaultItems());
   const [submitting, setSubmitting] = useState(false);
   const [notFound, setNotFound] = useState(false);
   const [draftRestored, setDraftRestored] = useState(false);
@@ -112,20 +116,11 @@ export default function FormPage() {
   }));
   const routeNames = basicData.routes.map((r) => r.name);
   const pickerField = picker === 'boardLocation' || picker === 'alightLocation' ? 'station' : picker;
-  const stationNames = useMemo(() => {
-    const seen = new Set();
-    const out = [];
-    const r = route.trim();
-    basicData.stations.forEach((s) => {
-      if (s.retired === true) return;
-      if (r && s.routeName !== r) return;
-      if (!seen.has(s.name)) {
-        seen.add(s.name);
-        out.push(s.name);
-      }
-    });
-    return out;
-  }, [basicData.stations, route]);
+  // 站点选项按「线路顺序 + 线路内站序」排列：已选线路时只看该线路，未选时按线路分组
+  const stationNames = useMemo(
+    () => stationNameOptions(basicData.stations, basicData.routes, { routeName: route }),
+    [basicData.stations, basicData.routes, route]
+  );
 
   useEffect(() => {
     if (!id) return;
@@ -177,7 +172,7 @@ export default function FormPage() {
     if (K.remark !== undefined) setRemark(K.remark);
     if (K.inspector !== undefined) setInspector(K.inspector);
     if (K.inspectionDate !== undefined) setInspectionDate(K.inspectionDate);
-    if (K.items) setItems(K.items);
+    if (K.items) setItems({ ...defaultItems(), ...K.items });
   }
 
   useEffect(() => {
@@ -234,7 +229,7 @@ export default function FormPage() {
     setRemark('');
     setInspector('');
     setInspectionDate(todayStr());
-    setItems(emptyItems());
+    setItems(defaultItems());
     setDraftRestored(false);
     toast('草稿已清空');
   };
