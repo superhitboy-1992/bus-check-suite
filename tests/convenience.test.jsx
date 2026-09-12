@@ -16,6 +16,7 @@ import {
   saveDraft,
   useStoragePressure,
 } from '../src/lib/storage';
+import { fieldInput } from './fieldQuery';
 
 const emptyData = {
   records: [],
@@ -47,7 +48,7 @@ describe('草稿恢复', () => {
   it('新建表单输入后写入草稿，重新进入自动恢复', async () => {
     window.location.hash = '#/new';
     const { unmount } = render(<App />);
-    fireEvent.change(screen.getByPlaceholderText('车牌号或自编号'), { target: { value: '粤B12345' } });
+    fireEvent.change(fieldInput('车牌/自编号'), { target: { value: '粤B12345' } });
     await waitFor(() => {
       expect(localStorage.getItem('busCheck.draft')).toBeTruthy();
     });
@@ -56,7 +57,7 @@ describe('草稿恢复', () => {
     window.location.hash = '#/new';
     render(<App />);
     await waitFor(() => {
-      expect(screen.getByPlaceholderText('车牌号或自编号').value).toBe('粤B12345');
+      expect(fieldInput('车牌/自编号').value).toBe('粤B12345');
     });
     expect(screen.getByText('清空草稿')).toBeTruthy();
   });
@@ -72,7 +73,7 @@ describe('草稿恢复', () => {
   it('清空草稿会清除本地草稿并清空表单', async () => {
     window.location.hash = '#/new';
     const { unmount } = render(<App />);
-    fireEvent.change(screen.getByPlaceholderText('车牌号或自编号'), { target: { value: '粤B12345' } });
+    fireEvent.change(fieldInput('车牌/自编号'), { target: { value: '粤B12345' } });
     await waitFor(() => {
       expect(localStorage.getItem('busCheck.draft')).toBeTruthy();
     });
@@ -85,7 +86,7 @@ describe('草稿恢复', () => {
     });
     fireEvent.click(screen.getByText('清空草稿'));
     expect(localStorage.getItem('busCheck.draft')).toBeNull();
-    expect(screen.getByPlaceholderText('车牌号或自编号').value).toBe('');
+    expect(fieldInput('车牌/自编号').value).toBe('');
     // 检查项回到默认全合格
     expect(screen.getByLabelText('按规范佩戴安全带合格').getAttribute('aria-pressed')).toBe('true');
   });

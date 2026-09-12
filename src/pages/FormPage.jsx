@@ -309,7 +309,6 @@ export default function FormPage() {
               <Input
                 value={route}
                 onChange={(e) => setRoute(e.target.value)}
-                placeholder="如：1路、20路"
                 className="h-11"
               />
               <Button
@@ -324,14 +323,13 @@ export default function FormPage() {
             </div>
           </Field>
           <Field label="车牌/自编号">
-            <Input value={plateNumber} onChange={(e) => setPlateNumber(e.target.value)} placeholder="车牌号或自编号" className="h-11" />
+            <Input value={plateNumber} onChange={(e) => setPlateNumber(e.target.value)} className="h-11" />
           </Field>
           <Field label="驾驶员">
             <div className="flex gap-1.5">
               <Input
                 value={driver}
                 onChange={(e) => setDriver(e.target.value)}
-                placeholder="驾驶员姓名"
                 className="h-11"
               />
               <Button
@@ -350,7 +348,6 @@ export default function FormPage() {
               <Input
                 value={conductor}
                 onChange={(e) => setConductor(e.target.value)}
-                placeholder="售票员姓名（可选）"
                 className="h-11"
               />
               <Button
@@ -372,7 +369,6 @@ export default function FormPage() {
               <Input
                 value={boardLocation}
                 onChange={(e) => setBoardLocation(e.target.value)}
-                placeholder="站点名称"
                 className="h-11"
               />
               <Button
@@ -394,7 +390,6 @@ export default function FormPage() {
               <Input
                 value={alightLocation}
                 onChange={(e) => setAlightLocation(e.target.value)}
-                placeholder="站点名称"
                 className="h-11"
               />
               <Button
@@ -439,7 +434,6 @@ export default function FormPage() {
             <Textarea
               value={remark}
               onChange={(e) => setRemark(e.target.value)}
-              placeholder="填写检查过程中的补充说明（可选）"
               rows={3}
             />
           </Field>
@@ -449,7 +443,6 @@ export default function FormPage() {
                 <Input
                   value={inspector}
                   onChange={(e) => setInspector(e.target.value)}
-                  placeholder="检查人姓名"
                   className="h-11 flex-1"
                 />
                 <Button

@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>移动端预览 · 公交检查助手</title>
+    <style>
+      :root {
+        --bg: #0b1220;
+        --panel: #141d2f;
+        --line: #26334d;
+        --text: #e6edf7;
+        --muted: #8aa0bf;
+        --brand: #1f7de2;
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: radial-gradient(1200px 600px at 50% -10%, #17243c 0%, var(--bg) 60%);
+        color: var(--text);
+        font: 14px/1.5 -apple-system, "Segoe UI", "Microsoft YaHei", sans-serif;
+      }
+      header {
+        padding: 20px 24px 8px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px 20px;
+        align-items: baseline;
+      }
+      header h1 { margin: 0; font-size: 18px; }
+      header .hint { color: var(--muted); font-size: 13px; }
+      header code {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 1px 6px;
+      }
+      .layout {
+        display: flex;
+        gap: 24px;
+        padding: 12px 24px 32px;
+        align-items: flex-start;
+      }
+      .panel {
+        width: 240px;
+        flex: 0 0 240px;
+        position: sticky;
+        top: 16px;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+      }
+      .panel h2 {
+        margin: 0 0 8px;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+      }
+      .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+      .chip {
+        appearance: none;
+        border: 1px solid var(--line);
+        background: var(--panel);
+        color: var(--text);
+        border-radius: 999px;
+        padding: 5px 11px;
+        font-size: 12.5px;
+        cursor: pointer;
+      }
+      .chip:hover { border-color: #3c5480; }
+      .chip[aria-pressed="true"] {
+        background: var(--brand);
+        border-color: var(--brand);
+        color: #fff;
+      }
+      .chip small { color: inherit; opacity: 0.75; margin-left: 4px; }
+      .options label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 0;
+        color: var(--text);
+        cursor: pointer;
+      }
+      .stage {
+        flex: 1;
+        min-width: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 12px;
+      }
+      .phone {
+        position: relative;
+        padding: 12px;
+        border-radius: 46px;
+        background: linear-gradient(180deg, #2a3448, #151c2b);
+        box-shadow: 0 30px 60px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+        transform-origin: top center;
+        transition: transform 0.15s ease;
+      }
+      .phone .island {
+        position: absolute;
+        top: 22px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 30%;
+        max-width: 110px;
+        height: 22px;
+        border-radius: 999px;
+        background: #05070c;
+        z-index: 2;
+        pointer-events: none;
+      }
+      iframe {
+        display: block;
+        border: 0;
+        border-radius: 34px;
+        background: #fff;
+      }
+      .caption { color: var(--muted); font-size: 13px; text-align: center; }
+      .note {
+        margin-top: 8px;
+        max-width: 560px;
+        color: var(--muted);
+        font-size: 12.5px;
+        text-align: center;
+      }
+      .actions {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .actions a.chip {
+        text-decoration: none;
+        display: inline-block;
+      }
+      @media (max-width: 900px) {
+        .layout { flex-direction: column; }
+        .panel { width: 100%; flex: none; position: static; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>移动端预览 · 公交检查助手</h1>
+      <div class="hint">
+        当前地址 <code id="origin">—</code>；手机连接同一 Wi-Fi 后可访问
+        <code id="lan">—</code>
+      </div>
+    </header>
+
+    <div class="layout">
+      <aside class="panel">
+        <section>
+          <h2>机型</h2>
+          <div class="chips" id="devices"></div>
+        </section>
+        <section>
+          <h2>页面</h2>
+          <div class="chips" id="pages"></div>
+        </section>
+        <section>
+          <h2>选项</h2>
+          <div class="options">
+            <label><input type="checkbox" id="rotate" /> 横屏</label>
+            <label><input type="checkbox" id="fit" checked /> 适应窗口高度</label>
+          </div>
+          <div class="actions" style="margin-top: 10px">
+            <a class="chip" id="open-app" href="/#/" target="_blank" rel="noopener">新标签页打开应用</a>
+            <a class="chip" id="open-real" href="/#/" target="_blank" rel="noopener">按当前设备尺寸打开</a>
+          </div>
+        </section>
+      </aside>
+
+      <main class="stage">
+        <div class="phone" id="phone">
+          <div class="island"></div>
+          <iframe id="frame" src="/#/" title="公交检查助手移动端预览"></iframe>
+        </div>
+        <div class="caption" id="caption"></div>
+        <p class="note">
+          框内就是应用本身，可以直接点击操作；记录存在 <code>localhost:5173</code> 这个来源的浏览器本地存储里，
+          和单独打开应用是同一份数据（清理浏览器数据会一并清掉）。想要真机效果，在手机浏览器打开
+          <code>http://&lt;电脑IP&gt;:5173/</code>（IP 见 start-preview.cmd 的输出）。
+        </p>
+      </main>
+    </div>
+
+    <script>
+      const DEVICES = [
+        { name: 'iPhone 15 Pro', w: 393, h: 852 },
+        { name: 'iPhone 15 Pro Max', w: 430, h: 932 },
+        { name: 'iPhone SE', w: 375, h: 667 },
+        { name: 'Pixel 8', w: 412, h: 915 },
+        { name: 'Galaxy S23', w: 360, h: 780 },
+        { name: 'iPad mini', w: 744, h: 1133 },
+      ];
+      const PAGES = [
+        { name: '首页', hash: '/#/', route: '#/' },
+        { name: '驻站检查', hash: '/#/station/reg', route: '#/station/reg' },
+        { name: '驻站列表', hash: '/#/station/list', route: '#/station/list' },
+        { name: '驻站导出', hash: '/#/station/export', route: '#/station/export' },
+        { name: '跳车检查', hash: '/#/jump', route: '#/jump' },
+        { name: '跳车台账', hash: '/#/export', route: '#/export' },
+        { name: '基础数据', hash: '/#/basic-data', route: '#/basic-data' },
+      ];
+
+      const frame = document.getElementById('frame');
+      const phone = document.getElementById('phone');
+      const caption = document.getElementById('caption');
+      const rotateEl = document.getElementById('rotate');
+      const fitEl = document.getElementById('fit');
+
+      let device = DEVICES[0];
+      let page = PAGES[0];
+
+      document.getElementById('origin').textContent = location.origin + '/';
+      document.getElementById('lan').textContent = 'http://<电脑IP>:5173/';
+
+      function chips(host, items, onPick, initial) {
+        items.forEach((item, index) => {
+          const btn = document.createElement('button');
+          btn.className = 'chip';
+          btn.type = 'button';
+          btn.innerHTML =
+            item.name + (item.w ? '<small>' + item.w + '×' + item.h + '</small>' : '');
+          btn.setAttribute('aria-pressed', String(index === initial));
+          btn.addEventListener('click', () => {
+            host.querySelectorAll('.chip').forEach((el) => el.setAttribute('aria-pressed', 'false'));
+            btn.setAttribute('aria-pressed', 'true');
+            onPick(item);
+          });
+          host.appendChild(btn);
+        });
+      }
+
+      function layout() {
+        const rotated = rotateEl.checked;
+        const w = rotated ? device.h : device.w;
+        const h = rotated ? device.w : device.h;
+        frame.style.width = w + 'px';
+        frame.style.height = h + 'px';
+        phone.querySelector('.island').style.display = rotated ? 'none' : 'block';
+
+        const available = window.innerHeight - 190;
+        const scale = fitEl.checked ? Math.min(1, available / (h + 24)) : 1;
+        phone.style.transform = 'scale(' + scale.toFixed(3) + ')';
+        phone.style.marginBottom = scale < 1 ? -(h + 24) * (1 - scale) + 'px' : '0';
+        caption.textContent =
+          device.name +
+          ' · ' +
+          w +
+          '×' +
+          h +
+          (rotated ? '（横屏）' : '') +
+          ' · ' +
+          page.name +
+          (scale < 1 ? ' · 显示比例 ' + Math.round(scale * 100) + '%' : '');
+      }
+
+      function goto(item) {
+        page = item;
+        try {
+          const win = frame.contentWindow;
+          if (win && win.location.pathname === '/' && win.location.hash !== item.route) {
+            win.location.hash = item.route;
+            layout();
+            return;
+          }
+        } catch (err) {
+          /* 跨域或尚未加载时退回直接赋值 */
+        }
+        frame.src = item.hash;
+        layout();
+      }
+
+      chips(document.getElementById('devices'), DEVICES, (item) => {
+        device = item;
+        layout();
+      }, 0);
+      chips(document.getElementById('pages'), PAGES, goto, 0);
+
+      rotateEl.addEventListener('change', layout);
+      fitEl.addEventListener('change', layout);
+      window.addEventListener('resize', layout);
+
+      document.getElementById('open-real').addEventListener('click', (event) => {
+        const rotated = rotateEl.checked;
+        const w = rotated ? device.h : device.w;
+        const h = rotated ? device.w : device.h;
+        const popup = window.open(
+          page.hash,
+          'bus-checklist-mobile',
+          'popup=yes,width=' + w + ',height=' + h + ',left=80,top=40'
+        );
+        if (popup) event.preventDefault();
+      });
+
+      frame.addEventListener('load', () => {
+        if (frame.contentWindow && frame.contentWindow.location.hash !== page.route) {
+          frame.contentWindow.location.hash = page.route;
+        }
+        layout();
+      });
+      layout();
+    </script>
+  </body>
+</html>

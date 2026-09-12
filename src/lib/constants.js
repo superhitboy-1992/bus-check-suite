@@ -77,7 +77,8 @@ export function isDefaultCheckState(items) {
 }
 
 // ---------- 驻站检查 ----------
-export const RESULT_PRESETS = ['正常', '未按规定进出站', '未打招呼', '其他问题'];
+export const RESULT_PRESETS = ['未按规定进出站', '未打招呼'];
+export const DIRECTION_PRESETS = ['上行', '下行'];
 export const TICK_SEQ = ['', '√', '×'];
 export const TICK_LABEL = { '': '留空', '√': '√ 正常', '×': '× 异常' };
 export const STATION_RECORD_HEADER = [

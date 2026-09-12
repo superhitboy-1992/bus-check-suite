@@ -3,6 +3,7 @@ import { beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import App from '../src/App';
 import { replaceAllData } from '../src/lib/storage';
+import { fieldInput } from './fieldQuery';
 
 const emptyData = {
   records: [],
@@ -226,10 +227,10 @@ describe('应用冒烟测试', () => {
     fireEvent.click(screen.getByLabelText('选择线路'));
     fireEvent.click(screen.getByText('全部线路'));
     fireEvent.click(screen.getByText('1路'));
-    expect(screen.getByPlaceholderText('如：1路、20路').value).toBe('1路');
+    expect(fieldInput('线路').value).toBe('1路');
 
-    fireEvent.change(screen.getByPlaceholderText('车牌号或自编号'), { target: { value: '粤B12345' } });
-    fireEvent.change(screen.getByPlaceholderText('检查人姓名'), { target: { value: '王五' } });
+    fireEvent.change(fieldInput('车牌/自编号'), { target: { value: '粤B12345' } });
+    fireEvent.change(fieldInput('检查人'), { target: { value: '王五' } });
     fireEvent.click(screen.getByLabelText('开启转向灯不合格'));
 
     fireEvent.click(screen.getByText('提交检查记录'));

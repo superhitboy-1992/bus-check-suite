@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Card, Field, Input, toast } from '../../components/ui';
-import { Icon } from '../../components/icons';
 import StationTabs from './StationTabs';
 import StationPicker from './StationPicker';
-import { RESULT_PRESETS, TICK_SEQ, TICK_LABEL } from '../../lib/constants';
+import { RESULT_PRESETS, DIRECTION_PRESETS, TICK_SEQ, TICK_LABEL } from '../../lib/constants';
 import { todayStr, nowTime, normalizePlate, validRecord } from '../../lib/stationCore';
 import { stationNameOptions } from '../../lib/stationOrder';
 import {
@@ -56,6 +55,10 @@ export default function StationRegPage() {
   const [checkResult, setCheckResult] = useState('');
   const [rectification, setRectification] = useState('');
   const [remark, setRemark] = useState('');
+  const remarkParts = String(remark)
+    .split(/[、,，;；\s]+/)
+    .map((s) => s.trim())
+    .filter(Boolean);
   const [editingId, setEditingId] = useState(null);
   const [picker, setPicker] = useState(null); // 'station'|'checker'|'route'|'plate'
   const [reminder, setReminder] = useState(null);
@@ -155,6 +158,19 @@ export default function StationRegPage() {
     const v = parseInt(boarding, 10);
     const next = Math.max(0, (isNaN(v) ? 0 : v) + delta);
     setBoarding(String(next));
+  }
+
+  // 备注常用词（上行 / 下行）：互斥写入备注文本，再点一次取消
+  function toggleDirection(dir) {
+    setRemark((prev) => {
+      const parts = String(prev)
+        .split(/[、,，;；\s]+/)
+        .map((s) => s.trim())
+        .filter(Boolean);
+      const on = parts.includes(dir);
+      const rest = parts.filter((p) => !DIRECTION_PRESETS.includes(p));
+      return on ? rest.join(' ') : [...rest, dir].join(' ');
+    });
   }
 
   function handlePlateBlur() {
@@ -280,7 +296,6 @@ export default function StationRegPage() {
                 开始新检查
               </Button>
             </div>
-            <p className="text-xs text-muted-foreground">站点、驻站人、日期为本次检查的固定信息，登记多辆车时保持不变。</p>
             <div className="grid gap-3 sm:grid-cols-3">
               <Field label="驻站站名 *">
                 <div className="flex gap-1.5">
@@ -290,7 +305,6 @@ export default function StationRegPage() {
                     onChange={(e) => setFixed({ ...fixed, station: e.target.value })}
                     onFocus={() => setPicker('station')}
                     onKeyDown={(e) => onKeyDownEnter(e, 'f-station', 0)}
-                    placeholder="如：汽车站"
                   />
                   <Button type="button" variant="outline" onClick={() => setPicker('station')} aria-label="选择站点">
                     ▾
@@ -305,7 +319,6 @@ export default function StationRegPage() {
                     onChange={(e) => setFixed({ ...fixed, checker: e.target.value })}
                     onFocus={() => setPicker('checker')}
                     onKeyDown={(e) => onKeyDownEnter(e, 'f-checker', 1)}
-                    placeholder="检查人姓名"
                   />
                   <Button type="button" variant="outline" onClick={() => setPicker('checker')} aria-label="选择驻站人">
                     ▾
@@ -355,7 +368,6 @@ export default function StationRegPage() {
                     onChange={(e) => setRoute(e.target.value)}
                     onFocus={() => setPicker('route')}
                     onKeyDown={(e) => onKeyDownEnter(e, 'f-route', 4)}
-                    placeholder="如：莲朱专线"
                   />
                   <Button type="button" variant="outline" onClick={() => setPicker('route')} aria-label="选择线路">
                     ▾
@@ -371,7 +383,6 @@ export default function StationRegPage() {
                     onFocus={() => setPicker('plate')}
                     onBlur={handlePlateBlur}
                     onKeyDown={(e) => onKeyDownEnter(e, 'f-plate', 5)}
-                    placeholder="如：沪A36401D，可留空"
                   />
                   <Button type="button" variant="outline" onClick={() => setPicker('plate')} aria-label="选择车号">
                     ▾
@@ -411,7 +422,6 @@ export default function StationRegPage() {
                   value={checkResult}
                   onChange={(e) => setCheckResult(e.target.value)}
                   onKeyDown={(e) => onKeyDownEnter(e, 'f-result', 7)}
-                  placeholder="文字描述，可留空"
                 />
                 <div className="mt-1.5 flex flex-wrap gap-1.5">
                   {RESULT_PRESETS.map((v) => (
@@ -436,7 +446,6 @@ export default function StationRegPage() {
                   value={rectification}
                   onChange={(e) => setRectification(e.target.value)}
                   onKeyDown={(e) => onKeyDownEnter(e, 'f-rectify', 8)}
-                  placeholder="如：已当场整改，可留空"
                 />
               </Field>
               <Field label="备注">
@@ -445,8 +454,23 @@ export default function StationRegPage() {
                   value={remark}
                   onChange={(e) => setRemark(e.target.value)}
                   onKeyDown={(e) => onKeyDownEnter(e, 'f-remark', 9)}
-                  placeholder="其他需要说明的事项，可留空"
                 />
+                <div className="mt-1.5 flex flex-wrap gap-1.5">
+                  {DIRECTION_PRESETS.map((v) => (
+                    <button
+                      key={v}
+                      type="button"
+                      onClick={() => toggleDirection(v)}
+                      className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                        remarkParts.includes(v)
+                          ? 'border-primary bg-primary text-primary-foreground'
+                          : 'border-border text-muted-foreground hover:bg-accent'
+                      }`}
+                    >
+                      {v}
+                    </button>
+                  ))}
+                </div>
               </Field>
             </div>
           </section>
@@ -466,9 +490,6 @@ export default function StationRegPage() {
               </Button>
             )}
           </div>
-          <p className="text-xs text-muted-foreground">
-            保存后自动清空车辆信息，可继续登记下一辆；站点、驻站人、日期为本次检查固定信息，换站时点「开始新检查」。
-          </p>
         </form>
       </Card>
 
@@ -512,10 +533,6 @@ export default function StationRegPage() {
         </div>
       )}
 
-      <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <Icon name="database" className="size-3.5" />
-        线路、站点、车号、驻站人支持汉字或拼音模糊匹配；资料可在「基础数据」统一维护。
-      </p>
     </div>
   );
 }

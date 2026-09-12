@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import App from '../src/App';
 import { replaceAllData } from '../src/lib/storage';
+import { fieldInput } from './fieldQuery';
 
 const emptyData = {
   records: [],
@@ -120,7 +121,7 @@ describe('跳车表单选择弹层', () => {
     fireEvent.click(screen.getByLabelText('选择线路'));
     fireEvent.click(screen.getByText('全部线路'));
     fireEvent.click(screen.getByText('莲金专线'));
-    expect(screen.getByPlaceholderText('如：1路、20路').value).toBe('莲金专线');
+    expect(fieldInput('线路').value).toBe('莲金专线');
 
     fireEvent.click(screen.getByLabelText('选择驾驶员'));
     expect(screen.getByText('张三')).toBeTruthy();
@@ -177,14 +178,13 @@ describe('跳车表单选择弹层', () => {
     window.location.hash = '#/new';
     render(<App />);
 
-    fireEvent.change(screen.getByPlaceholderText('如：1路、20路'), { target: { value: '临时线路' } });
-    fireEvent.change(screen.getByPlaceholderText('驾驶员姓名'), { target: { value: '临时司机' } });
-    fireEvent.change(screen.getByPlaceholderText('售票员姓名（可选）'), { target: { value: '临时售票' } });
-    const locations = screen.getAllByPlaceholderText('站点名称');
-    fireEvent.change(locations[0], { target: { value: '总站' } });
-    fireEvent.change(locations[1], { target: { value: '终点站' } });
-    fireEvent.change(screen.getByPlaceholderText('车牌号或自编号'), { target: { value: '沪A00000D' } });
-    fireEvent.change(screen.getByPlaceholderText('检查人姓名'), { target: { value: '王五' } });
+    fireEvent.change(fieldInput('线路'), { target: { value: '临时线路' } });
+    fireEvent.change(fieldInput('驾驶员'), { target: { value: '临时司机' } });
+    fireEvent.change(fieldInput('售票员'), { target: { value: '临时售票' } });
+    fireEvent.change(fieldInput('上车地点'), { target: { value: '总站' } });
+    fireEvent.change(fieldInput('下车地点'), { target: { value: '终点站' } });
+    fireEvent.change(fieldInput('车牌/自编号'), { target: { value: '沪A00000D' } });
+    fireEvent.change(fieldInput('检查人'), { target: { value: '王五' } });
 
     fireEvent.click(screen.getByText('提交检查记录'));
 
@@ -227,6 +227,6 @@ describe('跳车表单选择弹层', () => {
     });
     window.location.hash = '#/edit/r1';
     render(<App />);
-    expect(screen.getByPlaceholderText('驾驶员姓名').value).toBe('旧司机');
+    expect(fieldInput('驾驶员').value).toBe('旧司机');
   });
 });

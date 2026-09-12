@@ -18,7 +18,10 @@ export default function StationListPage() {
   const records = useStationRecords();
   const basicData = useBasicData();
   const [filters, setFilters] = useState({ from: '', to: '', station: '', route: '', keyword: '' });
+  const [showFilters, setShowFilters] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
+
+  const activeFilterCount = ['from', 'to', 'station', 'route', 'keyword'].filter((k) => filters[k]).length;
 
   // 站点联想顺序与选择弹层一致：线路顺序 + 线路内站序
   const stationNames = useMemo(
@@ -67,42 +70,63 @@ export default function StationListPage() {
       <StationTabs />
 
       <Card className="p-4">
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
-          <Field label="日期从">
-            <Input type="date" value={filters.from} onChange={(e) => setFilters({ ...filters, from: e.target.value })} />
-          </Field>
-          <Field label="至">
-            <Input type="date" value={filters.to} onChange={(e) => setFilters({ ...filters, to: e.target.value })} />
-          </Field>
-          <Field label="站点">
-            <Input list="station-list" value={filters.station} onChange={(e) => setFilters({ ...filters, station: e.target.value })} placeholder="全部" />
-          </Field>
-          <Field label="线路">
-            <Input list="route-list" value={filters.route} onChange={(e) => setFilters({ ...filters, route: e.target.value })} placeholder="全部" />
-          </Field>
-          <Field label="关键字">
-            <Input value={filters.keyword} onChange={(e) => setFilters({ ...filters, keyword: e.target.value })} placeholder="车号/检查情况/备注" />
-          </Field>
-        </div>
-        <datalist id="station-list">
-          {stationNames.map((s) => (
-            <option key={s} value={s} />
-          ))}
-        </datalist>
-        <datalist id="route-list">
-          {routeNames.map((r) => (
-            <option key={r} value={r} />
-          ))}
-        </datalist>
-        <div className="mt-3 flex items-center gap-2">
-          <Button size="sm" onClick={() => setFilters({ ...filters })}>
-            查询
+        <div className="flex items-center gap-2">
+          <Button
+            size="sm"
+            variant={showFilters || activeFilterCount > 0 ? 'default' : 'outline'}
+            aria-expanded={showFilters}
+            onClick={() => setShowFilters((v) => !v)}
+          >
+            <Icon name="filter" className="size-4" />
+            筛选
+            <Icon
+              name={showFilters ? 'chevronUp' : 'chevronDown'}
+              className="size-4"
+            />
           </Button>
-          <Button size="sm" variant="outline" onClick={resetFilters}>
-            重置
-          </Button>
+          {activeFilterCount > 0 && <Badge variant="muted">{activeFilterCount} 个条件</Badge>}
           <span className="ml-auto text-sm text-muted-foreground">共 {list.length} 条记录</span>
         </div>
+
+        {showFilters && (
+          <>
+            <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-5">
+              <Field label="日期从">
+                <Input type="date" value={filters.from} onChange={(e) => setFilters({ ...filters, from: e.target.value })} />
+              </Field>
+              <Field label="至">
+                <Input type="date" value={filters.to} onChange={(e) => setFilters({ ...filters, to: e.target.value })} />
+              </Field>
+              <Field label="站点">
+                <Input list="station-list" value={filters.station} onChange={(e) => setFilters({ ...filters, station: e.target.value })} placeholder="全部" />
+              </Field>
+              <Field label="线路">
+                <Input list="route-list" value={filters.route} onChange={(e) => setFilters({ ...filters, route: e.target.value })} placeholder="全部" />
+              </Field>
+              <Field label="关键字">
+                <Input value={filters.keyword} onChange={(e) => setFilters({ ...filters, keyword: e.target.value })} placeholder="车号/检查情况/备注" />
+              </Field>
+            </div>
+            <datalist id="station-list">
+              {stationNames.map((s) => (
+                <option key={s} value={s} />
+              ))}
+            </datalist>
+            <datalist id="route-list">
+              {routeNames.map((r) => (
+                <option key={r} value={r} />
+              ))}
+            </datalist>
+            <div className="mt-3 flex items-center gap-2">
+              <Button size="sm" onClick={() => setFilters({ ...filters })}>
+                查询
+              </Button>
+              <Button size="sm" variant="outline" onClick={resetFilters}>
+                重置
+              </Button>
+            </div>
+          </>
+        )}
       </Card>
 
       {list.length === 0 ? (
@@ -217,10 +241,6 @@ export default function StationListPage() {
         </div>
       )}
 
-      <p className="flex items-center gap-1.5 text-xs text-muted-foreground">
-        <Icon name="history" className="size-3.5" />
-        支持按日期、站点、线路与关键字筛选；车号关键字会自动忽略空格与横线。
-      </p>
     </div>
   );
 }

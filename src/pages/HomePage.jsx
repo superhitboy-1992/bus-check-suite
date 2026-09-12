@@ -35,9 +35,6 @@ export default function HomePage() {
     <div className="space-y-6">
       <section className="text-center">
         <h2 className="text-2xl font-bold text-foreground">欢迎使用公交检查助手</h2>
-        <p className="mt-2 text-sm text-muted-foreground">
-          驻站检查与跳车检查合为一体，线路、站点、车号、检查人等基础资料共用一份，数据自动互通。
-        </p>
       </section>
 
       <section className="grid gap-3 sm:grid-cols-3">

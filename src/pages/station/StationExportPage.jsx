@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react';
-import { Button, Card, EmptyState, Field, Input, Modal, toast } from '../../components/ui';
+import { Badge, Button, Card, EmptyState, Field, Input, Modal, toast } from '../../components/ui';
 import { Icon } from '../../components/icons';
 import StationTabs from './StationTabs';
 import { useStationRecords } from '../../lib/storage';
@@ -126,9 +126,18 @@ export default function StationExportPage() {
   const [to, setTo] = useState('');
   const [station, setStation] = useState('');
   const [queried, setQueried] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
   const [exportedFiles, setExportedFiles] = useState([]);
   const [result, setResult] = useState(null);
   const isMobile = isMobileView();
+
+  const activeFilterCount = [from, to, station].filter(Boolean).length;
+
+  function resetFilters() {
+    setFrom('');
+    setTo('');
+    setStation('');
+  }
 
   const groups = useMemo(() => {
     const list = records.filter((r) => {
@@ -222,26 +231,47 @@ export default function StationExportPage() {
       )}
 
       <Card className="p-4">
-        <div className="grid gap-3 sm:grid-cols-3">
-          <Field label="日期从">
-            <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
-          </Field>
-          <Field label="至">
-            <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
-          </Field>
-          <Field label="站点">
-            <Input value={station} onChange={(e) => setStation(e.target.value)} placeholder="全部" />
-          </Field>
-        </div>
-        <div className="mt-3 flex flex-wrap items-center gap-2">
-          <Button size="sm" onClick={() => setQueried((v) => !v)}>
-            查询分组
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            size="sm"
+            variant={showFilters || activeFilterCount > 0 ? 'default' : 'outline'}
+            aria-expanded={showFilters}
+            onClick={() => setShowFilters((v) => !v)}
+          >
+            <Icon name="filter" className="size-4" />
+            筛选
+            <Icon name={showFilters ? 'chevronUp' : 'chevronDown'} className="size-4" />
           </Button>
+          {activeFilterCount > 0 && <Badge variant="muted">{activeFilterCount} 个条件</Badge>}
+          <span className="ml-auto text-sm text-muted-foreground">共 {groups.length} 个分组</span>
           <Button size="sm" variant="outline" onClick={exportAllZip}>
             批量导出 ZIP
           </Button>
-          <span className="ml-auto text-sm text-muted-foreground">共 {groups.length} 个分组</span>
         </div>
+
+        {showFilters && (
+          <>
+            <div className="mt-3 grid gap-3 sm:grid-cols-3">
+              <Field label="日期从">
+                <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+              </Field>
+              <Field label="至">
+                <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+              </Field>
+              <Field label="站点">
+                <Input value={station} onChange={(e) => setStation(e.target.value)} placeholder="全部" />
+              </Field>
+            </div>
+            <div className="mt-3 flex flex-wrap items-center gap-2">
+              <Button size="sm" onClick={() => setQueried((v) => !v)}>
+                查询分组
+              </Button>
+              <Button size="sm" variant="outline" onClick={resetFilters}>
+                重置
+              </Button>
+            </div>
+          </>
+        )}
       </Card>
 
       {exportedFiles.length > 0 && (
@@ -311,13 +341,6 @@ export default function StationExportPage() {
           ))}
         </div>
       )}
-
-      <div className="rounded-lg border border-border bg-accent/40 p-4 text-xs leading-relaxed text-muted-foreground">
-        说明：按「日期 + 站点」分组，每组自动生成一张《驻站记录表》（固定 30 行、A4 打印格式），与现成模板一致。
-        点击「导出表格」会先弹出导出结果，可在弹窗中下载、打开或分享；已导出的文件会保留在本页列表中，可再次下载。
-        手机上可直接分享表格到微信/邮件；批量导出会把多张表打包成一个 ZIP 文件。
-        {embeddedHint && ` ${embeddedHint}`}
-      </div>
 
       <Modal
         open={!!result}
