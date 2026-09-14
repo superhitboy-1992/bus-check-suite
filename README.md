@@ -85,7 +85,33 @@ pnpm build:line-map   # 重新生成 public/line-map.json（站点映射，需�
 | --- | --- |
 | 电脑 `http://localhost:5173` | 直连随申行（最快，实测 0.5 秒左右返回） |
 | 手机 `/ 局域网 http://192.168.x.x:5173` | 同源转发：由电脑上的预览服务（`tools/live-dev-proxy.js`）代为请求 |
-| 线上 GitHub Pages | 只能自建代理（无服务端，且上游不放行线上来源） |
+| 线上 GitHub Pages | 自建代理（无服务端，且上游不放行线上来源），见下面「手机独立使用」 |
+| Netlify 部署 | 同源转发（应用与转发函数同一个域名，手机零配置） |
+
+### 手机独立使用（不依赖电脑）
+
+手机要能脱离电脑单独用，就必须有一个**你们网络能直连的公网转发**。实测（同一网络下）：
+
+| 域名 | 能否直连 |
+| --- | --- |
+| `*.workers.dev`、`*.pages.dev`、`*.vercel.app`、`*.onrender.com`、`*.fly.dev` | ❌ 被 DNS 投毒／超时 |
+| `*.netlify.app`、`*.deno.dev`、`*.up.railway.app`、`*.koyeb.app`、`cloudflare.com` | ✅ 可直连 |
+
+所以仓库里已经配好 Netlify 方案（`netlify.toml` + `netlify/functions/live-proxy.mjs`）：
+应用与转发函数部署在同一个域名下，**手机上打开该地址即可用，不需要填任何代理地址**。
+
+部署步骤（只需做一次，约 2 分钟）：
+
+1. 用 GitHub 账号登录 [netlify.com](https://www.netlify.com/) → **Add new site → Import an existing
+   project → GitHub** → 选择本仓库（构建命令、发布目录已写在 `netlify.toml`，不用改）；
+2. 部署完成后手机打开 `https://<站点名>.netlify.app`，「驻站 → 本站实时到站」直接可用；
+3. （可选）想让 GitHub Pages 那一版也有可用代理：在 GitHub 仓库
+   **Settings → Secrets and variables → Actions → Variables** 新增
+   `VITE_LIVE_PROXY_BASE = https://<站点名>.netlify.app`，再重跑一次 Pages 部署。
+
+> 如果你有自己的域名：也可以直接把现有 Cloudflare Worker 绑上自定义域名
+> （Workers → Settings → Domains & Routes → Add → Custom Domain），再把代理地址换成新域名，
+> 同样不需要 Netlify。
 
 > 随申行接口只放行 `localhost` / `127.0.0.1` 作为跨域来源（`Origin` 白名单），
 > 实测局域网 IP、`*.github.io`、普通域名直连都返回 403，所以浏览器直连只在

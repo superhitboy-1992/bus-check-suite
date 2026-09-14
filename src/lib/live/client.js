@@ -71,33 +71,20 @@ export function createProxySource(baseUrl) {
   return base ? { kind: SOURCE_KIND.PROXY, baseUrl: base } : null;
 }
 
-/** 只有在本机 / 局域网页面上才值得试同源转发（预览服务由本机启动） */
-export function shouldUseLocalSource(loc = globalThis.location) {
-  const host = (loc && loc.hostname) || '';
-  if (!host) return false;
-  if (host === 'localhost' || host === '127.0.0.1' || host === '::1' || host === '[::1]') return true;
-  if (host.endsWith('.localhost') || host.endsWith('.local')) return true;
-  if (/^10\./.test(host) || /^192\.168\./.test(host)) return true;
-  const private17 = /^172\.(\d{1,3})\./.exec(host);
-  if (private17) {
-    const second = Number(private17[1]);
-    if (second >= 16 && second <= 31) return true;
-  }
-  return false;
-}
-
 /**
  * 配置 → 候选数据源（按优先顺序）。
  * source 取值：auto（默认，直连优先、失败自动回退代理）/ direct / proxy
  */
-export function buildSources(config, loc = globalThis.location) {
+export function buildSources(config) {
   const cfg = config || {};
   const mode = cfg.source === 'direct' || cfg.source === 'proxy' ? cfg.source : 'auto';
   const proxy = createProxySource(cfg.proxyBaseUrl);
   if (mode === 'direct') return [createDirectSource()];
   if (mode === 'proxy') return proxy ? [proxy] : [];
+  // 同源转发始终排第二：本机预览服务、Netlify 这类「静态站 + 同源函数」的部署都靠它，
+  // 线上没有这个路径时只是多一次秒回的 404，然后自动落到自建代理
   const candidates = [createDirectSource()];
-  if (shouldUseLocalSource(loc)) candidates.push(createLocalSource());
+  candidates.push(createLocalSource());
   if (proxy) candidates.push(proxy);
   return candidates;
 }
@@ -250,6 +237,22 @@ function etaRequestBody(params) {
   };
 }
 
+/** 代理/同源转发的响应必须是我们约定的结构，否则按「接口不存在」处理并换下一条路 */
+function isEtaContract(payload) {
+  if (!payload || typeof payload !== 'object') return false;
+  return 'status' in payload || 'buses' in payload;
+}
+
+function etaPayloadError(payload) {
+  if (isEtaContract(payload)) return null;
+  return { code: 'not_found', message: '接口不存在或返回的不是实时到站数据' };
+}
+
+function healthPayloadError(payload) {
+  if (payload && typeof payload === 'object' && payload.ok === true) return null;
+  return { code: 'not_found', message: '接口不存在（不是实时到站代理）' };
+}
+
 /** 查询某数据源某线路某方向某站的实时到站，返回统一契约 */
 export async function requestEta(source, params, options = {}) {
   const body = etaRequestBody(params);
@@ -272,6 +275,7 @@ export async function requestEta(source, params, options = {}) {
     method: 'POST',
     body,
     timeoutMs: PROXY_TIMEOUT_MS,
+    validateError: etaPayloadError,
     ...options,
   });
 }
@@ -306,6 +310,7 @@ export async function checkSource(source, options = {}) {
     method: 'GET',
     timeoutMs: 8000,
     retries: 0,
+    validateError: healthPayloadError,
     ...options,
   });
   return {

@@ -1,0 +1,26 @@
+# Netlify 部署配置：静态站 + 同源转发函数
+#
+# 为什么用 Netlify：手机要能独立使用实时到站，就必须有一个「你们网络能直连」的公网
+# 转发。实测 *.workers.dev / *.pages.dev / *.vercel.app 在这条网络上被 DNS 投毒，
+# 而 *.netlify.app 可以直连。这里把应用和转发函数放在同一个域名下（同源），
+# 手机打开 https://<你的站点>.netlify.app 就能直接用，不需要任何额外设置。
+
+[build]
+  command = "node tools/build-data.js --from-json && pnpm build"
+  publish = "dist"
+
+[build.environment]
+  NODE_VERSION = "22"
+
+# 前端请求 /api/* → 同源函数代取（函数在服务端请求上游，不受浏览器 Origin 限制）
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/live-proxy/:splat"
+  status = 200
+  force = true
+
+# 其余路径交给静态站（哈希路由，正常只会用到 index.html 与 assets/）
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200

@@ -4,9 +4,9 @@ import {
   SOURCE_KIND,
   buildSources,
   createDirectSource,
+  createLocalSource,
   createProxySource,
   resetSourceHealth,
-  shouldUseLocalSource,
   sourceKey,
 } from '../src/lib/live/client';
 import { UPSTREAM_PATHS } from '../src/lib/live/upstream';
@@ -39,12 +39,15 @@ beforeEach(() => {
 });
 
 describe('数据源选择', () => {
-  it('auto：直连优先、有代理地址时附加代理；direct/proxy 各自只用一种', () => {
+  it('auto：直连 → 同源转发 → 代理；direct/proxy 各自只用一种', () => {
     const auto = buildSources({ source: 'auto', proxyBaseUrl: 'https://proxy.test/' });
-    expect(auto.map((s) => s.kind)).toEqual([SOURCE_KIND.DIRECT, SOURCE_KIND.PROXY]);
-    expect(auto[1].baseUrl).toBe('https://proxy.test');
+    expect(auto.map((s) => s.kind)).toEqual([SOURCE_KIND.DIRECT, SOURCE_KIND.LOCAL, SOURCE_KIND.PROXY]);
+    expect(auto[2].baseUrl).toBe('https://proxy.test');
 
-    expect(buildSources({ source: 'auto', proxyBaseUrl: '' }).map((s) => s.kind)).toEqual([SOURCE_KIND.DIRECT]);
+    expect(buildSources({ source: 'auto', proxyBaseUrl: '' }).map((s) => s.kind)).toEqual([
+      SOURCE_KIND.DIRECT,
+      SOURCE_KIND.LOCAL,
+    ]);
     expect(buildSources({ source: 'direct' }).map((s) => s.kind)).toEqual([SOURCE_KIND.DIRECT]);
     // 强制代理但没填地址 → 没有可用数据源
     expect(buildSources({ source: 'proxy', proxyBaseUrl: '  ' })).toEqual([]);
@@ -56,22 +59,47 @@ describe('数据源选择', () => {
     expect(sourceKey(createProxySource('https://proxy.test'))).toBe('proxy:https://proxy.test');
   });
 
-  it('本机/局域网页面上才试同源转发，线上域名不试', () => {
-    expect(shouldUseLocalSource({ hostname: 'localhost' })).toBe(true);
-    expect(shouldUseLocalSource({ hostname: '127.0.0.1' })).toBe(true);
-    expect(shouldUseLocalSource({ hostname: '192.168.1.5' })).toBe(true);
-    expect(shouldUseLocalSource({ hostname: '10.0.0.9' })).toBe(true);
-    expect(shouldUseLocalSource({ hostname: '172.20.3.4' })).toBe(true);
-    expect(shouldUseLocalSource({ hostname: '172.40.3.4' })).toBe(false);
-    expect(shouldUseLocalSource({ hostname: 'example.github.io' })).toBe(false);
-    expect(shouldUseLocalSource(undefined)).toBe(false);
+  it('自动模式：直连 → 同源转发 → 自建代理（同源转发对 Netlify 这类部署自动生效）', () => {
+    const kinds = buildSources({ source: 'auto', proxyBaseUrl: 'https://proxy.test' }).map((s) => s.kind);
+    expect(kinds).toEqual([SOURCE_KIND.DIRECT, SOURCE_KIND.LOCAL, SOURCE_KIND.PROXY]);
+    // 没填代理地址时也保留同源转发
+    expect(buildSources({ source: 'auto', proxyBaseUrl: '' }).map((s) => s.kind)).toEqual([
+      SOURCE_KIND.DIRECT,
+      SOURCE_KIND.LOCAL,
+    ]);
+  });
+});
 
-    // 局域网打开的预览：直连（上游只放行 localhost）→ 同源转发 → 自建代理
-    const lan = buildSources({ source: 'auto', proxyBaseUrl: 'https://proxy.test' }, { hostname: '192.168.1.5' });
-    expect(lan.map((s) => s.kind)).toEqual([SOURCE_KIND.DIRECT, SOURCE_KIND.LOCAL, SOURCE_KIND.PROXY]);
-    // 线上页面不试同源转发
-    const pages = buildSources({ source: 'auto', proxyBaseUrl: 'https://proxy.test' }, { hostname: 'user.github.io' });
-    expect(pages.map((s) => s.kind)).toEqual([SOURCE_KIND.DIRECT, SOURCE_KIND.PROXY]);
+describe('同源转发', () => {
+  it('相对路径请求 /api/bus/eta，返回结构与代理一致时正常成行', async () => {
+    const calls = [];
+    const fetchImpl = vi.fn(async (url) => {
+      calls.push(String(url));
+      return jsonResponse(proxyPayload);
+    });
+    const rows = await loadArrivalRows({
+      sources: [createLocalSource()],
+      tasks: [task],
+      fetchImpl,
+    });
+    expect(calls).toEqual(['/api/bus/eta']);
+    expect(rows[0].status).toBe(LIVE_STATUS.RUNNING);
+  });
+
+  it('同源路径不是实时接口（例如静态托管回 200 的 HTML）时算失败，会换下一个数据源', async () => {
+    const fetchImpl = vi.fn(async (url) => {
+      if (String(url).startsWith('/api/bus/eta')) return jsonResponse({ hello: 'index.html' });
+      return jsonResponse(proxyPayload);
+    });
+    const rows = await loadArrivalRows({
+      sources: buildSources({ source: 'auto', proxyBaseUrl: 'https://proxy.test' }).filter(
+        (s) => s.kind !== SOURCE_KIND.DIRECT
+      ),
+      tasks: [task],
+      fetchImpl,
+    });
+    expect(rows[0].status).toBe(LIVE_STATUS.RUNNING);
+    expect(fetchImpl).toHaveBeenCalledTimes(2);
   });
 });
 
@@ -128,7 +156,10 @@ describe('自动回退', () => {
       if (String(url).startsWith('https://api.shmaas.net')) throw aborted();
       return jsonResponse(proxyPayload);
     });
-    const sources = buildSources({ source: 'auto', proxyBaseUrl: 'https://proxy.test' });
+    // 这里只比较直连与自建代理两条路（同源转发另有专门用例）
+    const sources = buildSources({ source: 'auto', proxyBaseUrl: 'https://proxy.test' }).filter(
+      (s) => s.kind !== SOURCE_KIND.LOCAL
+    );
 
     const first = await loadArrivalRows({ sources, tasks: [task], fetchImpl });
     expect(first[0].status).toBe(LIVE_STATUS.RUNNING);
@@ -145,7 +176,9 @@ describe('自动回退', () => {
       throw aborted();
     });
     const rows = await loadArrivalRows({
-      sources: buildSources({ source: 'auto', proxyBaseUrl: 'https://proxy.test' }),
+      sources: buildSources({ source: 'auto', proxyBaseUrl: 'https://proxy.test' }).filter(
+        (s) => s.kind !== SOURCE_KIND.LOCAL
+      ),
       tasks: [task],
       fetchImpl,
     });
