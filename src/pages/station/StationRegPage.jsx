@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import { Button, Card, Field, Input, toast } from '../../components/ui';
 import StationTabs from './StationTabs';
 import StationPicker from './StationPicker';
+import StationLivePanel from './StationLivePanel';
 import { RESULT_PRESETS, DIRECTION_PRESETS, TICK_SEQ, TICK_LABEL } from '../../lib/constants';
 import { todayStr, nowTime, normalizePlate, validRecord } from '../../lib/stationCore';
 import { stationNameOptions } from '../../lib/stationOrder';
@@ -336,6 +337,8 @@ export default function StationRegPage() {
               </Field>
             </div>
           </section>
+
+          {fixed.station.trim() && <StationLivePanel stationName={fixed.station.trim()} />}
 
           <section className="space-y-3 border-t border-border pt-4">
             <h3 className="text-sm font-semibold text-foreground">车辆登记信息</h3>

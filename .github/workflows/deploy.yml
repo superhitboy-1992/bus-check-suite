@@ -43,6 +43,9 @@ jobs:
 
       - name: Build
         run: pnpm build
+        env:
+          # 可选：在仓库 Settings → Variables 里配置 VITE_LIVE_PROXY_BASE 覆盖默认代理地址
+          VITE_LIVE_PROXY_BASE: ${{ vars.VITE_LIVE_PROXY_BASE }}
 
       - name: Configure Pages
         uses: actions/configure-pages@v5

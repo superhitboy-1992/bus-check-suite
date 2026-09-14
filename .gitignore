@@ -5,5 +5,8 @@ dist
 *.local
 dev-server.log
 dev-server.err.log
+# Cloudflare Worker 本地调试产物
+.wrangler/
+worker/.wrangler/
 # 原始数据表格仅保留在本机，不入库
 database/

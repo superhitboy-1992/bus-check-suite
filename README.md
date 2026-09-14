@@ -20,6 +20,11 @@
   （固定 30 行、A4 打印格式），支持单张导出与批量 ZIP；导出后显示结果面板，
   可下载或分享，已导出文件保留在本页列表中。
 - 备份提醒：登记达 50 条或距上次备份超 7 天时提示。
+- 实时到站（可选）：站点选定后展开「本站实时到站」折叠面板，列出经过本站的线路
+  （按站名自动反查），**上下行分开**显示线路名、车牌号、还有几站、距离与预计到站时间；
+  在途车按预计到达升序排在前面，没有在途车时显示下一班发车时间或「不在运营时间」。
+  面板展开时按设定间隔（默认 30 秒）自动刷新，收起或页面切到后台即停止。
+  数据来自随申行接口，需先部署一个 Cloudflare Worker 代理，详见下文。
 
 ### 跳车检查（`#/jump`、`#/export`）
 
@@ -53,7 +58,57 @@ pnpm dev        # 开发服务器，监听 0.0.0.0，本机 http://localhost:517
 pnpm build      # 产物在 dist/
 pnpm preview    # 本地预览构建产物
 pnpm test       # Vitest 单元与页面测试
+pnpm build:line-map   # 重新生成 public/line-map.json（站点映射，需要联网）
 ```
+
+## 实时到站（可选功能）
+
+### 数据来源与前提
+
+实时数据来自**随申行**（上海 MaaS）的公交接口（`api.shmaas.net`），能返回
+线路名、车牌号、还有几站、距离（米）、预计到达（分钟）。该接口是 App 使用的
+**未公开接口**：没有文档、没有服务承诺，可能随时变更或限制访问，所以本功能：
+
+- 默认不影响任何原有功能，接口不可用时只在面板上显示「暂无数据」，登记、查询、导出照常；
+- 所有调用集中在 `src/lib/live/` 这一层，将来换数据源只改适配层。
+
+浏览器不能直连该接口（跨域预检返回 403），因此需要一个代理，**当前已部署好**：
+
+- 代理地址：`https://bus-live-proxy.1015184868.workers.dev`，写在
+  `src/lib/live/config.js` 的 `DEPLOYED_PROXY_BASE`，应用默认直接用，不用手填；
+- 换地址：构建时用环境变量 `VITE_LIVE_PROXY_BASE`（GitHub 仓库
+  **Settings → Variables** 加一个同名变量即可），或在应用里的
+  **基础数据 → 实时数据源**（`#/basic-data`）临时覆盖，并用「连通性自检」验证；
+- 重新部署 / 本地调试见 `worker/README.md`（`pnpm dlx wrangler@4 deploy`；
+  本地调试用 `pnpm dlx wrangler@4 dev`，代理地址填 `http://localhost:8787`）。
+
+> ⚠️ 已知网络问题：`*.workers.dev` 在部分国内网络下会被 DNS 投毒 + SNI 阻断
+> （实测办公电脑访问超时、手机流量正常）。哪台设备打不开，就把域名换成绑在同一个
+> Worker 上的自定义域名，应用侧只需改代理地址。
+
+### 站点映射
+
+面板需要把「本应用站名」对上接口的 `stopId`，这份对照表由脚本生成：
+
+```bash
+pnpm build:line-map                 # 重新生成 public/line-map.json
+pnpm build:line-map --only 1677路    # 只重跑指定线路（与已有结果合并）
+```
+
+脚本会把全角/半角括号、「（招呼站）」括号内容、「单向/双向」后缀归一化后再匹配，
+当前 50 条有站点的线路中 23 条匹配率 ≥95%、22 条 70–95%、5 条偏低。匹配不上的
+站点对应的线路会在面板底部提示「未匹配到站点的线路」，可人工校对：把正确的
+`stopId` 写进 `tools/line-map.overrides.json`（格式见该文件旁注释与
+`tools/build-line-map.js` 说明），再重跑脚本，人工结果不会被覆盖。
+
+已知需要校对的线路：`1677路`、`1683路`、`枫泾2路`、`枫泾1路`、`莲漕专线`
+（多为站名写法差异，例如基础数据里的「平漾路」与接口的「漾平路」）。
+
+### 刷新频率与请求量
+
+一次刷新 = 本站经过的线路数 × 方向数（最多约 24 次请求）。代理端对线路站点缓存
+24 小时、实时到站缓存 20 秒，前端还有 20 秒内存缓存与 4 路并发上限，因此实际打到
+上游的请求量很小。
 
 ## 从旧应用迁移（重要）
 
@@ -116,7 +171,8 @@ node tools/build-data.js --from-excel
 
 - 数据只存在当前浏览器（localStorage），键名：`busCheck.records`（跳车记录）、
   `busCheck.stationRecords`（驻站记录）、`busCheck.basicData`（共享基础资料）、
-  `busCheck.version`（当前 2）。
+  `busCheck.version`（当前 2）、`busCheck.liveConfig`（实时到站的代理地址与刷新间隔，
+  属于本机设置，不参与备份合并）。
 - 清理浏览器数据、换手机/电脑会导致数据丢失，请定期在「基础数据 → 备份/恢复」导出 JSON。
 - 数据量较大时（约 4MB 以上）会提示存储空间预警，建议及时导出备份。
 
@@ -138,6 +194,10 @@ src/lib/export.js           跳车 CSV 导出与导出文件名
 src/lib/jumpXlsx.js         跳车模板 Excel 导出（20 行/页、多工作表）
 src/lib/jumpTemplate.js     内置《营运检查表-跳车及服务检查》模板（由 build-template.js 生成，勿手改）
 src/lib/remoteCatalog.js    线上基础数据拉取：哈希/校验/增量合并
+src/lib/live/               实时到站数据层：代理客户端、到站归一化、映射查询、轮询 hook
+worker/                     Cloudflare Worker 代理（隐藏上游与跨域，带缓存与来源白名单）
+tools/build-line-map.js     生成 public/line-map.json（线路 + 方向 + 站点 → stopId）
+public/line-map.json        站点映射真源（由脚本生成，勿手改）
 src/data/catalogSeed.js     内置初始资料库（由 basic-data.json 生成，勿手改）
 public/basic-data.json      线上基础数据真源（可在 GitHub 网页直接编辑）
 src/pages/HomePage.jsx      首页双入口

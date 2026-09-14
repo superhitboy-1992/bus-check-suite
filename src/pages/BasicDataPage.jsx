@@ -9,6 +9,7 @@ import { normalizePlate } from '../lib/stationCore';
 import { canonicalStationName } from '../lib/catalogFormat';
 import { sortStationsByRoute } from '../lib/stationOrder';
 import { downloadBlob } from '../lib/export';
+import LiveSourceSection from './LiveSourceSection';
 import {
   addBasicItem,
   addBasicString,
@@ -39,6 +40,7 @@ const TABS = [
   { key: 'conductor', label: '售票员' },
   { key: 'fleet', label: '车队' },
   { key: 'import', label: 'Excel 导入' },
+  { key: 'live', label: '实时数据源' },
   { key: 'backup', label: '备份/恢复' },
 ];
 
@@ -521,6 +523,8 @@ export default function BasicDataPage() {
             )}
           </div>
         </Card>
+      ) : tab === 'live' ? (
+        <LiveSourceSection />
       ) : STRING_TABS.has(tab) ? (
         <Card>
           <div className="space-y-4 p-5">
