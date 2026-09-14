@@ -1,8 +1,15 @@
-/* 实时到站配置：代理地址、刷新间隔、开关。
+/* 实时到站配置：数据源、代理地址、刷新间隔、开关。
    存在浏览器 localStorage，不进备份必需字段，缺失或非法时按未配置处理。 */
 import { useSyncExternalStore } from 'react';
 
 export const LIVE_CONFIG_KEY = 'busCheck.liveConfig';
+
+// 数据源选项：auto = 直连优先、失败自动回退到自建代理
+export const LIVE_SOURCE_OPTIONS = [
+  { value: 'auto', label: '自动（推荐）' },
+  { value: 'direct', label: '直连随申行' },
+  { value: 'proxy', label: '自建代理' },
+];
 
 // 刷新间隔选项（秒），0 表示只手动刷新
 export const REFRESH_OPTIONS = [
@@ -15,13 +22,14 @@ export const REFRESH_OPTIONS = [
 const BUILD_DEFAULT_PROXY =
   (import.meta && import.meta.env && import.meta.env.VITE_LIVE_PROXY_BASE) || '';
 
-// 已部署的 Cloudflare Worker 代理地址。注意：*.workers.dev 在部分国内网络下
-// 会被 DNS 投毒/SNI 阻断，若打不开可在「基础数据 → 实时数据源」里换成自定义域名，
-// 或用构建变量 VITE_LIVE_PROXY_BASE 覆盖。
+// 已部署的 Cloudflare Worker 代理地址（备用数据源；默认「自动」模式下直连优先）。
+// 注意：*.workers.dev 在部分国内网络下会被 DNS 投毒/连接无响应，若直连也不通，
+// 可在「基础数据 → 实时数据源」里换成自定义域名，或用构建变量 VITE_LIVE_PROXY_BASE 覆盖。
 export const DEPLOYED_PROXY_BASE = 'https://bus-live-proxy.1015184868.workers.dev';
 
 export const DEFAULT_LIVE_CONFIG = {
   enabled: true,
+  source: 'auto',
   proxyBaseUrl: String(BUILD_DEFAULT_PROXY || DEPLOYED_PROXY_BASE).trim(),
   refreshSeconds: 30,
 };
@@ -30,8 +38,10 @@ export function normalizeLiveConfig(raw) {
   const src = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
   const refresh = Number(src.refreshSeconds);
   const allowed = REFRESH_OPTIONS.map((o) => o.value);
+  const source = LIVE_SOURCE_OPTIONS.some((o) => o.value === src.source) ? src.source : DEFAULT_LIVE_CONFIG.source;
   return {
     enabled: src.enabled === undefined ? DEFAULT_LIVE_CONFIG.enabled : src.enabled !== false,
+    source,
     proxyBaseUrl: String(src.proxyBaseUrl === undefined ? DEFAULT_LIVE_CONFIG.proxyBaseUrl : src.proxyBaseUrl || '').trim(),
     refreshSeconds: allowed.includes(refresh) ? refresh : DEFAULT_LIVE_CONFIG.refreshSeconds,
   };
@@ -86,5 +96,8 @@ export function reloadLiveConfig() {
 
 export function isLiveConfigured(config) {
   const c = config || state;
-  return Boolean(c && c.enabled && String(c.proxyBaseUrl || '').trim());
+  if (!c || !c.enabled) return false;
+  // 直连/自动模式不依赖代理地址；只有强制走代理时才要求填地址
+  if (c.source === 'proxy') return Boolean(String(c.proxyBaseUrl || '').trim());
+  return true;
 }

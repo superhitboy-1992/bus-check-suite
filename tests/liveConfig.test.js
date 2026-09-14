@@ -20,7 +20,12 @@ describe('实时到站配置', () => {
   it('默认使用已部署的代理地址与 30 秒刷新', () => {
     expect(DEFAULT_LIVE_CONFIG.proxyBaseUrl).toBe(DEPLOYED_PROXY_BASE);
     const cfg = normalizeLiveConfig({});
-    expect(cfg).toMatchObject({ enabled: true, proxyBaseUrl: DEPLOYED_PROXY_BASE, refreshSeconds: 30 });
+    expect(cfg).toMatchObject({
+      enabled: true,
+      source: 'auto',
+      proxyBaseUrl: DEPLOYED_PROXY_BASE,
+      refreshSeconds: 30,
+    });
   });
 
   it('非法刷新间隔回落到默认值', () => {
@@ -39,9 +44,20 @@ describe('实时到站配置', () => {
     expect(getLiveConfig()).toMatchObject({ proxyBaseUrl: 'https://proxy.example.com/', enabled: false });
   });
 
-  it('未配置或已关闭时都视为不可用', () => {
+  it('已关闭时视为不可用', () => {
     expect(isLiveConfigured({ enabled: true, proxyBaseUrl: DEPLOYED_PROXY_BASE })).toBe(true);
-    expect(isLiveConfigured({ enabled: true, proxyBaseUrl: '   ' })).toBe(false);
     expect(isLiveConfigured({ enabled: false, proxyBaseUrl: DEPLOYED_PROXY_BASE })).toBe(false);
+  });
+
+  it('直连/自动模式不依赖代理地址，强制走代理时才要求填地址', () => {
+    expect(isLiveConfigured({ enabled: true, source: 'auto', proxyBaseUrl: '' })).toBe(true);
+    expect(isLiveConfigured({ enabled: true, source: 'direct', proxyBaseUrl: '' })).toBe(true);
+    expect(isLiveConfigured({ enabled: true, source: 'proxy', proxyBaseUrl: '   ' })).toBe(false);
+    expect(isLiveConfigured({ enabled: true, source: 'proxy', proxyBaseUrl: DEPLOYED_PROXY_BASE })).toBe(true);
+  });
+
+  it('非法数据源回落到 auto', () => {
+    expect(normalizeLiveConfig({ source: 'svn' }).source).toBe('auto');
+    expect(normalizeLiveConfig({ source: 'proxy' }).source).toBe('proxy');
   });
 });

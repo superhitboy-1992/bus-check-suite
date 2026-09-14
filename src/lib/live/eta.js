@@ -1,6 +1,14 @@
 /* 实时到站：把代理返回的数据归一化成界面用的行数据，
    并提供 TTL 缓存与并发上限（一个站点最多十几条线路 × 2 个方向）。 */
-import { fetchEta, LiveError } from './client';
+import {
+  LiveError,
+  SOURCE_KIND,
+  isFailoverError,
+  markSourceFail,
+  markSourceOk,
+  pickSources,
+  requestEta,
+} from './client';
 
 export const LIVE_STATUS = {
   RUNNING: 'running',
@@ -202,7 +210,8 @@ export const DEFAULT_CONCURRENCY = 4;
 /**
  * 批量取一个站点上多条线路的到站数据。
  * @param {object} options
- * @param {string} options.proxyBaseUrl
+ * @param {Array<{kind: string, baseUrl: string}>} [options.sources] 候选数据源（按优先顺序，失败自动换下一个）
+ * @param {string} [options.proxyBaseUrl] 兼容旧调用：只用一个代理数据源
  * @param {Array<{routeName: string, upDown: number, toward?: string, stopName: string, stopId: string}>} options.tasks
  * @param {object} [options.cache] createTtlCache 的实例
  * @param {number} [options.concurrency]
@@ -210,6 +219,7 @@ export const DEFAULT_CONCURRENCY = 4;
  * @param {typeof fetch} [options.fetchImpl]
  */
 export async function loadArrivalRows({
+  sources,
   proxyBaseUrl,
   tasks,
   cache,
@@ -219,33 +229,49 @@ export async function loadArrivalRows({
 } = {}) {
   const list = Array.isArray(tasks) ? tasks : [];
   const store = cache || createTtlCache({ ttlMs: DEFAULT_ETA_CACHE_TTL_MS });
+  const candidates = resolveCandidates(sources, proxyBaseUrl);
   const rows = await mapWithConcurrency(list, concurrency, async (task) => {
-    const key = `${proxyBaseUrl}|${task.routeName}|${task.upDown}|${task.stopId}`;
+    const key = `${task.routeName}|${task.upDown}|${task.stopId}`;
     const hit = store.get(key);
     if (hit) return toRow(hit, task);
-    try {
-      const payload = await fetchEta(
-        proxyBaseUrl,
-        {
-          lineName: task.routeName,
-          stopName: task.stopName,
-          stopId: String(task.stopId),
-          direction: String(task.upDown),
-        },
-        { signal, fetchImpl }
-      );
-      const parsed = parseEta(payload);
-      store.set(key, parsed);
-      return toRow(parsed, task);
-    } catch (e) {
-      if (e instanceof LiveError && e.code === 'aborted') throw e;
-      // 失败时退回上一次拿到的数据（即使已过期），界面会标注为旧数据
-      const stale = store.getStale(key);
-      if (stale) {
-        return { ...toRow(stale.value, task), stale: true, staleAt: stale.at, error: e };
+
+    const params = {
+      lineName: task.routeName,
+      stopName: task.stopName,
+      stopId: String(task.stopId),
+      direction: String(task.upDown),
+    };
+    let lastError = null;
+    for (const source of pickSources(candidates)) {
+      try {
+        const payload = await requestEta(source, params, { signal, fetchImpl });
+        markSourceOk(source);
+        const parsed = parseEta(payload);
+        store.set(key, parsed);
+        return toRow(parsed, task);
+      } catch (e) {
+        if (e instanceof LiveError && e.code === 'aborted') throw e;
+        lastError = e;
+        if (isFailoverError(e)) markSourceFail(source);
+        else break;
       }
-      return errorRow(task, e);
     }
+
+    const error = lastError || new LiveError('not_configured', '未配置实时数据源');
+    // 失败时退回上一次拿到的数据（即使已过期），界面会标注为旧数据
+    const stale = store.getStale(key);
+    if (stale) {
+      return { ...toRow(stale.value, task), stale: true, staleAt: stale.at, error };
+    }
+    return errorRow(task, error);
   });
   return sortRows(rows);
+}
+
+/** 候选数据源：优先用显式传入的 sources，兼容只传 proxyBaseUrl 的旧调用 */
+function resolveCandidates(sources, proxyBaseUrl) {
+  const list = (Array.isArray(sources) ? sources : []).filter(Boolean);
+  if (list.length) return list;
+  const base = String(proxyBaseUrl || '').trim().replace(/\/+$/, '');
+  return base ? [{ kind: SOURCE_KIND.PROXY, baseUrl: base }] : [];
 }

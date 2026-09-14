@@ -5,7 +5,7 @@ import { isLiveConfigured, useLiveConfig } from './config';
 import { buildLineMapIndex, findStops, loadLineMap } from './lineMap';
 import { routesServingStation } from './stationRoutes';
 import { DEFAULT_ETA_CACHE_TTL_MS, createTtlCache, loadArrivalRows } from './eta';
-import { LiveError } from './client';
+import { LiveError, buildSources, sourceKey } from './client';
 
 // 模块级缓存：面板收起后再打开、或切到别的站点再切回来都能命中
 const etaCache = createTtlCache({ ttlMs: DEFAULT_ETA_CACHE_TTL_MS });
@@ -31,6 +31,8 @@ export const LIVE_PHASE = {
 export function useStationLive({ stationName, stations, expanded }) {
   const config = useLiveConfig();
   const configured = isLiveConfigured(config);
+  const sources = useMemo(() => buildSources(config), [config.source, config.proxyBaseUrl]);
+  const sourcesKey = sources.map(sourceKey).join(',');
   const routeNames = useMemo(
     () => (expanded && stationName ? routesServingStation(stations, stationName) : []),
     [stations, stationName, expanded]
@@ -93,7 +95,7 @@ export function useStationLive({ stationName, stations, expanded }) {
         }
 
         const rows = await loadArrivalRows({
-          proxyBaseUrl: config.proxyBaseUrl,
+          sources,
           tasks,
           cache: etaCache,
           signal: controller.signal,
@@ -144,7 +146,7 @@ export function useStationLive({ stationName, stations, expanded }) {
         document.removeEventListener('visibilitychange', onVisibilityChange);
       }
     };
-  }, [expanded, stationName, configured, config.proxyBaseUrl, config.refreshSeconds, routeKey, nonce]);
+  }, [expanded, stationName, configured, sourcesKey, config.refreshSeconds, routeKey, nonce]);
 
   const refresh = useCallback(() => {
     etaCache.clear();

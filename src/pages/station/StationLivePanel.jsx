@@ -156,11 +156,30 @@ export default function StationLivePanel({ stationName }) {
           ) : (
             <>
               {live.phase === LIVE_PHASE.ERROR && (
-                <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
-                  <span className="text-sm text-muted-foreground">实时数据获取失败：{liveErrorText(live.error)}</span>
-                  <Button size="sm" variant="outline" onClick={live.refresh}>
-                    重试
-                  </Button>
+                <div className="mb-2 space-y-1">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="text-sm text-muted-foreground">实时数据获取失败：{liveErrorText(live.error)}</span>
+                    <span className="flex flex-wrap gap-2">
+                      <Button size="sm" variant="outline" onClick={live.refresh}>
+                        重试
+                      </Button>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => navigate('/basic-data', { state: { tab: 'live' } })}
+                      >
+                        检查数据源
+                      </Button>
+                    </span>
+                  </div>
+                  {['timeout', 'network_error', 'upstream_unreachable', 'not_found', 'origin_not_allowed'].includes(
+                    live.error?.code
+                  ) && (
+                    <p className="text-xs text-muted-foreground">
+                      一直超时多半是网络把接口地址拦住了（例如 *.workers.dev 被 DNS 投毒），可在「基础数据 → 实时数据源」
+                      里改用「直连随申行」或用「连通性自检」确认哪条路通。
+                    </p>
+                  )}
                 </div>
               )}
               {live.rows.length === 0 ? (

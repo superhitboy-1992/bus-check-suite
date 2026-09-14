@@ -2,12 +2,15 @@ import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import tailwindcss from '@tailwindcss/vite';
 import { VitePWA } from 'vite-plugin-pwa';
+import liveDevProxy from './tools/live-dev-proxy.js';
 
 export default defineConfig({
   base: './',
   plugins: [
     react(),
     tailwindcss(),
+    // 本地预览时提供同源转发（/api/bus/*），让手机用局域网 IP 打开也能取实时到站
+    liveDevProxy(),
     VitePWA({
       registerType: 'autoUpdate',
       includeAssets: ['icon-source.svg', 'apple-touch-icon-180x180.png'],

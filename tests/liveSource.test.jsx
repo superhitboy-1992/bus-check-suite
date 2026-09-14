@@ -31,7 +31,7 @@ beforeEach(() => {
   sessionStorage.clear();
   resetLineMapCache();
   replaceAllData(emptyData);
-  setLiveConfig({ proxyBaseUrl: '', enabled: true, refreshSeconds: 30 });
+  setLiveConfig({ source: 'proxy', proxyBaseUrl: '', enabled: true, refreshSeconds: 30 });
 });
 
 describe('实时数据源设置', () => {
@@ -40,7 +40,8 @@ describe('实时数据源设置', () => {
 
     fireEvent.click(screen.getByText('实时数据源'));
     expect(await screen.findByText('连通性自检')).toBeTruthy();
-    expect(screen.getByText('Worker 代理地址')).toBeTruthy();
+    expect(screen.getByText('数据源')).toBeTruthy();
+    expect(screen.getByText('自建代理地址（可选）')).toBeTruthy();
 
     const input = screen.getByPlaceholderText(/bus-live-proxy/);
     fireEvent.change(input, { target: { value: 'https://proxy.example.workers.dev/' } });
@@ -64,6 +65,21 @@ describe('实时数据源设置', () => {
 
     await waitFor(() => {
       expect(getLiveConfig().proxyBaseUrl).toBe('');
+    });
+  });
+
+  it('可以切换数据源（直连/自动/自建代理）', async () => {
+    renderBasicData();
+    fireEvent.click(screen.getByText('实时数据源'));
+
+    fireEvent.click(await screen.findByRole('button', { name: '直连随申行' }));
+    await waitFor(() => {
+      expect(getLiveConfig().source).toBe('direct');
+    });
+
+    fireEvent.click(screen.getByRole('button', { name: '自动（推荐）' }));
+    await waitFor(() => {
+      expect(getLiveConfig().source).toBe('auto');
     });
   });
 

@@ -1,31 +1,36 @@
 /* 实时公交代理（Cloudflare Worker）
 
-   浏览器不能直连随申行接口（跨域预检 403），由这个 Worker 转发并做归一化。
+   备用数据源：转发随申行接口并做归一化（应用默认直连上游，不需要这个代理）。
    只暴露三个白名单端点，其它路径一律 404，避免变成开放代理。
 
    环境变量（wrangler.toml 的 [vars]）：
      UPSTREAM_BASE    上游地址，默认 https://api.shmaas.net
      CITY_CODE        城市代码，默认 310100（上海）
      ALLOWED_ORIGINS  允许的前端来源，逗号分隔，支持 * 通配
+
+   注意：应用默认先试「直连随申行」，但上游只放行 localhost / 127.0.0.1 作为跨域来源，
+   局域网 IP 与线上域名直连会被拒；所以这个代理作为备用数据源保留，
+   线上部署（GitHub Pages）打开时只有它可用。
+
+   上游地址、路径与响应归一化来自 ../src/lib/live/upstream.js，前端直连模式共用同一份。
 */
 
-const DEFAULT_UPSTREAM = 'https://api.shmaas.net';
-const DEFAULT_CITY = '310100';
+import {
+  UPSTREAM_BASE,
+  UPSTREAM_CITY_CODE,
+  UPSTREAM_PATHS,
+  hashString,
+  normalizeEta,
+  upstreamError,
+  unwrapUpstream,
+} from '../src/lib/live/upstream.js';
+
+// 供测试与外部复用；实现集中在共享模块里
+export { hashString, normalizeEta, unwrapUpstream } from '../src/lib/live/upstream.js';
+
+const DEFAULT_UPSTREAM = UPSTREAM_BASE;
+const DEFAULT_CITY = UPSTREAM_CITY_CODE;
 const DEFAULT_ALLOWED = 'https://*.github.io,http://localhost:*,http://127.0.0.1:*,http://192.168.*:*,http://10.*:*';
-
-const UPSTREAM_PATHS = {
-  search: '/traffic/v2/querytrafficline',
-  detail: '/traffic/v1/querybusline',
-  eta: '/traffic/v1/getbusstoparrivedetails',
-};
-
-/** 上游统一是 { errCode, errMsg, data } 包装，这里取出内层业务数据 */
-export function unwrapUpstream(payload) {
-  if (payload && typeof payload === 'object' && payload.data && typeof payload.data === 'object') {
-    return payload.data;
-  }
-  return payload && typeof payload === 'object' ? payload : {};
-}
 
 const CACHE_TTL_SECONDS = {
   detail: 60 * 60 * 24,
@@ -106,9 +111,8 @@ async function upstreamPost(env, path, payload) {
       data = null;
     }
     if (!res.ok) return { ok: false, code: 'upstream_error', message: `HTTP ${res.status}` };
-    if (!data || (data.errCode !== undefined && data.errCode !== 0)) {
-      return { ok: false, code: 'upstream_error', message: (data && data.errMsg) || '上游返回异常' };
-    }
+    const bizError = upstreamError(data);
+    if (bizError) return { ok: false, code: bizError.code, message: bizError.message };
     return { ok: true, data };
   } catch (e) {
     const aborted = e && (e.name === 'AbortError' || e.name === 'TimeoutError');
@@ -116,62 +120,6 @@ async function upstreamPost(env, path, payload) {
   } finally {
     clearTimeout(timer);
   }
-}
-
-function toNumber(value) {
-  if (value === undefined || value === null || value === '') return null;
-  const n = Number(value);
-  return Number.isFinite(n) ? n : null;
-}
-
-/** 上游到站原始数据 → 前端统一契约 */
-export function normalizeEta(payload, upstreamNow) {
-  const data = unwrapUpstream(payload);
-  const nowMs = Number.isFinite(Number(upstreamNow)) ? Number(upstreamNow) : Number(payload && payload.now);
-  const info = (data && data.stopArriveInfo) || {};
-  const schedule = (data && data.dispatchCarSchedule) || {};
-  const buses = [];
-
-  const pushBus = (prefix) => {
-    // 上游字段名是 currentLicensePlate / nextLicensePlate，
-    // 兼容个别版本里出现的 currentLicensePlat 写法
-    const rawPlate = info[`${prefix}LicensePlate`] !== undefined ? info[`${prefix}LicensePlate`] : info[`${prefix}LicensePlat`];
-    const plate = rawPlate !== undefined && rawPlate !== null ? String(rawPlate).trim() : '';
-    const stopsAway = toNumber(info[`${prefix}BusStopCount`]);
-    const distanceMeters = toNumber(info[`${prefix}BusDistance`]);
-    const etaMinutes = toNumber(info[`${prefix}BusArriveTime`]);
-    const running = Boolean(plate) || (stopsAway !== null && stopsAway > 0) || etaMinutes !== null;
-    if (!running) return;
-    buses.push({
-      plate,
-      stopsAway: stopsAway === null ? null : Math.max(0, stopsAway),
-      distanceMeters,
-      etaMinutes,
-      accessible: Boolean(prefix === 'current' ? info.currentBarrierFree : info.nextBarrierFree) || /无障碍/.test(plate),
-      gps: prefix === 'current' && info.currentBusGps ? String(info.currentBusGps) : '',
-    });
-  };
-
-  pushBus('current');
-  pushBus('next');
-
-  const cars = (Array.isArray(schedule.dispatchCars) ? schedule.dispatchCars : [])
-    .map((car) => ({
-      vehicle: car && car.vehicle ? String(car.vehicle) : '',
-      time: car && car.time ? String(car.time) : '',
-      countdown: car && car.countdown !== undefined && car.countdown !== null ? String(car.countdown) : '',
-    }))
-    .filter((car) => car.vehicle || car.time);
-
-  const message = String(schedule.scheduleMsgShort || schedule.scheduleMsg || '').trim();
-  const status = buses.length ? 'running' : cars.length || !message ? 'waiting' : 'closed';
-
-  return {
-    status,
-    buses,
-    schedule: { message, cars },
-    updatedAt: new Date(Number.isFinite(nowMs) ? nowMs : Date.now()).toISOString(),
-  };
 }
 
 async function handleRequest(request, env) {
@@ -222,17 +170,6 @@ async function handleRequest(request, env) {
     return json(normalizeEta(result.data, result.data && result.data.now));
   }
   return fail('not_found', '接口不存在', 404);
-}
-
-/** 请求体指纹（FNV-1a 32 位），用于区分不同站点的缓存条目 */
-export function hashString(value) {
-  let h = 0x811c9dc5;
-  const str = String(value || '');
-  for (let i = 0; i < str.length; i += 1) {
-    h ^= str.charCodeAt(i);
-    h = Math.imul(h, 0x01000193);
-  }
-  return (h >>> 0).toString(16).padStart(8, '0');
 }
 
 async function withCache(cacheKeyUrl, ctx, ttlSeconds, producer) {

@@ -99,7 +99,7 @@ beforeEach(() => {
 
 describe('驻站实时到站面板', () => {
   it('未配置代理时给出配置入口，且不请求上游', async () => {
-    setLiveConfig({ proxyBaseUrl: '', enabled: true });
+    setLiveConfig({ source: 'proxy', proxyBaseUrl: '', enabled: true });
     const fetchMock = installFetch();
     renderStationReg();
 
@@ -109,7 +109,7 @@ describe('驻站实时到站面板', () => {
   });
 
   it('已关闭时说明原因而不是要求重新配置', async () => {
-    setLiveConfig({ proxyBaseUrl: 'https://proxy.test', enabled: false });
+    setLiveConfig({ source: 'proxy', proxyBaseUrl: 'https://proxy.test', enabled: false });
     const fetchMock = installFetch();
     renderStationReg();
 
@@ -120,7 +120,7 @@ describe('驻站实时到站面板', () => {
   });
 
   it('配置代理后展开才拉数据，并显示车牌与预计分钟', async () => {
-    setLiveConfig({ proxyBaseUrl: 'https://proxy.test', enabled: true, refreshSeconds: 30 });
+    setLiveConfig({ source: 'proxy', proxyBaseUrl: 'https://proxy.test', enabled: true, refreshSeconds: 30 });
     const fetchMock = installFetch();
     renderStationReg();
 
@@ -143,7 +143,7 @@ describe('驻站实时到站面板', () => {
   });
 
   it('请求失败时提示失败并可重试', async () => {
-    setLiveConfig({ proxyBaseUrl: 'https://proxy.test', enabled: true, refreshSeconds: 30 });
+    setLiveConfig({ source: 'proxy', proxyBaseUrl: 'https://proxy.test', enabled: true, refreshSeconds: 30 });
     installFetch({
       etaImpl: () => jsonResponse({ error: 'upstream_error', error_msg: '数据源暂时不可用' }, false, 502),
     });
@@ -155,7 +155,7 @@ describe('驻站实时到站面板', () => {
   });
 
   it('站点未匹配到映射时给出提示', async () => {
-    setLiveConfig({ proxyBaseUrl: 'https://proxy.test', enabled: true, refreshSeconds: 30 });
+    setLiveConfig({ source: 'proxy', proxyBaseUrl: 'https://proxy.test', enabled: true, refreshSeconds: 30 });
     installFetch();
     replaceAllData({
       ...seededData,

@@ -1,6 +1,8 @@
 # 实时公交代理（Cloudflare Worker）
 
-浏览器不能直连随申行接口（跨域预检返回 403），所以用这个 Worker 转发。
+应用默认按「直连随申行 → 本机预览服务同源转发 → 本 Worker」的顺序找可用数据源。
+本机 localhost 打开时直连就够（上游的 Origin 白名单只放行 localhost），
+手机走局域网地址时由预览服务转发，**线上部署（GitHub Pages）打开时只有这个 Worker 可用**。
 它只暴露三个白名单端点，不是开放代理。
 
 ## 端点
@@ -50,8 +52,13 @@ pnpm dlx wrangler@4 login     # 浏览器登录；弹不出浏览器就加 --bro
 pnpm dlx wrangler@4 deploy    # 首次会下载约 40MB，之后很快
 ```
 
+`index.js` 通过 `../src/lib/live/upstream.js` 复用前端同一份上游契约（地址、路径与
+响应归一化），wrangler 会一起打包，所以要在仓库里用命令行部署。
+若要在 Cloudflare 控制台 **Edit code** 里手贴，需要同时新建
+`src/lib/live/upstream.js` 模块（内容与仓库里的同名文件一致）。
+
 不想用命令行时，也可以在 Cloudflare 控制台 **Workers & Pages → 该 Worker →
-Edit code** 里直接粘贴 `index.js` 并 Deploy，再在 **Settings → Variables** 配好
+Edit code** 里编辑并 Deploy，再在 **Settings → Variables** 配好
 `UPSTREAM_BASE` / `CITY_CODE` / `ALLOWED_ORIGINS`（改完要重新 Deploy 才生效）。
 
 本地联调：
@@ -67,7 +74,8 @@ pnpm dlx wrangler@4 dev       # 默认 http://localhost:8787
 > `curl https://bus-live-proxy.1015184868.workers.dev/api/health` 超时，同一个
 > 地址手机流量正常。若某台设备打不开，绑一个自定义域名给这个 Worker
 > （Workers → Settings → Domains & Routes → Add → Custom Domain），
-> 再把应用里的代理地址换成新域名即可，代码不用改。
+> 再把应用里的代理地址换成新域名即可，代码不用改；也可以直接在应用里把数据源
+> 切回「直连随申行」。
 
 ## 配置项
 

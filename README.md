@@ -72,19 +72,41 @@ pnpm build:line-map   # 重新生成 public/line-map.json（站点映射，需�
 - 默认不影响任何原有功能，接口不可用时只在面板上显示「暂无数据」，登记、查询、导出照常；
 - 所有调用集中在 `src/lib/live/` 这一层，将来换数据源只改适配层。
 
-浏览器不能直连该接口（跨域预检返回 403），因此需要一个代理，**当前已部署好**：
+**数据源（基础数据 → 实时数据源，`#/basic-data`）**，三选一，默认「自动」：
 
-- 代理地址：`https://bus-live-proxy.1015184868.workers.dev`，写在
-  `src/lib/live/config.js` 的 `DEPLOYED_PROXY_BASE`，应用默认直接用，不用手填；
-- 换地址：构建时用环境变量 `VITE_LIVE_PROXY_BASE`（GitHub 仓库
-  **Settings → Variables** 加一个同名变量即可），或在应用里的
-  **基础数据 → 实时数据源**（`#/basic-data`）临时覆盖，并用「连通性自检」验证；
-- 重新部署 / 本地调试见 `worker/README.md`（`pnpm dlx wrangler@4 deploy`；
-  本地调试用 `pnpm dlx wrangler@4 dev`，代理地址填 `http://localhost:8787`）。
+- **自动（推荐）**：依次尝试 直连随申行 → 本机预览服务的同源转发 → 下面填的自建代理，
+  哪条通用哪条（失败的数据源会短暂降级，不会每次都白等一个超时）；
+- **直连随申行**：直接调 `https://api.shmaas.net`；
+- **自建代理**：只走 Cloudflare Worker 代理。
 
-> ⚠️ 已知网络问题：`*.workers.dev` 在部分国内网络下会被 DNS 投毒 + SNI 阻断
-> （实测办公电脑访问超时、手机流量正常）。哪台设备打不开，就把域名换成绑在同一个
-> Worker 上的自定义域名，应用侧只需改代理地址。
+按打开方式对照：
+
+| 打开方式 | 实际走的数据源 |
+| --- | --- |
+| 电脑 `http://localhost:5173` | 直连随申行（最快，实测 0.5 秒左右返回） |
+| 手机 `/ 局域网 http://192.168.x.x:5173` | 同源转发：由电脑上的预览服务（`tools/live-dev-proxy.js`）代为请求 |
+| 线上 GitHub Pages | 只能自建代理（无服务端，且上游不放行线上来源） |
+
+> 随申行接口只放行 `localhost` / `127.0.0.1` 作为跨域来源（`Origin` 白名单），
+> 实测局域网 IP、`*.github.io`、普通域名直连都返回 403，所以浏览器直连只在
+> localhost 打开时可用；其他来源由本机预览服务或 Worker 在服务端转发（服务端请求不带
+> `Origin`，不受该限制）。
+
+代理地址默认填 `https://bus-live-proxy.1015184868.workers.dev`（写在
+`src/lib/live/config.js` 的 `DEPLOYED_PROXY_BASE`），可用构建变量
+`VITE_LIVE_PROXY_BASE`（GitHub 仓库 **Settings → Variables**）或应用内输入框覆盖。
+部署 / 本地调试见 `worker/README.md`（`pnpm dlx wrangler@4 deploy`；本地调试
+`pnpm dlx wrangler@4 dev`，代理地址填 `http://localhost:8787`）。
+
+> ⚠️ 已知网络问题：`*.workers.dev` 在部分国内网络下会被 DNS 投毒 + 连接无响应
+> （实测办公电脑 `curl https://bus-live-proxy.1015184868.workers.dev/api/health` 超时，
+> 界面表现为「请求超时，请稍后重试」）。这类设备保持默认「自动」即可：电脑用
+> localhost 直连、手机走本机预览服务的同源转发，都不会经过 `workers.dev`。
+> 确实要代理时，给 Worker 绑一个自定义域名（Workers → Settings → Domains & Routes →
+> Custom Domain），再把代理地址改成新域名。应用里的「连通性自检」会逐个数据源报出通不通。
+
+上游地址、路径与响应归一化在 `src/lib/live/upstream.js`，前端直连与
+`worker/index.js` 代理共用同一份。
 
 ### 站点映射
 
@@ -171,8 +193,8 @@ node tools/build-data.js --from-excel
 
 - 数据只存在当前浏览器（localStorage），键名：`busCheck.records`（跳车记录）、
   `busCheck.stationRecords`（驻站记录）、`busCheck.basicData`（共享基础资料）、
-  `busCheck.version`（当前 2）、`busCheck.liveConfig`（实时到站的代理地址与刷新间隔，
-  属于本机设置，不参与备份合并）。
+  `busCheck.version`（当前 2）、`busCheck.liveConfig`（实时到站的数据源、代理地址与
+  刷新间隔，属于本机设置，不参与备份合并）。
 - 清理浏览器数据、换手机/电脑会导致数据丢失，请定期在「基础数据 → 备份/恢复」导出 JSON。
 - 数据量较大时（约 4MB 以上）会提示存储空间预警，建议及时导出备份。
 
