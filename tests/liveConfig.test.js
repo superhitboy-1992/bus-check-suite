@@ -6,6 +6,7 @@ import {
   LIVE_CONFIG_KEY,
   getLiveConfig,
   isLiveConfigured,
+  migrateProxyBaseUrl,
   normalizeLiveConfig,
   reloadLiveConfig,
   setLiveConfig,
@@ -59,5 +60,23 @@ describe('实时到站配置', () => {
   it('非法数据源回落到 auto', () => {
     expect(normalizeLiveConfig({ source: 'svn' }).source).toBe('auto');
     expect(normalizeLiveConfig({ source: 'proxy' }).source).toBe('proxy');
+  });
+
+  it('沿用旧内置默认地址的设备，自动切到新的构建默认值', () => {
+    const next = 'https://friendly-lily-0cb4b5.netlify.app';
+    // 老设备：localStorage 里存着旧默认地址，且不是手动填的
+    expect(migrateProxyBaseUrl({ stored: DEPLOYED_PROXY_BASE, custom: false, buildDefault: next })).toBe(next);
+    expect(normalizeLiveConfig({ proxyBaseUrl: DEPLOYED_PROXY_BASE }, next).proxyBaseUrl).toBe(next);
+    // 手动填过的一律沿用（哪怕填的就是旧地址）
+    expect(migrateProxyBaseUrl({ stored: DEPLOYED_PROXY_BASE, custom: true, buildDefault: next })).toBe(
+      DEPLOYED_PROXY_BASE
+    );
+    // 没存过 → 用构建默认值；清空过 → 保持清空
+    expect(migrateProxyBaseUrl({ stored: undefined, custom: false, buildDefault: next })).toBe(next);
+    expect(migrateProxyBaseUrl({ stored: '', custom: true, buildDefault: next })).toBe('');
+    // 构建默认值没变时不动它
+    expect(migrateProxyBaseUrl({ stored: DEPLOYED_PROXY_BASE, custom: false, buildDefault: DEPLOYED_PROXY_BASE })).toBe(
+      DEPLOYED_PROXY_BASE
+    );
   });
 });

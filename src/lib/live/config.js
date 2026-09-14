@@ -27,6 +27,11 @@ const BUILD_DEFAULT_PROXY =
 // 可在「基础数据 → 实时数据源」里换成自定义域名，或用构建变量 VITE_LIVE_PROXY_BASE 覆盖。
 export const DEPLOYED_PROXY_BASE = 'https://bus-live-proxy.1015184868.workers.dev';
 
+// 历史上当过内置默认值的代理地址。它们只是「产品默认」，不是用户手动选择：
+// 换默认值后，老设备 localStorage 里存着的旧地址不应该继续生效
+// （否则换了可用代理，老设备还会一直去连被封的地址）。
+export const LEGACY_PROXY_BASES = [DEPLOYED_PROXY_BASE];
+
 export const DEFAULT_LIVE_CONFIG = {
   enabled: true,
   source: 'auto',
@@ -34,7 +39,19 @@ export const DEFAULT_LIVE_CONFIG = {
   refreshSeconds: 30,
 };
 
-export function normalizeLiveConfig(raw) {
+/**
+ * 代理地址迁移：只有用户手动填过的地址（proxyBaseUrlCustom）才一直沿用，
+ * 沿用旧内置默认值的设备自动切到新的构建默认值。
+ */
+export function migrateProxyBaseUrl({ stored, custom, buildDefault }) {
+  const fallback = String(buildDefault || '').trim();
+  if (stored === undefined) return fallback;
+  const value = String(stored || '').trim();
+  if (custom !== true && value && value !== fallback && LEGACY_PROXY_BASES.includes(value)) return fallback;
+  return value;
+}
+
+export function normalizeLiveConfig(raw, buildDefault = DEFAULT_LIVE_CONFIG.proxyBaseUrl) {
   const src = raw && typeof raw === 'object' && !Array.isArray(raw) ? raw : {};
   const refresh = Number(src.refreshSeconds);
   const allowed = REFRESH_OPTIONS.map((o) => o.value);
@@ -42,7 +59,12 @@ export function normalizeLiveConfig(raw) {
   return {
     enabled: src.enabled === undefined ? DEFAULT_LIVE_CONFIG.enabled : src.enabled !== false,
     source,
-    proxyBaseUrl: String(src.proxyBaseUrl === undefined ? DEFAULT_LIVE_CONFIG.proxyBaseUrl : src.proxyBaseUrl || '').trim(),
+    proxyBaseUrl: migrateProxyBaseUrl({
+      stored: src.proxyBaseUrl,
+      custom: src.proxyBaseUrlCustom,
+      buildDefault,
+    }),
+    proxyBaseUrlCustom: src.proxyBaseUrlCustom === true,
     refreshSeconds: allowed.includes(refresh) ? refresh : DEFAULT_LIVE_CONFIG.refreshSeconds,
   };
 }

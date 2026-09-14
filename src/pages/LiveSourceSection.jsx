@@ -62,10 +62,13 @@ export default function LiveSourceSection() {
       toast('代理地址要以 http:// 或 https:// 开头', 'error');
       return;
     }
-    save({ proxyBaseUrl: value });
+    // 标记为「手动填写」，以后换内置默认值不会再覆盖它
+    save({ proxyBaseUrl: value, proxyBaseUrlCustom: true });
     setDraft(value);
     toast(value ? '代理地址已保存' : '已清空代理地址');
   }
+
+  const sourceChain = buildSources(config).map(sourceLabel).join(' → ');
 
   async function runCheck() {
     const base = draft.trim().replace(/\/+$/, '');
@@ -163,6 +166,9 @@ export default function LiveSourceSection() {
               : config.source === 'proxy'
                 ? '只用自建代理：线上部署（GitHub Pages 等）或直连、同源都不通时用。'
                 : '依次尝试直连随申行 → 本机预览服务的同源转发 → 下面填的自建代理，第一次失败会自动换下一条。'}
+          </p>
+          <p className="mt-1 text-xs text-muted-foreground">
+            当前实际链路：{sourceChain || '（没有可用数据源）'}
           </p>
         </Field>
 
