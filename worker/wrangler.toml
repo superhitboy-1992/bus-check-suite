@@ -7,7 +7,7 @@ compatibility_date = "2026-09-01"
 UPSTREAM_BASE = "https://api.shmaas.net"
 CITY_CODE = "310100"
 # 前端来源白名单，逗号分隔，支持 * 通配；部署后请按实际地址收紧
-ALLOWED_ORIGINS = "https://*.github.io,http://localhost:*,http://127.0.0.1:*,http://192.168.*:*,http://10.*:*"
+ALLOWED_ORIGINS = "https://*.github.io,https://*.netlify.app,https://*.vercel.app,http://localhost:*,http://127.0.0.1:*,http://192.168.*:*,http://10.*:*"
 
 [observability]
 enabled = true

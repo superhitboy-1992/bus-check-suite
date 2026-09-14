@@ -30,7 +30,9 @@ export { hashString, normalizeEta, unwrapUpstream } from '../src/lib/live/upstre
 
 const DEFAULT_UPSTREAM = UPSTREAM_BASE;
 const DEFAULT_CITY = UPSTREAM_CITY_CODE;
-const DEFAULT_ALLOWED = 'https://*.github.io,http://localhost:*,http://127.0.0.1:*,http://192.168.*:*,http://10.*:*';
+// 浏览器对同源 POST 也会带 Origin，所以线上部署的域名必须在这里放行
+const DEFAULT_ALLOWED =
+  'https://*.github.io,https://*.netlify.app,https://*.vercel.app,http://localhost:*,http://127.0.0.1:*,http://192.168.*:*,http://10.*:*';
 
 const CACHE_TTL_SECONDS = {
   detail: 60 * 60 * 24,

@@ -67,17 +67,41 @@ describe('Netlify 同源转发函数', () => {
     expect((await res.json()).error).toBe('bad_request');
   });
 
-  it('页面来源在 CORS 白名单内时回显 Origin（线上 Pages 也能直接用这个函数）', async () => {
+  it('站点自身来源（同源 POST 也带 Origin）在白名单内，不被拦', async () => {
+    globalThis.fetch = vi.fn(async () =>
+      upstreamJson({
+        errCode: 0,
+        now: 1789401850001,
+        data: {
+          stopArriveInfo: { currentLicensePlate: '沪A-53935D', currentBusStopCount: '2' },
+          dispatchCarSchedule: {},
+        },
+      })
+    );
+    const res = await handler(
+      new Request('https://friendly-lily-0cb4b5.netlify.app/api/bus/eta', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Origin: 'https://friendly-lily-0cb4b5.netlify.app' },
+        body: JSON.stringify(etaBody),
+      })
+    );
+    expect(res.status).toBe(200);
+    expect(await res.json()).toMatchObject({ status: 'running' });
+    expect(res.headers.get('Access-Control-Allow-Origin')).toBe('https://friendly-lily-0cb4b5.netlify.app');
+  });
+
+  it('白名单放行 GitHub Pages 来源（Pages 版也能直接用这个函数）', async () => {
     globalThis.fetch = vi.fn(async () =>
       upstreamJson({ errCode: 0, now: 1, data: { stopArriveInfo: {}, dispatchCarSchedule: {} } })
     );
     const res = await handler(
-      new Request('https://bus.netlify.app/api/bus/eta', {
+      new Request('https://friendly-lily-0cb4b5.netlify.app/api/bus/eta', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Origin: 'https://superhitboy-1992.github.io' },
         body: JSON.stringify(etaBody),
       })
     );
+    expect(res.status).toBe(200);
     expect(res.headers.get('Access-Control-Allow-Origin')).toBe('https://superhitboy-1992.github.io');
   });
 });
